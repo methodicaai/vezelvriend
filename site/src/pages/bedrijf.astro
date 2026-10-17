@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+import world from '../../../config/world.json';
+---
+<Base title="Het bedrijf Vezelvriend">
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Het bedrijf</p>
+      <h1>{world.company}</h1>
+      <p class="lead">Een regionaal glasvezelbedrijf in {world.city} {world.district}, met ongeveer 25 medewerkers. Klein genoeg om iedereen te kennen, groot genoeg om rommelige systemen te hebben.</p>
+    </div>
+  </section>
+
+  <section class="sectie sectie--vlak">
+    <div class="wrap smal prose">
+      <p class="label">Let op</p>
+      <h2>Dit bedrijf bestaat niet</h2>
+      <p><strong>{world.company} is een fictief bedrijf.</strong> Het is geen echte internetaanbieder en heeft niets te maken met bestaande glasvezel- of telecombedrijven. Alle klanten, namen, telefoonnummers, MAC-adressen, IBAN's en adressen zijn verzonnen. Het modemmerk "Vezelbox" is ook verzonnen.</p>
+      <p>De adressen zijn voorlopig bedachte straatnamen. Lijkt iets toevallig op een echt persoon of adres, dan is dat niet zo bedoeld.</p>
+    </div>
+  </section>
+
+  <section class="sectie">
+    <div class="wrap smal prose">
+      <h2>Jouw rol vandaag</h2>
+      <p>Het is <strong>{world.clockLabel}</strong>. In de nepwereld staat de klok altijd op dit moment, zodat iedereen in de groep dezelfde situatie ziet. "Hoe oud is deze meting?" heeft dus voor iedereen hetzelfde antwoord.</p>
+      <p>Je werkt bij de klantenservice, of je bent businessanalist of tester in het team dat de klantsystemen verbetert. Klanten bellen met vragen over hun internet. Je hebt een AI-assistent, maar die kan niet in de systemen van Vezelvriend kijken. Wat de AI weet, weet hij van jou.</p>
+
+      <h2>Wie is wie</h2>
+      <div class="tabel-vak">
+        <table class="tabel">
+          <thead><tr><th>Wie</th><th>Wat</th></tr></thead>
+          <tbody>
+            <tr><td>Klantenservice</td><td>Neemt de telefoon op en gebruikt het Klantbeeld.</td></tr>
+            <tr><td>Daan</td><td>Netwerkbeheer. Krijgt de gevallen die niet in de beslisboom passen.</td></tr>
+            <tr><td>Monteurs</td><td>Gaan alleen op pad als het modem aantoonbaar niet goed werkt.</td></tr>
+            <tr><td>Productteam</td><td>Businessanalisten en testers die de klantsystemen verbeteren.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>De werkregel</h2>
+      <p>Er gaat pas een monteur als het modem <strong>aantoonbaar</strong> niet goed werkt. Een monteur kost geld en een dagdeel van de klant. Daarom werkt de klantenservice met een beslisboom, die je bij <a href="/systemen/">De systemen</a> vindt.</p>
+    </div>
+  </section>
+</Base>

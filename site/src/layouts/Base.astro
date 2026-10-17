@@ -1,0 +1,64 @@
+---
+// Shared page frame: fictional-company notice, header, footer.
+// The notice sits on every page on purpose: participants (and anyone who
+// lands here via a search engine) must never mistake Vezelvriend for a real ISP.
+import world from '../../../config/world.json';
+
+interface Props { title: string; description?: string; }
+const { title, description = 'Oefenomgeving van Methodica: leer AI goed inzetten met context, guardrails en oog voor valkuilen in data.' } = Astro.props;
+
+const nav = [
+  { href: '/', label: 'Start' },
+  { href: '/bedrijf/', label: 'Het bedrijf Vezelvriend' },
+  { href: '/systemen/', label: 'De systemen' },
+  { href: '/oefeningen/', label: 'Oefeningen' },
+  { href: '/over-methodica/', label: 'Over Methodica' },
+];
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => href === '/' ? path === '/' : path.startsWith(href);
+---
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{title} | Vezelvriend oefenomgeving</title>
+  <meta name="description" content={description}>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/fonts.css">
+  <link rel="stylesheet" href="/assets/theme.css">
+  <link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+  <a class="skip" href="#inhoud">Naar de inhoud</a>
+  <div class="fictief" role="note">
+    <p>{world.company} is een <strong>fictief bedrijf</strong>, bedacht voor de AI-training van Methodica. Het is geen echte internetaanbieder. Alle klanten, namen en nummers zijn verzonnen.</p>
+  </div>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="/">
+        <img src="/favicon.svg" alt="" width="28" height="28">
+        <span><span class="brand-name">Vezelvriend</span><br><span class="brand-sub">oefenomgeving van Methodica</span></span>
+      </a>
+      <nav aria-label="Hoofdmenu">
+        <ul class="nav-list">
+          {nav.map((item) => (
+            <li><a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <main id="inhoud">
+    <slot />
+  </main>
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="voet-naam">Methodica</p>
+      <p>AI is zo goed als de context die je meegeeft.</p>
+      <p>{world.company} ({world.city} {world.district}) is fictief. Code: MIT-licentie. Oefeningen en teksten: CC BY-NC 4.0. <a href="https://github.com/methodicaai/vezelvriend">Bekijk de broncode</a>.</p>
+      <p>Deze site gebruikt geen cookies en geen tracking.</p>
+    </div>
+  </footer>
+</body>
+</html>

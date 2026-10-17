@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="De systemen">
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">De systemen</p>
+      <h1>Nepsystemen die zich gedragen als echte</h1>
+      <p class="lead">De systemen van Vezelvriend zijn nagebouwd voor de training. Ze zijn eenvoudig, maar de data heeft de rommel van echte bedrijfssoftware.</p>
+    </div>
+  </section>
+
+  <section class="sectie sectie--vlak">
+    <div class="wrap">
+      <div class="kaarten">
+        <div class="kaart">
+          <p class="label">Beschikbaar</p>
+          <h3>Klantsysteem</h3>
+          <p>Lijst van alle klanten met contract en adres. Zoeken op naam, adres, postcode of klantnummer. Met een SQL-scherm waarin je zelf vragen aan de database stelt.</p>
+          <p><a class="meer" href="/klantsysteem/">Open het Klantsysteem</a></p>
+        </div>
+        <div class="kaart">
+          <p class="label">Beschikbaar</p>
+          <h3>Klantbeeld</h3>
+          <p>Het scherm dat je tijdens een telefoongesprek gebruikt: gespreksleidraad, klantgegevens, klanthistorie op het adres en techniek, met de knop "Modem controleren".</p>
+          <p><a class="meer" href="/klantbeeld/">Open het Klantbeeld</a></p>
+        </div>
+        <div class="kaart kaart--later">
+          <p class="label">Later</p>
+          <h3>Mail en documenten, servicedesk, backlog</h3>
+          <p>Deze systemen komen in een volgende versie. Tot die tijd staan losse documenten en mails in de map <code>data/</code> van de repository.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sectie">
+    <div class="wrap smal prose">
+      <h2>Waarom praat het systeem niet met de AI?</h2>
+      <p>De knop "Modem controleren" toont de modemgegevens alleen aan jou. Je AI-assistent kan ze niet zelf ophalen. Dat is bewust: jij kiest welke gegevens je overneemt in je prompt, en jij ziet of een meting oud is of of er een storing in de straat is. Wie dat vergeet, krijgt een antwoord dat goed klinkt maar nergens op gebaseerd is.</p>
+    </div>
+  </section>
+</Base>

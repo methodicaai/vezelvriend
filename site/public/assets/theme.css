@@ -1,0 +1,39 @@
+/* Methodica: het thema. Kleuren en lettertypen voor de hele site staan hier.
+   Wil je de sfeer aanpassen, verander dan alleen de waarden in dit bestand. */
+:root{
+  /* Kleuren */
+  --kleur-ink:#0B1F3A;            /* tekst en donkere vlakken */
+  --kleur-muted:#4A6070;          /* rustige tekst */
+  --kleur-accent:#E09B30;         /* accent op donker */
+  --kleur-accent-tekst:#8A5200;   /* accent als tekst op licht (goed leesbaar) */
+  --kleur-achtergrond:#FAFAF7;    /* pagina */
+  --kleur-vlak:#FFFFFF;           /* kaarten en banden */
+  --kleur-zacht:#EFEAE0;          /* rustige beeldvlakken */
+  --kleur-lijn:#E6E1D6;           /* dunne lijnen */
+  --kleur-donker:#0B1F3A;         /* menu, uitnodiging, voettekst */
+  --kleur-op-donker:#FFFFFF;
+  --kleur-op-donker-zacht:#B7C7D6;
+
+  /* Lettertypen: eerst het gewenste lettertype, dan een nette terugval */
+  --font-kop:'Instrument Serif',Georgia,'Times New Roman',serif;
+  --font-tekst:'DM Sans','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+
+  /* Vormen */
+  --radius:20px;
+  --radius-klein:12px;
+  --breedte:1100px;
+  --breedte-smal:860px;
+}
+
+@media (prefers-color-scheme:dark){
+  :root{
+    --kleur-ink:#EEF2F6;
+    --kleur-muted:#B3C2D1;
+    --kleur-accent-tekst:#F0B04F;
+    --kleur-achtergrond:#0E1B2C;
+    --kleur-vlak:#13263D;
+    --kleur-zacht:#1A3350;
+    --kleur-lijn:#26405B;
+    --kleur-donker:#0A1626;
+  }
+}
