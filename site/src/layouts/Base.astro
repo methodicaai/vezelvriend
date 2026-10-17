@@ -24,6 +24,9 @@ const isCurrent = (href: string) => href === '/' ? path === '/' : path.startsWit
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{title} | Vezelvriend oefenomgeving</title>
   <meta name="description" content={description}>
+  {/* Keep search engines out: a fictional ISP on a real domain must not show up
+      for people searching for a real internet outage. */}
+  <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/fonts.css">
   <link rel="stylesheet" href="/assets/theme.css">
