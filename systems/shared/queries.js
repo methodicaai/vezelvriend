@@ -67,7 +67,19 @@ export function getModemCheck(db, customerId) {
   const segment = db.prepare('SELECT network_segment FROM addresses WHERE address_id = ?').get(customer.address_id);
   const area = db.prepare('SELECT * FROM area_status WHERE network_segment = ?').get(segment.network_segment);
   const contract = db.prepare('SELECT * FROM contracts WHERE customer_id = ? AND end_date IS NULL').get(customerId);
+  // Other connections on the same street cable whose latest measurement is offline:
+  // tells "only this customer" apart from "the whole street".
+  const { offlineNeighbours } = db.prepare(`
+    SELECT COUNT(*) AS offlineNeighbours
+    FROM modems mo
+    JOIN customers c ON c.customer_id = mo.customer_id
+    JOIN addresses a ON a.address_id = c.address_id
+    JOIN modem_measurements mm ON mm.modem_id = mo.modem_id
+    WHERE a.network_segment = ? AND mo.modem_id <> ? AND mm.status = 'offline'
+      AND mm.measured_at = (SELECT MAX(measured_at) FROM modem_measurements WHERE modem_id = mo.modem_id)`)
+    .get(segment.network_segment, modem.modem_id);
   return {
+    offlineNeighbours,
     checkedAt: now,
     modem,
     firmwareLatest: world.latestFirmware,

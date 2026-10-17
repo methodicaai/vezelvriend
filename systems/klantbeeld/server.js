@@ -182,6 +182,7 @@ function modemResult(r) {
     `Firmware: ${r.modem.firmware} (nieuwste versie: ${r.firmwareLatest})`,
     `Laatste meting: ${measuredAt}`,
     `Straatstatus: ${area}`,
+    `Andere aansluitingen op dit netwerksegment offline: ${r.offlineNeighbours}`,
     `Laatste herstart op afstand: ${restart}`,
   ].join('\n');
 
@@ -194,12 +195,13 @@ function modemResult(r) {
         <tr><th scope="row">Firmware</th><td>${r.modem.firmware} <span class="uitleg">(nieuwste versie: ${r.firmwareLatest})</span></td></tr>
         <tr><th scope="row">Laatste meting</th><td>${measuredAt}</td></tr>
         <tr><th scope="row">Straatstatus</th><td>${r.area?.status === 'storing' ? html`<span class="status status--bad">storing</span> ` : html`<span class="status status--ok">normaal</span> `}${area}</td></tr>
+        <tr><th scope="row">Buren offline</th><td>${r.offlineNeighbours} andere aansluiting(en) op dit netwerksegment</td></tr>
         <tr><th scope="row">Laatste herstart op afstand</th><td>${restart}</td></tr>
       </tbody>
     </table></div>
     <h2>Als tekst</h2>
     <label class="uitleg" for="modemtekst">Selecteer en kopieer wat je nodig hebt. Denk na over wat je wel en niet aan een AI geeft.</label>
-    <textarea id="modemtekst" rows="9" readonly>${asText}</textarea>
+    <textarea id="modemtekst" rows="10" readonly>${asText}</textarea>
     <p class="uitleg">Klok in de oefenwereld: ${world.clockLabel}.</p>`;
 }
 

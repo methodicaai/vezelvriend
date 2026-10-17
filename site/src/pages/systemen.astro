@@ -1,5 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
+// Same file as docs/decision-tree.md, so the site and the repo never disagree.
+import { Content as DecisionTree } from '../../../docs/decision-tree.md';
 ---
 <Base title="De systemen">
   <section class="hero">
@@ -35,9 +37,15 @@ import Base from '../layouts/Base.astro';
   </section>
 
   <section class="sectie">
+    <div class="wrap smal">
+      <article class="markdown"><DecisionTree /></article>
+    </div>
+  </section>
+
+  <section class="sectie sectie--vlak">
     <div class="wrap smal prose">
       <h2>Waarom praat het systeem niet met de AI?</h2>
-      <p>De knop "Modem controleren" toont de modemgegevens alleen aan jou. Je AI-assistent kan ze niet zelf ophalen. Dat is bewust: jij kiest welke gegevens je overneemt in je prompt, en jij ziet of een meting oud is of of er een storing in de straat is. Wie dat vergeet, krijgt een antwoord dat goed klinkt maar nergens op gebaseerd is.</p>
+      <p>De knop "Modem controleren" toont de modemgegevens alleen aan jou. Je AI-assistent kan ze niet zelf ophalen. Dat is bewust: jij kiest welke gegevens je overneemt in je prompt, en jij ziet of een meting oud is en of er een storing in de straat is. Wie dat vergeet, krijgt een antwoord dat goed klinkt maar nergens op gebaseerd is.</p>
     </div>
   </section>
 </Base>
