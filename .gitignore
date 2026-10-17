@@ -23,3 +23,6 @@ Thumbs.db
 
 # Local editor/agent settings
 .claude/
+
+# Server-specific Docker settings (see docs/server.md)
+docker-compose.override.yml
