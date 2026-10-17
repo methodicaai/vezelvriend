@@ -1,0 +1,13 @@
+[
+  {"modem_id":"M-5001","customer_id":"K-1001","model":"Vezelbox VB-200","serial_number":"VB200-024017","mac_address":"02:56:46:00:50:01","firmware":"4.2.1"},
+  {"modem_id":"M-5002","customer_id":"K-1002","model":"Vezelbox VB-200","serial_number":"VB200-024054","mac_address":"02:56:46:00:50:02","firmware":"4.2.1"},
+  {"modem_id":"M-5003","customer_id":"K-1003","model":"Vezelbox VB-200","serial_number":"VB200-024091","mac_address":"02:56:46:00:50:03","firmware":"4.2.1"},
+  {"modem_id":"M-5004","customer_id":"K-1004","model":"Vezelbox VB-200","serial_number":"VB200-024128","mac_address":"02:56:46:00:50:04","firmware":"4.2.1"},
+  {"modem_id":"M-5005","customer_id":"K-1005","model":"Vezelbox VB-200","serial_number":"VB200-024165","mac_address":"02:56:46:00:50:05","firmware":"3.8.0"},
+  {"modem_id":"M-5006","customer_id":"K-1006","model":"Vezelbox VB-200","serial_number":"VB200-024202","mac_address":"02:56:46:00:50:06","firmware":"4.1.0"},
+  {"modem_id":"M-5007","customer_id":"K-1007","model":"Vezelbox VB-200","serial_number":"VB200-024239","mac_address":"02:56:46:00:50:07","firmware":"4.2.1"},
+  {"modem_id":"M-5008","customer_id":"K-1008","model":"Vezelbox VB-200","serial_number":"VB200-024276","mac_address":"02:56:46:00:50:08","firmware":"4.2.1"},
+  {"modem_id":"M-5009","customer_id":"K-1009","model":"Vezelbox VB-200","serial_number":"VB200-024313","mac_address":"02:56:46:00:50:09","firmware":"4.2.1"},
+  {"modem_id":"M-5010","customer_id":"K-1010","model":"Vezelbox VB-200","serial_number":"VB200-024350","mac_address":"02:56:46:00:50:10","firmware":"4.2.1"},
+  {"modem_id":"M-5011","customer_id":"K-1011","model":"Vezelbox VB-200","serial_number":"VB200-024387","mac_address":"02:56:46:00:50:11","firmware":"4.2.1"}
+]

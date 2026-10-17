@@ -1,0 +1,15 @@
+[
+  {"measurement_id":"MM-90001","modem_id":"M-5001","measured_at":"2026-10-17 08:30","status":"online","session":"actief","download_mbps":472,"upload_mbps":468},
+  {"measurement_id":"MM-90002","modem_id":"M-5001","measured_at":"2026-10-17 10:11","status":"offline","session":"geen sessie","download_mbps":0,"upload_mbps":0},
+  {"measurement_id":"MM-90003","modem_id":"M-5002","measured_at":"2026-10-17 10:09","status":"online","session":"actief","download_mbps":941,"upload_mbps":938},
+  {"measurement_id":"MM-90004","modem_id":"M-5003","measured_at":"2026-10-17 07:12","status":"offline","session":"geen sessie","download_mbps":0,"upload_mbps":0},
+  {"measurement_id":"MM-90005","modem_id":"M-5004","measured_at":"2026-10-17 09:58","status":"offline","session":"geen sessie","download_mbps":0,"upload_mbps":0},
+  {"measurement_id":"MM-90006","modem_id":"M-5004","measured_at":"2026-10-17 10:07","status":"offline","session":"geen sessie","download_mbps":0,"upload_mbps":0},
+  {"measurement_id":"MM-90007","modem_id":"M-5005","measured_at":"2026-10-17 10:02","status":"wisselend","session":"onderbroken (11x in het afgelopen uur)","download_mbps":118,"upload_mbps":41},
+  {"measurement_id":"MM-90008","modem_id":"M-5006","measured_at":"2026-10-17 10:11","status":"offline","session":"geen sessie","download_mbps":0,"upload_mbps":0},
+  {"measurement_id":"MM-90009","modem_id":"M-5007","measured_at":"2026-10-17 10:10","status":"offline","session":"geen sessie","download_mbps":0,"upload_mbps":0},
+  {"measurement_id":"MM-90010","modem_id":"M-5008","measured_at":"2026-10-17 10:05","status":"online","session":"actief","download_mbps":96,"upload_mbps":95},
+  {"measurement_id":"MM-90011","modem_id":"M-5009","measured_at":"2026-10-17 10:13","status":"online","session":"actief","download_mbps":912,"upload_mbps":897},
+  {"measurement_id":"MM-90012","modem_id":"M-5010","measured_at":"2026-10-17 10:01","status":"online","session":"actief","download_mbps":488,"upload_mbps":471},
+  {"measurement_id":"MM-90013","modem_id":"M-5011","measured_at":"2026-10-17 10:08","status":"online","session":"actief","download_mbps":463,"upload_mbps":470}
+]

@@ -1,0 +1,14 @@
+{
+  "_comment": "Gespreksleidraad voor de klantenservice, getoond in het Klantbeeld.",
+  "title": "Gespreksleidraad: klant meldt een probleem met internet",
+  "version": "2026-05",
+  "steps": [
+    { "title": "Begroeten", "text": "Noem je voornaam en Vezelvriend. Vraag hoe je de klant kunt helpen." },
+    { "title": "Identiteit controleren", "text": "Vraag naar postcode en huisnummer en controleer de naam. Geef geen gegevens door voordat dit klopt." },
+    { "title": "Probleem uitvragen", "text": "Wat werkt er niet, sinds wanneer, en op welke apparaten? Werkt het via een netwerkkabel wel?" },
+    { "title": "Modem controleren", "text": "Klik op 'Modem controleren' op het tabblad Techniek en loop de beslisboom door." },
+    { "title": "Storing in de straat", "text": "Is er een storing in de straat? Zeg: 'We weten ervan en werken eraan. Storingen worden binnen 4 uur verholpen.' Koppel het gesprek aan het storingsticket." },
+    { "title": "Afspraak maken", "text": "Spreek af wat de klant van ons hoort en wanneer. Beloof alleen wat in je eigen macht ligt." },
+    { "title": "Vastleggen", "text": "Leg het gesprek vast in de klanthistorie. Zet geen bankgegevens of wachtwoorden in de notitie." }
+  ]
+}

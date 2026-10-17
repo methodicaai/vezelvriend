@@ -1,0 +1,15 @@
+[
+  {"contract_id":"C-0871","customer_id":"K-0871","product":"Vezel 100","download_mbps":100,"upload_mbps":100,"monthly_fee_eur":39.5,"start_date":"2018-05-01","end_date":"2025-10-15"},
+  {"contract_id":"C-3001","customer_id":"K-1001","product":"Vezel 500","download_mbps":500,"upload_mbps":500,"monthly_fee_eur":49.5,"start_date":"2021-03-01","end_date":null},
+  {"contract_id":"C-3002","customer_id":"K-1002","product":"Vezel 1000","download_mbps":1000,"upload_mbps":1000,"monthly_fee_eur":59.5,"start_date":"2022-06-15","end_date":null},
+  {"contract_id":"C-3003","customer_id":"K-1003","product":"Vezel 500","download_mbps":500,"upload_mbps":500,"monthly_fee_eur":49.5,"start_date":"2023-01-10","end_date":null},
+  {"contract_id":"C-3004","customer_id":"K-1004","product":"Vezel 1000","download_mbps":1000,"upload_mbps":1000,"monthly_fee_eur":59.5,"start_date":"2025-11-01","end_date":null},
+  {"contract_id":"C-3005","customer_id":"K-1005","product":"Zakelijk Vezel 500","download_mbps":500,"upload_mbps":500,"monthly_fee_eur":79,"start_date":"2020-04-01","end_date":null},
+  {"contract_id":"C-3006","customer_id":"K-1006","product":"Vezel 500","download_mbps":500,"upload_mbps":500,"monthly_fee_eur":49.5,"start_date":"2022-02-01","end_date":null},
+  {"contract_id":"C-3007","customer_id":"K-1007","product":"Zakelijk Vezel 500","download_mbps":500,"upload_mbps":500,"monthly_fee_eur":79,"start_date":"2021-09-01","end_date":null},
+  {"contract_id":"C-3008","customer_id":"K-1008","product":"Vezel 100","download_mbps":100,"upload_mbps":100,"monthly_fee_eur":39.5,"start_date":"2024-03-15","end_date":null},
+  {"contract_id":"C-3009","customer_id":"K-1009","product":"Vezel 1000","download_mbps":1000,"upload_mbps":1000,"monthly_fee_eur":59.5,"start_date":"2023-07-01","end_date":null},
+  {"contract_id":"C-3010","customer_id":"K-1010","product":"Vezel 500","download_mbps":500,"upload_mbps":500,"monthly_fee_eur":49.5,"start_date":"2022-11-01","end_date":null},
+  {"contract_id":"C-3011","customer_id":"K-1011","product":"Vezel 500","download_mbps":500,"upload_mbps":500,"monthly_fee_eur":49.5,"start_date":"2024-08-01","end_date":null},
+  {"contract_id":"C-3012","customer_id":"K-1012","product":"Vezel 100","download_mbps":100,"upload_mbps":100,"monthly_fee_eur":39.5,"start_date":"2019-02-01","end_date":null}
+]

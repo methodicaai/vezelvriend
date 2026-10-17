@@ -1,0 +1,7 @@
+[
+  {"network_segment":"S-KABEL","status":"storing","since":"2026-10-17 08:40","ticket_id":"INC-2026-0412","description":"Kabel geraakt bij graafwerkzaamheden. Netwerkbeheer is ter plaatse."},
+  {"network_segment":"S-GLAS","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-LICHT","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-ROUTER","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-MODEM","status":"normaal","since":null,"ticket_id":null,"description":null}
+]

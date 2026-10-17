@@ -1,0 +1,13 @@
+[
+  {"address_id":"A-2001","map_label":"Kabelkade 14","network_segment":"S-KABEL","splitter":"SPL-KAB-01"},
+  {"address_id":"A-2002","map_label":"Kabelkade 18","network_segment":"S-KABEL","splitter":"SPL-KAB-01"},
+  {"address_id":"A-2003","map_label":"Kabelkade 2","network_segment":"S-KABEL","splitter":"SPL-KAB-01"},
+  {"address_id":"A-2004","map_label":"Glasvezelstraat 3","network_segment":"S-GLAS","splitter":"SPL-GLS-01"},
+  {"address_id":"A-2005","map_label":"Glasvezelstraat 11","network_segment":"S-GLAS","splitter":"SPL-GLS-01"},
+  {"address_id":"A-2006","map_label":"Lichtsnelheidslaan 7-b","network_segment":"S-LICHT","splitter":"SPL-LCH-02"},
+  {"address_id":"A-2007","map_label":"Lichtsnelheidlaan 19","network_segment":"S-LICHT","splitter":"SPL-LCH-01"},
+  {"address_id":"A-2008","map_label":"Routerpad 22","network_segment":"S-ROUTER","splitter":"SPL-RTR-01"},
+  {"address_id":"A-2009","map_label":"Routerpad 5","network_segment":"S-ROUTER","splitter":"SPL-RTR-01"},
+  {"address_id":"A-2010","map_label":"Modemhof 3","network_segment":"S-MODEM","splitter":"SPL-MDM-01"},
+  {"address_id":"A-2011","map_label":"Modemhof 9","network_segment":"S-MODEM","splitter":"SPL-MDM-01"}
+]

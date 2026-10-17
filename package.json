@@ -1,0 +1,14 @@
+{
+  "name": "vezelvriend",
+  "private": true,
+  "type": "module",
+  "description": "Oefenomgeving van Methodica: het fictieve glasvezelbedrijf Vezelvriend B.V.",
+  "license": "MIT",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node systems/start-all.js",
+    "klantsysteem": "node systems/klantsysteem/server.js",
+    "klantbeeld": "node systems/klantbeeld/server.js",
+    "site": "npm --prefix site run dev"
+  }
+}

@@ -1,0 +1,35 @@
+# Starts the whole Vezelvriend training environment:
+#   docker compose up --build
+# then open http://localhost:8080
+#
+# Only the gateway is published, and only on 127.0.0.1: on the server,
+# Nginx Proxy Manager forwards the public domain to it (see docs/server.md).
+services:
+  gateway:
+    build: { context: ., dockerfile: gateway/Dockerfile }
+    ports:
+      - "127.0.0.1:${VEZELVRIEND_PORT:-8080}:80"
+    depends_on: [klantsysteem, klantbeeld]
+    restart: unless-stopped
+
+  klantsysteem:
+    build: { context: ., dockerfile: systems/Dockerfile }
+    command: ["node", "systems/klantsysteem/server.js"]
+    environment:
+      BASE_PATH: /klantsysteem
+      KLANTBEELD_URL: /klantbeeld
+    restart: unless-stopped
+    mem_limit: 256m
+    read_only: true          # the database is rebuilt in /tmp on every start
+    tmpfs: [/tmp]
+
+  klantbeeld:
+    build: { context: ., dockerfile: systems/Dockerfile }
+    command: ["node", "systems/klantbeeld/server.js"]
+    environment:
+      BASE_PATH: /klantbeeld
+      KLANTSYSTEEM_URL: /klantsysteem
+    restart: unless-stopped
+    mem_limit: 256m
+    read_only: true
+    tmpfs: [/tmp]

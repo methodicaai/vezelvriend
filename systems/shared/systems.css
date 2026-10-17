@@ -1,0 +1,67 @@
+/* Styling of the fake business systems. Deliberately a bit plainer than the
+   site: these screens imitate internal company software. Colours follow the
+   methodica.nl theme so everything still feels like one training. */
+:root{
+  --ink:#0B1F3A;--muted:#4A6070;--accent:#E09B30;--accent-text:#8A5200;
+  --bg:#F3F1EC;--panel:#FFFFFF;--soft:#EFEAE0;--line:#DDD7CA;--dark:#0B1F3A;
+  --ok:#1E6B3A;--ok-bg:#E3F2E7;--bad:#9B1C1C;--bad-bg:#FBE4E4;--warn:#7A4B00;--warn-bg:#FDF0D5;
+  --font:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  --mono:Consolas,'Cascadia Mono','Courier New',monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{--ink:#EEF2F6;--muted:#B3C2D1;--accent-text:#F0B04F;--bg:#0E1B2C;--panel:#13263D;--soft:#1A3350;--line:#26405B;--dark:#0A1626;
+    --ok:#9FE0B2;--ok-bg:#163A26;--bad:#F2B8B5;--bad-bg:#4A1C1C;--warn:#F6D28B;--warn-bg:#46350F}
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--font)}
+a{color:var(--accent-text)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.fictief{background:var(--accent);color:#0B1F3A;font-size:.85rem;font-weight:600;text-align:center;padding:.35rem 1rem}
+.balk{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.5rem;background:var(--dark);color:#fff;padding:.6rem 1.25rem}
+.balk .systeem{color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none}
+.balk nav{display:flex;gap:1rem;flex-wrap:wrap}
+.balk nav a{color:#B7C7D6;text-decoration:none}
+.balk nav a:hover{color:#fff}
+.klok{margin-left:auto;color:#B7C7D6;font-size:.9rem;font-variant-numeric:tabular-nums}
+main{max-width:1200px;margin:0 auto;padding:1.25rem}
+h1{font-size:1.5rem;margin:.25rem 0 1rem}
+h2{font-size:1.15rem;margin:1.5rem 0 .6rem}
+.paneel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem}
+.uitleg{color:var(--muted);max-width:75ch}
+.zoek{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.zoek input[type=search]{flex:1;min-width:14rem}
+input,textarea,select{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.5rem .7rem}
+textarea{width:100%;font-family:var(--mono);font-size:.9rem}
+button,.knop{font:inherit;font-weight:600;background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:.55rem 1rem;cursor:pointer;text-decoration:none;display:inline-block}
+button:hover,.knop:hover{background:var(--accent-text);color:#fff}
+.knop--licht{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.tabel-vak{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft)}
+tbody tr:last-child td{border-bottom:0}
+td{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);font-size:.88rem}
+.status{display:inline-block;padding:.1rem .55rem;border-radius:999px;font-size:.82rem;font-weight:700}
+.status--ok{background:var(--ok-bg);color:var(--ok)}
+.status--bad{background:var(--bad-bg);color:var(--bad)}
+.status--warn{background:var(--warn-bg);color:var(--warn)}
+.status--uit{background:var(--soft);color:var(--muted)}
+.kop-klant{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem 1rem;margin-bottom:.75rem}
+.kop-klant h1{margin:0}
+.kop-klant .sub{color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:.25rem;border-bottom:2px solid var(--line);margin-bottom:1rem}
+.tabs a{padding:.55rem 1rem;text-decoration:none;color:var(--muted);font-weight:600;border-radius:8px 8px 0 0}
+.tabs a:hover{color:var(--ink);background:var(--soft)}
+.tabs a[aria-current=page]{color:var(--ink);background:var(--panel);border:2px solid var(--line);border-bottom-color:var(--panel);margin-bottom:-2px}
+dl.gegevens{display:grid;grid-template-columns:minmax(10rem,max-content) 1fr;gap:.35rem 1.25rem;margin:0}
+dl.gegevens dt{color:var(--muted)}
+dl.gegevens dd{margin:0}
+ol.leidraad{padding-left:1.25rem;margin:0}
+ol.leidraad li{margin-bottom:.6rem}
+.melding{border-left:4px solid var(--accent);background:var(--soft);padding:.6rem .9rem;border-radius:0 8px 8px 0;margin:.75rem 0}
+.fout{border-left-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+.kolommen{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:1rem}
+pre.schema{white-space:pre-wrap;font-family:var(--mono);font-size:.82rem;max-height:28rem;overflow:auto;background:var(--soft);padding:.75rem;border-radius:8px;margin:0}
+.leeg{color:var(--muted);font-style:italic}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
