@@ -1,0 +1,4 @@
+customer_id;customer_name;invoice_id;invoice_date;amount_eur;status
+K-1005;Bloemenhuis Lente;F-2026-0905;2026-09-01;85.00;open
+K-1005;Bloemenhuis Lente;F-2026-1005;2026-10-01;42.50;open
+K-1010;R. Hendriks;F-2026-1010;2026-10-01;15.00;open

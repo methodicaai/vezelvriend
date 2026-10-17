@@ -1,0 +1,2 @@
+// Trainer test with the expected outcome of the five modem scenarios.
+// The real file lives in the private repo. Run: node --test "trainer-private/tests/*.test.js"
