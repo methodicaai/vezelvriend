@@ -1,0 +1,25 @@
+# Trainer material: answers, pitfall register, expected outcomes.
+# NEVER commit this folder. It moves to the private repo methodicaai/vezelvriend-trainer.
+trainer-private/
+
+# Generated: the SQLite database is rebuilt from data/ on every start,
+# so the JSON seed files stay the single, readable source of truth.
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Secrets never belong in this repo.
+.env
+.env.*
+*.pem
+*.key
+
+node_modules/
+site/dist/
+site/.astro/
+.DS_Store
+Thumbs.db
+
+# Local editor/agent settings
+.claude/

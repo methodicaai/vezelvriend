@@ -1,0 +1,12 @@
+{
+  "_comment": "One place for the settings of the fictional world. See docs/change-city.md.",
+  "company": "Vezelvriend B.V.",
+  "city": "Breda",
+  "district": "Centrum",
+  "clock": "2026-10-17T10:15",
+  "clockLabel": "zaterdag 17-10-2026 10:15",
+  "measurementMaxAgeMinutes": 15,
+  "normalSpeedRatio": 0.7,
+  "latestFirmware": "4.2.1",
+  "networkManagementContact": "Daan (netwerkbeheer)"
+}
