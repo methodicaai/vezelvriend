@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/CompanyLayout.astro';
+import Vlak from '../components/Vlak.astro';
 import { world, getPlans, euro } from '../world';
 const plans = getPlans().filter((p) => !p.business);
 const cheapest = Math.min(...plans.map((p) => p.fee));
@@ -19,23 +20,11 @@ const cheapest = Math.min(...plans.map((p) => p.fee));
   <section class="vv-sectie">
     <div class="wrap">
       <h2>Waarom Vezelvriend?</h2>
-      <div class="vv-kaarten">
-        <div class="vv-kaart">
-          <span class="vv-icoon" aria-hidden="true">⚡</span>
-          <h3>Echt glasvezel</h3>
-          <p>Glasvezel tot in je meterkast, met de Vezelbox als modem. Even snel uploaden als downloaden.</p>
-        </div>
-        <div class="vv-kaart">
-          <span class="vv-icoon" aria-hidden="true">🏘️</span>
-          <h3>Lokaal</h3>
-          <p>Ons team van zo'n 25 mensen zit in {world.city}. Onze monteurs kennen de wijk.</p>
-        </div>
-        <div class="vv-kaart">
-          <span class="vv-icoon" aria-hidden="true">📞</span>
-          <h3>Klantenservice die meedenkt</h3>
-          <p>Ook op zaterdag. We kijken eerst samen wat er aan de hand is, en sturen pas een monteur als dat echt nodig is.</p>
-        </div>
-      </div>
+      <Vlak columns={3} items={[
+        { label: 'Glasvezel', title: 'Echt glasvezel', text: 'Glasvezel tot in je meterkast, met de Vezelbox als modem. Even snel uploaden als downloaden.', href: '/internet/', linkLabel: 'Bekijk de abonnementen' },
+        { label: 'Lokaal', title: `Uit ${world.city}`, text: `Ons team van zo'n 25 mensen zit in ${world.city}. Onze monteurs kennen de wijk.`, href: '/over-ons/', linkLabel: 'Over ons' },
+        { label: 'Service', title: 'Klantenservice die meedenkt', text: 'Ook op zaterdag. We kijken eerst samen wat er aan de hand is, en sturen pas een monteur als dat echt nodig is.', href: '/service/', linkLabel: 'Naar service' },
+      ]} />
     </div>
   </section>
 

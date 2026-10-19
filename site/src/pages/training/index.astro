@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/TrainingLayout.astro';
+import Vlak from '../../components/Vlak.astro';
 ---
 <Base title="Start">
   <section class="hero">
@@ -14,26 +15,14 @@ import Base from '../../layouts/TrainingLayout.astro';
     </div>
   </section>
 
-  <section class="sectie sectie--vlak">
+  <section class="sectie">
     <div class="wrap">
       <h2>Wat je hier leert</h2>
-      <div class="kaarten">
-        <div class="kaart">
-          <p class="label">Context</p>
-          <h3>Geef de AI wat jij ziet</h3>
-          <p>Een AI weet niets van jouw klant, jouw systemen of het tijdstip. Je oefent met wat je wel en niet meegeeft, en ziet wat dat doet met het antwoord.</p>
-        </div>
-        <div class="kaart">
-          <p class="label">Guardrails</p>
-          <h3>Spreek af wat niet mag</h3>
-          <p>Je schrijft regels voor wat de AI wel en niet mag adviseren, zodat een goed klinkend antwoord geen verkeerde beslissing wordt.</p>
-        </div>
-        <div class="kaart">
-          <p class="label">Valkuilen</p>
-          <h3>Vertrouw de data niet blind</h3>
-          <p>Ook in nepdata zitten de fouten van echte systemen. Je leert ze herkennen voordat je ze aan een AI voert.</p>
-        </div>
-      </div>
+      <Vlak columns={3} items={[
+        { label: 'Context', title: 'Geef de AI wat jij ziet', text: 'Een AI weet niets van jouw klant, jouw systemen of het tijdstip. Je oefent met wat je wel en niet meegeeft, en ziet wat dat doet met het antwoord.', href: '/training/oefeningen/01-context/', linkLabel: 'Naar oefening 1' },
+        { label: 'Guardrails', title: 'Spreek af wat niet mag', text: 'Je schrijft regels voor wat de AI wel en niet mag adviseren, zodat een goed klinkend antwoord geen verkeerde beslissing wordt.', href: '/training/oefeningen/02-guardrails/', linkLabel: 'Naar oefening 2' },
+        { label: 'Valkuilen', title: 'Vertrouw de data niet blind', text: 'Ook in nepdata zitten de fouten van echte systemen. Je leert ze herkennen voordat je ze aan een AI voert.', href: '/training/oefeningen/05-data-pitfall/', linkLabel: 'Naar oefening 5' },
+      ]} />
     </div>
   </section>
 

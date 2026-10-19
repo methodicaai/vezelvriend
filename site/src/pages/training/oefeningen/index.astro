@@ -1,5 +1,6 @@
 ---
 import Base from '../../../layouts/TrainingLayout.astro';
+import Vlak from '../../../components/Vlak.astro';
 import { getExercises } from '../../../exercises';
 const exercises = getExercises();
 ---
@@ -11,19 +12,16 @@ const exercises = getExercises();
       <p class="lead">Elke oefening heeft een doel, een opdracht, een voorbeeldprompt zonder en met context, en een reflectievraag. Antwoorden staan er bewust niet bij: die bespreek je met de trainer.</p>
     </div>
   </section>
-  <section class="sectie sectie--vlak">
+  <section class="sectie">
     <div class="wrap">
       {exercises.length === 0 && <p>De oefeningen komen binnenkort.</p>}
-      <div class="kaarten">
-        {exercises.map((ex) => (
-          <div class="kaart">
-            <p class="label">Oefening {ex.number} · {ex.role}</p>
-            <h3>{ex.title}</h3>
-            <p>{ex.summary}</p>
-            <p><a class="meer" href={`/training/oefeningen/${ex.slug}/`}>Naar de oefening</a></p>
-          </div>
-        ))}
-      </div>
+      <Vlak items={exercises.map((ex) => ({
+        label: `Oefening ${ex.number} · ${ex.role}`,
+        title: ex.title,
+        text: ex.summary,
+        href: `/training/oefeningen/${ex.slug}/`,
+        linkLabel: 'Naar de oefening',
+      }))} />
     </div>
   </section>
 </Base>

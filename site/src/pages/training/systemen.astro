@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/TrainingLayout.astro';
+import Vlak from '../../components/Vlak.astro';
 // Same file as docs/decision-tree.md, so the site and the repo never disagree.
 import { Content as DecisionTree } from '../../../../docs/decision-tree.md';
 ---
@@ -12,33 +13,14 @@ import { Content as DecisionTree } from '../../../../docs/decision-tree.md';
     </div>
   </section>
 
-  <section class="sectie sectie--vlak">
+  <section class="sectie">
     <div class="wrap">
-      <div class="kaarten">
-        <div class="kaart">
-          <p class="label">Beschikbaar</p>
-          <h3>Website vezelvriend.nl</h3>
-          <p>De website van het bedrijf, zoals klanten hem zien: abonnementen, storingen, service en servicevoorwaarden. Ook een bron, en net als in het echt niet altijd in lijn met wat intern wordt gezegd.</p>
-          <p><a class="meer" href="/">Open de website</a></p>
-        </div>
-        <div class="kaart">
-          <p class="label">Beschikbaar</p>
-          <h3>Klantsysteem</h3>
-          <p>Lijst van alle klanten met contract en adres. Zoeken op naam, adres, postcode of klantnummer. Met een SQL-scherm waarin je zelf vragen aan de database stelt.</p>
-          <p><a class="meer" href="/klantsysteem/">Open het Klantsysteem</a></p>
-        </div>
-        <div class="kaart">
-          <p class="label">Beschikbaar</p>
-          <h3>Klantbeeld</h3>
-          <p>Het scherm dat je tijdens een telefoongesprek gebruikt: gespreksleidraad, klantgegevens, klanthistorie op het adres en techniek, met de knop "Modem controleren".</p>
-          <p><a class="meer" href="/klantbeeld/">Open het Klantbeeld</a></p>
-        </div>
-        <div class="kaart kaart--later">
-          <p class="label">Later</p>
-          <h3>Mail en documenten, servicedesk, backlog</h3>
-          <p>Deze systemen komen in een volgende versie. Tot die tijd staan losse documenten en mails in de map <code>data/</code> van de repository.</p>
-        </div>
-      </div>
+      <Vlak items={[
+        { label: 'Beschikbaar', title: 'Website vezelvriend.nl', text: 'De website van het bedrijf, zoals klanten hem zien: abonnementen, storingen, service en servicevoorwaarden. Ook een bron, en net als in het echt niet altijd in lijn met wat intern wordt gezegd.', href: '/', linkLabel: 'Open de website' },
+        { label: 'Beschikbaar', title: 'Klantsysteem', text: 'Lijst van alle klanten met contract en adres. Zoeken op naam, adres, postcode of klantnummer. Met een SQL-scherm waarin je zelf vragen aan de database stelt.', href: '/klantsysteem/', linkLabel: 'Open het Klantsysteem' },
+        { label: 'Beschikbaar', title: 'Klantbeeld', text: 'Het scherm dat je tijdens een telefoongesprek gebruikt: gespreksleidraad, klantgegevens, klanthistorie op het adres en techniek, met de knop "Modem controleren".', href: '/klantbeeld/', linkLabel: 'Open het Klantbeeld' },
+        { label: 'Later', title: 'Mail en documenten, servicedesk, backlog', text: 'Deze systemen komen in een volgende versie. Tot die tijd staan losse documenten en mails in de map data/ van de repository.', href: 'https://github.com/methodicaai/vezelvriend/tree/main/data', linkLabel: 'Bekijk de map data' },
+      ]} />
     </div>
   </section>
 

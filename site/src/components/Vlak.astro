@@ -1,0 +1,29 @@
+---
+// Card grid in the methodica.nl style ("tweedeling"): one surface split into
+// cells with shared lines and rounded outer corners only. The first cell is
+// tinted. Each cell: small label, large serif heading, text, link with arrow.
+//
+// House rule: every card grid on a new page uses this component, so all
+// pages look the same. Styling: .vlak in public/assets/site.css (training)
+// and public/vv/vezelvriend.css (company website).
+interface Item { label?: string; title: string; text?: string; href?: string; linkLabel?: string; }
+interface Props { items: Item[]; columns?: 2 | 3; }
+const { items, columns = 2 } = Astro.props;
+const external = (href: string) => href.startsWith('http');
+---
+<div class={`vlak vlak--${columns}`}>
+  {items.map((item, i) => (
+    <div class={`vlak-vak${i === 0 ? ' vlak-vak--accent' : ''}`}>
+      {item.label && <p class="vlak-label">{item.label}</p>}
+      <h3>{item.title}</h3>
+      {item.text && <p>{item.text}</p>}
+      {item.href && (
+        <p class="vlak-link">
+          <a href={item.href} target={external(item.href) ? '_blank' : undefined} rel={external(item.href) ? 'noopener' : undefined}>
+            {item.linkLabel ?? 'Lees verder'}<span aria-hidden="true"> →</span>
+          </a>
+        </p>
+      )}
+    </div>
+  ))}
+</div>
