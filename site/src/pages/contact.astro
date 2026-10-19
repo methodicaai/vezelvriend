@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/CompanyLayout.astro';
+import { world } from '../world';
+---
+<Layout title="Contact">
+  <section class="vv-hero vv-hero--klein">
+    <div class="wrap">
+      <h1>Contact</h1>
+      <p>Onze klantenservice helpt je graag.</p>
+    </div>
+  </section>
+  <section class="vv-sectie">
+    <div class="wrap vv-tekst">
+      <div class="vv-melding">
+        <p><strong>Dit is een oefenbedrijf.</strong> Je kunt {world.company} niet echt bellen of mailen, en er is geen klantenservice die je helpt. Heb je een vraag over de training? Neem dan contact op met je trainer of met <a href="https://methodica.nl/">Methodica</a>.</p>
+      </div>
+      <h2>Klantenservice (in de oefenwereld)</h2>
+      <ul>
+        <li>Telefoon: 076 000 00 00 (verzonnen nummer, niet bellen)</li>
+        <li>Maandag tot en met zaterdag van 08:00 tot 20:00</li>
+        <li>Kantoor: {world.city} {world.district}</li>
+      </ul>
+      <h2>Storing?</h2>
+      <p>Kijk eerst op de <a href="/storingen/">storingspagina</a> of er een storing in je straat is.</p>
+    </div>
+  </section>
+</Layout>

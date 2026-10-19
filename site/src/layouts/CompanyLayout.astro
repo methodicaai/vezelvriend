@@ -1,0 +1,100 @@
+---
+// Page frame of the fictional company website (vezelvriend.nl).
+// Own house style (/vv/vezelvriend.css), clearly different from the training
+// pages. The fictional-company notice sits on every page: a fake internet
+// provider on a real domain must never be mistaken for a real one.
+import { world, getOutages, timeOf } from '../world';
+
+interface Props { title: string; description?: string; }
+const { title, description = `${world.company} is een fictief glasvezelbedrijf, bedacht voor de AI-training van Methodica.` } = Astro.props;
+
+const nav = [
+  { href: '/internet/', label: 'Internet' },
+  { href: '/storingen/', label: 'Storingen' },
+  { href: '/service/', label: 'Service' },
+  { href: '/over-ons/', label: 'Over ons' },
+  { href: '/contact/', label: 'Contact' },
+];
+const path = Astro.url.pathname;
+const outages = getOutages();
+---
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{title} | {world.company} (fictief)</title>
+  <meta name="description" content={description}>
+  {/* Keep search engines out: a fictional ISP on a real domain must not show up
+      for people searching for a real internet outage. */}
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/vv/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/vv/vezelvriend.css">
+</head>
+<body>
+  <a class="skip" href="#inhoud">Naar de inhoud</a>
+  <div class="fictief" role="note">
+    <p><strong>Let op: {world.company} is een fictief bedrijf</strong>, bedacht voor de AI-training van Methodica. Geen echte internetaanbieder; alle namen, nummers en adressen zijn verzonnen. <a href="/training/">Naar de training</a></p>
+  </div>
+  <header class="vv-header">
+    <div class="wrap vv-bar">
+      <a class="vv-logo" href="/">
+        <img src="/vv/logo.svg" alt="" width="38" height="38">
+        <span>vezel<span>vriend</span></span>
+      </a>
+      <nav class="vv-nav" aria-label="Hoofdmenu">
+        <ul>
+          {nav.map((item) => (
+            <li><a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>{item.label}</a></li>
+          ))}
+          <li><a class="vv-cta" href="/bestellen/">Bestellen</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  {outages.length > 0 && (
+    <div class="vv-storing" role="status">
+      <div class="wrap">
+        <p><strong>Storing</strong> in {outages.flatMap((o) => o.streets).join(', ')} sinds {timeOf(outages[0].since)}. We werken eraan. <a href="/storingen/">Bekijk de storingen</a></p>
+      </div>
+    </div>
+  )}
+  <main id="inhoud">
+    <slot />
+  </main>
+  <footer class="vv-footer">
+    <div class="wrap">
+      <div class="vv-voet">
+        <div>
+          <h2>Internet</h2>
+          <ul>
+            <li><a href="/internet/">Abonnementen</a></li>
+            <li><a href="/internet/#zakelijk">Zakelijk</a></li>
+            <li><a href="/bestellen/">Bestellen</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2>Hulp</h2>
+          <ul>
+            <li><a href="/storingen/">Storingen</a></li>
+            <li><a href="/service/">Service en veelgestelde vragen</a></li>
+            <li><a href="/service/voorwaarden/">Servicevoorwaarden</a></li>
+            <li><a href="/contact/">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2>Vezelvriend</h2>
+          <ul>
+            <li><a href="/over-ons/">Over ons</a></li>
+            <li><a href="/training/">Training (Methodica)</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="vv-voet-onder">
+        <p>{world.company} ({world.city} {world.district}) is een fictief bedrijf, bedacht voor de AI-training van <a href="https://methodica.nl/">Methodica</a>. Het is geen echte internetaanbieder en heeft niets te maken met bestaande glasvezel- of telecombedrijven.</p>
+        <p>Deze site gebruikt geen cookies en geen tracking. <a href="https://github.com/methodicaai/vezelvriend">Broncode</a></p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

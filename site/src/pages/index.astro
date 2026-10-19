@@ -1,61 +1,69 @@
 ---
-import Base from '../layouts/Base.astro';
+import Layout from '../layouts/CompanyLayout.astro';
+import { world, getPlans, euro } from '../world';
+const plans = getPlans().filter((p) => !p.business);
+const cheapest = Math.min(...plans.map((p) => p.fee));
 ---
-<Base title="Start">
-  <section class="hero">
-    <div class="hero-inner">
-      <p class="eyebrow">AI-training voor businessanalisten en testers</p>
-      <h1>AI is zo goed als de <em>context</em> die je meegeeft.</h1>
-      <p class="lead">Dit is de oefenomgeving van Methodica. Je werkt een ochtend bij het (verzonnen) glasvezelbedrijf Vezelvriend en ontdekt hoe je AI goed inzet: context meegeven, grenzen stellen en valkuilen in data herkennen.</p>
-      <div class="knoppen">
-        <a class="knop knop--vol" href="/oefeningen/">Naar de oefeningen</a>
-        <a class="knop knop--rand" href="/bedrijf/">Maak kennis met Vezelvriend</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="sectie sectie--vlak">
+<Layout title="Glasvezel van je buren">
+  <section class="vv-hero">
     <div class="wrap">
-      <h2>Wat je hier leert</h2>
-      <div class="kaarten">
-        <div class="kaart">
-          <p class="label">Context</p>
-          <h3>Geef de AI wat jij ziet</h3>
-          <p>Een AI weet niets van jouw klant, jouw systemen of het tijdstip. Je oefent met wat je wel en niet meegeeft, en ziet wat dat doet met het antwoord.</p>
+      <h1>Snel glasvezel van je buren in {world.city}.</h1>
+      <p>Vezelvriend is het glasvezelbedrijf uit {world.city} {world.district}. Echt glasvezel tot in je meterkast, een klantenservice om de hoek en abonnementen zonder kleine lettertjes. Vanaf {euro(cheapest)} per maand.</p>
+      <div class="vv-knoppen">
+        <a class="vv-knop vv-knop--accent" href="/internet/">Bekijk abonnementen</a>
+        <a class="vv-knop vv-knop--rand" href="/storingen/">Storing? Bekijk de status</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="vv-sectie">
+    <div class="wrap">
+      <h2>Waarom Vezelvriend?</h2>
+      <div class="vv-kaarten">
+        <div class="vv-kaart">
+          <span class="vv-icoon" aria-hidden="true">⚡</span>
+          <h3>Echt glasvezel</h3>
+          <p>Glasvezel tot in je meterkast, met de Vezelbox als modem. Even snel uploaden als downloaden.</p>
         </div>
-        <div class="kaart">
-          <p class="label">Guardrails</p>
-          <h3>Spreek af wat niet mag</h3>
-          <p>Je schrijft regels voor wat de AI wel en niet mag adviseren, zodat een goed klinkend antwoord geen verkeerde beslissing wordt.</p>
+        <div class="vv-kaart">
+          <span class="vv-icoon" aria-hidden="true">🏘️</span>
+          <h3>Lokaal</h3>
+          <p>Ons team van zo'n 25 mensen zit in {world.city}. Onze monteurs kennen de wijk.</p>
         </div>
-        <div class="kaart">
-          <p class="label">Valkuilen</p>
-          <h3>Vertrouw de data niet blind</h3>
-          <p>Ook in nepdata zitten de fouten van echte systemen. Je leert ze herkennen voordat je ze aan een AI voert.</p>
+        <div class="vv-kaart">
+          <span class="vv-icoon" aria-hidden="true">📞</span>
+          <h3>Klantenservice die meedenkt</h3>
+          <p>Ook op zaterdag. We kijken eerst samen wat er aan de hand is, en sturen pas een monteur als dat echt nodig is.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="sectie">
-    <div class="wrap smal">
-      <h2>Zo begin je</h2>
-      <ol class="stappen">
-        <li><h3>Lees wie Vezelvriend is</h3><p>Een regionaal glasvezelbedrijf met zo'n 25 medewerkers. Jij zit vandaag aan de telefoon.</p></li>
-        <li><h3>Bekijk de systemen</h3><p>Het Klantsysteem en het Klantbeeld zijn nep, maar gedragen zich als echte bedrijfssoftware.</p></li>
-        <li><h3>Kies een oefening</h3><p>Elke oefening heeft een doel, een opdracht, voorbeeldprompts en een reflectievraag.</p></li>
-        <li><h3>Werk met je eigen AI-assistent</h3><p>De systemen praten niet met een AI. Jij beslist wat je overneemt in je prompt. Dat is precies de vaardigheid die je oefent.</p></li>
-        <li><h3>Bespreek wat je zag</h3><p>De trainer bespreekt met de groep wat er goed ging en waar het misliep.</p></li>
-      </ol>
-    </div>
-  </section>
-
-  <section class="sectie">
-    <div class="wrap smal">
-      <div class="kern">
-        <p class="label">De kernboodschap</p>
-        <p>Een AI-antwoord is nooit beter dan de context die je meegeeft.</p>
+  <section class="vv-sectie vv-sectie--zacht">
+    <div class="wrap">
+      <h2>Internet zonder gedoe</h2>
+      <div class="vv-kaarten">
+        {plans.map((p) => (
+          <div class="vv-pakket">
+            <h3>{p.product}</h3>
+            <p class="vv-snelheid">{p.download} <small>Mbit/s</small></p>
+            <p class="vv-prijs">{euro(p.fee)} <small>per maand</small></p>
+            <a class="vv-knop vv-knop--vol" href="/internet/">Meer informatie</a>
+          </div>
+        ))}
       </div>
     </div>
   </section>
-</Base>
+
+  <section class="vv-sectie">
+    <div class="wrap">
+      <div class="vv-training">
+        <h2>Ben je hier voor de training?</h2>
+        <p>Vezelvriend is een oefenbedrijf. Deze website, de klanten en de systemen zijn nagebouwd voor de AI-training van Methodica voor businessanalisten en testers.</p>
+        <div class="vv-knoppen">
+          <a class="vv-knop vv-knop--accent" href="/training/">Naar de training en de opdrachten</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

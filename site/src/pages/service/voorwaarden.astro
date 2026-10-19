@@ -1,0 +1,14 @@
+---
+import Layout from '../../layouts/CompanyLayout.astro';
+// Same file as data/documents/service-document.md: one source for the
+// systems, the exercises and the website.
+import { Content as ServiceDocument } from '../../../../data/documents/service-document.md';
+---
+<Layout title="Servicevoorwaarden">
+  <section class="vv-sectie">
+    <div class="wrap vv-tekst">
+      <p><a href="/service/">Terug naar Service</a></p>
+      <ServiceDocument />
+    </div>
+  </section>
+</Layout>

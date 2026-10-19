@@ -2,12 +2,13 @@
 # /klantsysteem/ and /klantbeeld/ to the system containers.
 # Why one entrance: one port locally, one domain and one certificate on the server.
 
-# Stage 1: build the Astro site (it reads config/, exercises/ and docs/ from the repo root)
+# Stage 1: build the Astro site (it reads config/, data/, exercises/ and docs/ from the repo root)
 FROM node:24-alpine AS site
 WORKDIR /repo
 COPY config ./config
 COPY exercises ./exercises
 COPY docs ./docs
+COPY data ./data
 COPY site/package.json site/package-lock.json ./site/
 RUN npm ci --prefix site --no-audit --no-fund
 COPY site ./site

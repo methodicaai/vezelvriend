@@ -1,0 +1,60 @@
+---
+import Layout from '../layouts/CompanyLayout.astro';
+import { getPlans, euro } from '../world';
+const plans = getPlans();
+const home = plans.filter((p) => !p.business);
+const business = plans.filter((p) => p.business);
+const popular = 'Vezel 500';
+---
+<Layout title="Internet abonnementen">
+  <section class="vv-hero vv-hero--klein">
+    <div class="wrap">
+      <h1>Internet abonnementen</h1>
+      <p>Alle abonnementen zijn echt glasvezel, met dezelfde snelheid voor downloaden en uploaden. Maandelijks opzegbaar na het eerste jaar.</p>
+    </div>
+  </section>
+
+  <section class="vv-sectie">
+    <div class="wrap">
+      <h2>Voor thuis</h2>
+      <div class="vv-kaarten">
+        {home.map((p) => (
+          <div class={`vv-pakket${p.product === popular ? ' vv-pakket--uitgelicht' : ''}`}>
+            {p.product === popular && <span class="label">Meest gekozen</span>}
+            <h3>{p.product}</h3>
+            <p class="vv-snelheid">{p.download} <small>Mbit/s</small></p>
+            <p class="vv-prijs">{euro(p.fee)} <small>per maand</small></p>
+            <ul>
+              <li>{p.download} Mbit/s down, {p.upload} Mbit/s up</li>
+              <li>Vezelbox-modem met wifi</li>
+              <li>Geen eenmalige kosten</li>
+            </ul>
+            <a class="vv-knop vv-knop--vol" href="/bestellen/">Bestellen</a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="vv-sectie vv-sectie--zacht" id="zakelijk">
+    <div class="wrap">
+      <h2>Zakelijk</h2>
+      <p class="vv-intro">Voor winkels, horeca en kantoren. Met snellere hersteltijd bij storingen op werkdagen; zie de <a href="/service/voorwaarden/">servicevoorwaarden</a>.</p>
+      <div class="vv-kaarten">
+        {business.map((p) => (
+          <div class="vv-pakket">
+            <h3>{p.product}</h3>
+            <p class="vv-snelheid">{p.download} <small>Mbit/s</small></p>
+            <p class="vv-prijs">{euro(p.fee)} <small>per maand, excl. btw</small></p>
+            <ul>
+              <li>{p.download} Mbit/s down, {p.upload} Mbit/s up</li>
+              <li>Vaste contactpersoon</li>
+              <li>Snellere hersteltijd op werkdagen</li>
+            </ul>
+            <a class="vv-knop vv-knop--vol" href="/bestellen/">Bestellen</a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,45 @@
+---
+import Layout from '../layouts/CompanyLayout.astro';
+import { world, getOutages, timeOf } from '../world';
+const outages = getOutages();
+---
+<Layout title="Storingen">
+  <section class="vv-hero vv-hero--klein">
+    <div class="wrap">
+      <h1>Storingen</h1>
+      <p>Hier zie je of er een storing is in ons netwerk. Staat jouw straat ertussen? Dan weten we ervan en hoef je niet te bellen.</p>
+    </div>
+  </section>
+
+  <section class="vv-sectie">
+    <div class="wrap">
+      <h2>Actuele storingen</h2>
+      <p class="vv-bijgewerkt">Laatst bijgewerkt: {world.clockLabel}</p>
+      {outages.length === 0 ? (
+        <ul class="vv-lijst"><li class="ok"><h3>Geen storingen bekend</h3><p>Ons netwerk werkt overal normaal.</p></li></ul>
+      ) : (
+        <ul class="vv-lijst">
+          {outages.map((o) => (
+            <li>
+              <h3>{o.streets.join(', ')}, {world.city}</h3>
+              <p>Sinds {timeOf(o.since)} uur. {o.description}</p>
+              <p>Storingsnummer: {o.ticket_id}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+
+  <section class="vv-sectie vv-sectie--zacht">
+    <div class="wrap vv-tekst">
+      <h2>Geen storing in je straat, maar werkt je internet niet?</h2>
+      <ol>
+        <li>Zet de Vezelbox uit, wacht 30 seconden en zet hem weer aan.</li>
+        <li>Werkt internet via een netwerkkabel wel, maar wifi niet? Dan ligt het waarschijnlijk aan de wifi. Kijk bij <a href="/service/">Service</a> voor tips.</li>
+        <li>Werkt het nog steeds niet? Bel onze klantenservice. We controleren je modem op afstand en kijken samen wat er nodig is.</li>
+      </ol>
+      <p>Hoe snel we een storing oplossen, lees je bij <a href="/service/">Service</a>.</p>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/CompanyLayout.astro';
+import { world } from '../world';
+---
+<Layout title="Over ons">
+  <section class="vv-hero vv-hero--klein">
+    <div class="wrap">
+      <h1>Over Vezelvriend</h1>
+      <p>Een glasvezelbedrijf uit {world.city}, voor {world.city}.</p>
+    </div>
+  </section>
+  <section class="vv-sectie">
+    <div class="wrap vv-tekst">
+      <div class="vv-melding">
+        <p><strong>{world.company} bestaat niet.</strong> Het is een oefenbedrijf, bedacht voor de AI-training van <a href="https://methodica.nl/">Methodica</a>. Het verhaal hieronder is verzonnen, net als alle klanten, medewerkers, nummers en adressen.</p>
+      </div>
+      <h2>Ons verhaal</h2>
+      <p>Vezelvriend begon met een simpel idee: snel internet hoort bij je wijk, net als de bakker en de fietsenmaker. Daarom leggen we glasvezel aan in {world.city} {world.district} en helpen we onze klanten vanuit {world.city}.</p>
+      <p>Met zo'n 25 collega's doen we alles zelf: van de kabel in de straat tot de klantenservice aan de telefoon.</p>
+      <h2>Zo werken we</h2>
+      <ul>
+        <li><strong>Eerst meten, dan pas een monteur.</strong> We controleren je modem op afstand, zodat je niet voor niets thuis hoeft te blijven.</li>
+        <li><strong>Eerlijk over storingen.</strong> Op onze storingspagina zie je meteen of je straat een storing heeft.</li>
+        <li><strong>Geen kleine lettertjes.</strong> Onze servicevoorwaarden passen op één pagina.</li>
+      </ul>
+    </div>
+  </section>
+</Layout>

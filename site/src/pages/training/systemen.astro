@@ -1,7 +1,7 @@
 ---
-import Base from '../layouts/Base.astro';
+import Base from '../../layouts/TrainingLayout.astro';
 // Same file as docs/decision-tree.md, so the site and the repo never disagree.
-import { Content as DecisionTree } from '../../../docs/decision-tree.md';
+import { Content as DecisionTree } from '../../../../docs/decision-tree.md';
 ---
 <Base title="De systemen">
   <section class="hero">
@@ -15,6 +15,12 @@ import { Content as DecisionTree } from '../../../docs/decision-tree.md';
   <section class="sectie sectie--vlak">
     <div class="wrap">
       <div class="kaarten">
+        <div class="kaart">
+          <p class="label">Beschikbaar</p>
+          <h3>Website vezelvriend.nl</h3>
+          <p>De website van het bedrijf, zoals klanten hem zien: abonnementen, storingen, service en servicevoorwaarden. Ook een bron, en net als in het echt niet altijd in lijn met wat intern wordt gezegd.</p>
+          <p><a class="meer" href="/">Open de website</a></p>
+        </div>
         <div class="kaart">
           <p class="label">Beschikbaar</p>
           <h3>Klantsysteem</h3>

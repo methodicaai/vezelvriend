@@ -1,0 +1,140 @@
+/* Vezelvriend B.V. (fictional): house style of the company website.
+   Deliberately different from the Methodica training pages, so participants
+   always see whether they are looking at "the company" or at "the training".
+   Colours are made up and do not imitate any real internet provider. */
+:root{
+  --vv-ink:#0E2A33;
+  --vv-muted:#4B6670;
+  --vv-primary:#0B6E6E;
+  --vv-primary-dark:#084F4F;
+  --vv-accent:#FF7A59;
+  --vv-accent-text:#B3401F;
+  --vv-bg:#F5FAF9;
+  --vv-panel:#FFFFFF;
+  --vv-soft:#E2F2EF;
+  --vv-line:#D3E5E1;
+  --vv-warn-bg:#FFF1EC;
+  --vv-ok:#1E6B3A;
+  --vv-radius:16px;
+  --vv-width:1120px;
+  --vv-font:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--vv-ink:#E8F3F1;--vv-muted:#A9C2BE;--vv-primary:#3CB8AE;--vv-primary-dark:#7AD3CB;--vv-accent-text:#FFA58C;
+    --vv-bg:#0C1D21;--vv-panel:#12292E;--vv-soft:#173A3D;--vv-line:#24484C;--vv-warn-bg:#3A231C;--vv-ok:#8FD9A8}
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--vv-bg);color:var(--vv-ink);font:1.0625rem/1.6 var(--vv-font)}
+a{color:var(--vv-primary)}
+a:hover{color:var(--vv-accent-text)}
+:focus-visible{outline:3px solid var(--vv-accent);outline-offset:3px;border-radius:4px}
+img,svg{max-width:100%}
+p{margin:0 0 1rem}
+.skip{position:absolute;left:1rem;top:-4rem;background:var(--vv-accent);color:#1a0f0b;padding:.6rem 1rem;border-radius:8px;font-weight:700;z-index:200;text-decoration:none}
+.skip:focus{top:1rem}
+.wrap{max-width:var(--vv-width);margin:0 auto;padding:0 1.25rem}
+
+/* Fictional-company notice: same text as everywhere, own colours */
+.fictief{background:#1B1B1B;color:#FFFFFF;font-size:.88rem;text-align:center;padding:.5rem 1.25rem}
+.fictief p{margin:0}
+.fictief a{color:#FFD2C4}
+
+/* Header */
+.vv-header{background:var(--vv-panel);border-bottom:1px solid var(--vv-line)}
+.vv-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1.5rem;min-height:72px;padding:.5rem 0}
+.vv-logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--vv-ink);font-weight:800;font-size:1.45rem;letter-spacing:-.02em}
+.vv-logo img{width:38px;height:38px}
+.vv-logo span span{color:var(--vv-primary)}
+.vv-nav ul{display:flex;flex-wrap:wrap;gap:.15rem;list-style:none;margin:0;padding:0}
+.vv-nav a{display:block;padding:.5rem .8rem;border-radius:999px;text-decoration:none;color:var(--vv-ink);font-weight:600;font-size:.97rem}
+.vv-nav a:hover{background:var(--vv-soft);color:var(--vv-ink)}
+.vv-nav a[aria-current="page"]{background:var(--vv-soft);color:var(--vv-primary)}
+.vv-nav a.vv-cta{background:var(--vv-accent);color:#1a0f0b}
+.vv-nav a.vv-cta:hover{background:var(--vv-accent-text);color:#fff}
+
+/* Outage bar */
+.vv-storing{background:var(--vv-warn-bg);border-bottom:1px solid var(--vv-line)}
+.vv-storing p{margin:0;padding:.6rem 0;font-size:.95rem}
+.vv-storing strong{color:var(--vv-accent-text)}
+
+/* Hero */
+.vv-hero{background:linear-gradient(135deg,var(--vv-primary) 0%,var(--vv-primary-dark) 100%);color:#fff;padding:clamp(3rem,7vw,5.5rem) 0}
+.vv-hero h1{font-size:clamp(2.2rem,5.5vw,3.8rem);line-height:1.08;margin:0 0 1rem;letter-spacing:-.02em;max-width:18ch}
+.vv-hero p{font-size:clamp(1.05rem,1.8vw,1.25rem);max-width:52ch;opacity:.92}
+.vv-hero--klein{padding:clamp(2rem,5vw,3.5rem) 0}
+.vv-hero--klein h1{font-size:clamp(1.9rem,4.5vw,3rem)}
+.vv-knoppen{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.75rem}
+.vv-knop{display:inline-block;padding:.85rem 1.5rem;border-radius:999px;font-weight:700;text-decoration:none;border:2px solid transparent}
+.vv-knop--accent{background:var(--vv-accent);color:#1a0f0b}
+.vv-knop--accent:hover{background:#fff;color:var(--vv-primary-dark)}
+.vv-knop--rand{border-color:#fff;color:#fff}
+.vv-knop--rand:hover{background:#fff;color:var(--vv-primary-dark)}
+.vv-knop--vol{background:var(--vv-primary);color:#fff}
+.vv-knop--vol:hover{background:var(--vv-primary-dark);color:#fff}
+
+/* Sections and cards */
+.vv-sectie{padding:clamp(2.5rem,5vw,4rem) 0}
+.vv-sectie--zacht{background:var(--vv-soft)}
+.vv-sectie h2{font-size:clamp(1.6rem,3.2vw,2.3rem);line-height:1.15;margin:0 0 1.25rem;letter-spacing:-.01em}
+.vv-intro{color:var(--vv-muted);max-width:62ch;margin-bottom:2rem}
+.vv-kaarten{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:1.25rem}
+.vv-kaart{background:var(--vv-panel);border:1px solid var(--vv-line);border-radius:var(--vv-radius);padding:1.5rem}
+.vv-kaart h3{margin:0 0 .4rem;font-size:1.2rem}
+.vv-kaart p{color:var(--vv-muted);font-size:.97rem}
+.vv-kaart p:last-child{margin:0}
+.vv-icoon{font-size:1.6rem;line-height:1;margin-bottom:.6rem;display:block}
+
+/* Plans */
+.vv-pakket{display:flex;flex-direction:column;gap:.5rem;background:var(--vv-panel);border:2px solid var(--vv-line);border-radius:var(--vv-radius);padding:1.6rem}
+.vv-pakket--uitgelicht{border-color:var(--vv-primary)}
+.vv-pakket .label{font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--vv-accent-text)}
+.vv-pakket h3{margin:0;font-size:1.35rem}
+.vv-snelheid{font-size:2.2rem;font-weight:800;line-height:1;color:var(--vv-primary)}
+.vv-snelheid small{font-size:1rem;font-weight:600;color:var(--vv-muted)}
+.vv-prijs{font-size:1.25rem;font-weight:700}
+.vv-prijs small{font-weight:400;color:var(--vv-muted);font-size:.9rem}
+.vv-pakket ul{margin:.25rem 0 1rem;padding-left:1.1rem;color:var(--vv-muted);font-size:.95rem}
+.vv-pakket .vv-knop{margin-top:auto;text-align:center}
+
+/* Outage list */
+.vv-lijst{list-style:none;margin:0;padding:0}
+.vv-lijst li{background:var(--vv-panel);border:1px solid var(--vv-line);border-left:5px solid var(--vv-accent);border-radius:12px;padding:1rem 1.25rem;margin-bottom:.75rem}
+.vv-lijst li.ok{border-left-color:var(--vv-ok)}
+.vv-lijst h3{margin:0 0 .25rem;font-size:1.1rem}
+.vv-lijst p{margin:0;color:var(--vv-muted)}
+.vv-bijgewerkt{font-size:.9rem;color:var(--vv-muted)}
+
+/* FAQ */
+.vv-faq details{background:var(--vv-panel);border:1px solid var(--vv-line);border-radius:12px;margin-bottom:.6rem}
+.vv-faq summary{cursor:pointer;font-weight:700;padding:1rem 1.25rem}
+.vv-faq details>div{padding:0 1.25rem 1rem;color:var(--vv-muted)}
+.vv-faq details>div p:last-child{margin:0}
+
+/* Text pages */
+.vv-tekst{max-width:70ch}
+.vv-tekst h2{margin-top:2rem}
+.vv-tekst li{margin-bottom:.35rem}
+.vv-melding{background:var(--vv-warn-bg);border-left:5px solid var(--vv-accent);border-radius:0 12px 12px 0;padding:1rem 1.25rem;margin:1.25rem 0}
+.vv-melding p:last-child{margin:0}
+
+/* Training teaser */
+.vv-training{background:#1B1B1B;color:#fff;border-radius:var(--vv-radius);padding:clamp(1.5rem,4vw,2.5rem)}
+.vv-training h2{color:#fff}
+.vv-training p{color:#E6E6E6;max-width:62ch}
+
+/* Footer */
+.vv-footer{background:var(--vv-ink);color:#CFE3E0;padding:2.5rem 0;font-size:.93rem;margin-top:2rem}
+@media (prefers-color-scheme:dark){.vv-footer{background:#081417}}
+.vv-footer a{color:#CFE3E0}
+.vv-footer a:hover{color:var(--vv-accent)}
+.vv-voet{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:1.5rem}
+.vv-voet h2{font-size:1rem;margin:0 0 .5rem;color:#fff}
+.vv-voet ul{list-style:none;margin:0;padding:0}
+.vv-voet li{margin-bottom:.3rem}
+.vv-voet-onder{border-top:1px solid rgba(255,255,255,.15);margin-top:2rem;padding-top:1.25rem}
+.vv-voet-onder p{margin:0 0 .4rem}
+
+@media print{.vv-header nav,.skip{display:none}body{background:#fff;color:#000}}
+.vv-hero a{color:#fff}
+.vv-hero a:hover{color:#FFD2C4}

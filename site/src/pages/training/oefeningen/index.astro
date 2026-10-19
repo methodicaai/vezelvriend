@@ -1,6 +1,6 @@
 ---
-import Base from '../../layouts/Base.astro';
-import { getExercises } from '../../exercises';
+import Base from '../../../layouts/TrainingLayout.astro';
+import { getExercises } from '../../../exercises';
 const exercises = getExercises();
 ---
 <Base title="Oefeningen">
@@ -20,7 +20,7 @@ const exercises = getExercises();
             <p class="label">Oefening {ex.number} · {ex.role}</p>
             <h3>{ex.title}</h3>
             <p>{ex.summary}</p>
-            <p><a class="meer" href={`/oefeningen/${ex.slug}/`}>Naar de oefening</a></p>
+            <p><a class="meer" href={`/training/oefeningen/${ex.slug}/`}>Naar de oefening</a></p>
           </div>
         ))}
       </div>

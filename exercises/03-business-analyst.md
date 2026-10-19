@@ -17,7 +17,7 @@ Lees deze bestanden in de map `data/` van de repository:
 
 - `documents/customer-story-de-wit.md`: het verhaal van Familie De Wit;
 - `documents/call-guide.json`: de gespreksleidraad van de klantenservice;
-- `documents/service-document.md`: de servicevoorwaarden;
+- `documents/service-document.md`: de servicevoorwaarden (ook te lezen op de website, onder Service);
 - `backlog/US-014-outage-repair-time.md`: de user story zoals die nu in de backlog staat;
 - `mail/2026-10-14-sanne-us-014.md`: een mail van de product owner.
 

@@ -1,5 +1,7 @@
 ---
-// Shared page frame: fictional-company notice, header, footer.
+// Page frame of the training part (/training/), in the methodica.nl style.
+// The company website of Vezelvriend uses CompanyLayout.astro instead, so
+// participants always see whether they are "at the company" or "in the training".
 // The notice sits on every page on purpose: participants (and anyone who
 // lands here via a search engine) must never mistake Vezelvriend for a real ISP.
 import world from '../../../config/world.json';
@@ -8,21 +10,22 @@ interface Props { title: string; description?: string; }
 const { title, description = 'Oefenomgeving van Methodica: leer AI goed inzetten met context, guardrails en oog voor valkuilen in data.' } = Astro.props;
 
 const nav = [
-  { href: '/', label: 'Start' },
-  { href: '/bedrijf/', label: 'Het bedrijf Vezelvriend' },
-  { href: '/systemen/', label: 'De systemen' },
-  { href: '/oefeningen/', label: 'Oefeningen' },
-  { href: '/over-methodica/', label: 'Over Methodica' },
+  { href: '/training/', label: 'Start' },
+  { href: '/training/bedrijf/', label: 'Het bedrijf Vezelvriend' },
+  { href: '/training/systemen/', label: 'De systemen' },
+  { href: '/training/oefeningen/', label: 'Oefeningen' },
+  { href: '/training/over-methodica/', label: 'Over Methodica' },
+  { href: '/', label: 'Naar vezelvriend.nl' },
 ];
 const path = Astro.url.pathname;
-const isCurrent = (href: string) => href === '/' ? path === '/' : path.startsWith(href);
+const isCurrent = (href: string) => href === '/' ? false : href === '/training/' ? path === '/training/' : path.startsWith(href);
 ---
 <!doctype html>
 <html lang="nl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{title} | Vezelvriend oefenomgeving</title>
+  <title>{title} | Training | Vezelvriend oefenomgeving</title>
   <meta name="description" content={description}>
   {/* Keep search engines out: a fictional ISP on a real domain must not show up
       for people searching for a real internet outage. */}
@@ -39,7 +42,7 @@ const isCurrent = (href: string) => href === '/' ? path === '/' : path.startsWit
   </div>
   <header class="site-header">
     <div class="bar">
-      <a class="brand" href="/">
+      <a class="brand" href="/training/">
         <img src="/favicon.svg" alt="" width="28" height="28">
         <span><span class="brand-name">Vezelvriend</span><br><span class="brand-sub">oefenomgeving van Methodica</span></span>
       </a>

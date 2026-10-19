@@ -14,10 +14,10 @@ Je werkt een ochtend bij het verzonnen glasvezelbedrijf Vezelvriend in Breda Cen
 
 ## Zo begin je (deelnemers)
 
-1. **Installeer Docker Desktop** via [docker.com](https://www.docker.com/products/docker-desktop/) en start het. (Draait de omgeving al op een server van je trainer? Open dan het adres dat je trainer geeft en ga naar stap 4.)
+1. **Installeer Docker Desktop** via [docker.com](https://www.docker.com/products/docker-desktop/) en start het. (Doe je de training met de online omgeving? Ga dan naar [vezelvriend.nl/training](https://vezelvriend.nl/training/) en sla stap 1 t/m 4 over.)
 2. **Download deze repository**: knop *Code* → *Download ZIP* op GitHub, en pak het bestand uit. Of: `git clone https://github.com/methodicaai/vezelvriend.git`
 3. **Start de omgeving**: open een terminal in de map en typ `docker compose up --build`. De eerste keer duurt dat een paar minuten.
-4. **Open** [http://localhost:8080](http://localhost:8080). Je ziet de site met uitleg, de systemen en de oefeningen.
+4. **Open** [http://localhost:8080](http://localhost:8080). Je ziet de website van het (fictieve) bedrijf. De training met uitleg, systemen en oefeningen staat op [http://localhost:8080/training/](http://localhost:8080/training/).
 5. **Kies een oefening** bij *Oefeningen* en werk met je eigen AI-assistent. Stoppen doe je met `Ctrl+C` in de terminal.
 
 Zonder Docker kan het ook, met [Node.js 24](https://nodejs.org/): `npm start` start de twee systemen (http://localhost:3001 en http://localhost:3002) en `npm run site` de site.
@@ -26,7 +26,7 @@ Zonder Docker kan het ook, met [Node.js 24](https://nodejs.org/): `npm start` st
 
 | Map | Wat | Waarom zo |
 |---|---|---|
-| `site/` | Website met uitleg over de training, het bedrijf en de oefeningen (Astro, statisch) | Statische HTML: snel, veilig, geen tracking. Zelfde uiterlijk als methodica.nl. |
+| `site/` | De nep-bedrijfswebsite van Vezelvriend (`/`) en de trainingspagina's met de oefeningen (`/training/`) (Astro, statisch) | Statische HTML: snel, veilig, geen tracking, geen formulieren. Het bedrijf heeft een eigen huisstijl, de training die van methodica.nl, zodat je altijd ziet waar je bent. |
 | `systems/` | De nepsystemen: **Klantsysteem** en **Klantbeeld** | Kleine Node-apps zonder framework of extra pakketten: weinig om te onderhouden of uit te leggen. |
 | `data/` | De verzonnen brondata (JSON) en het databaseschema | JSON is leesbaar en goed te beoordelen; bij elke start wordt er een SQLite-database van gebouwd. |
 | `exercises/` | De oefeningen voor deelnemers | Markdown: leesbaar op GitHub én op de site, één bron. |

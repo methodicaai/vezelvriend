@@ -1,6 +1,6 @@
 ---
-import Base from '../../layouts/Base.astro';
-import { getExercises } from '../../exercises';
+import Base from '../../../layouts/TrainingLayout.astro';
+import { getExercises } from '../../../exercises';
 
 export function getStaticPaths() {
   return getExercises().map((ex) => ({ params: { slug: ex.slug }, props: { ex } }));
@@ -11,7 +11,7 @@ const { Content } = ex;
 <Base title={ex.title} description={ex.summary}>
   <section class="sectie">
     <div class="wrap smal">
-      <p><a href="/oefeningen/">Alle oefeningen</a></p>
+      <p><a href="/training/oefeningen/">Alle oefeningen</a></p>
       <p class="label">Oefening {ex.number} · {ex.role}</p>
       <article class="markdown"><Content /></article>
     </div>

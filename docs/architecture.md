@@ -4,7 +4,7 @@
 browser
    │
    ▼
-gateway (nginx, poort 8080)  ── /               → statische site (Astro, gebouwd in de image)
+gateway (nginx, poort 8080)  ── /               → bedrijfswebsite + /training/ (Astro, statisch)
    │                          ── /klantsysteem/ → klantsysteem (Node, poort 3000)
    │                          ── /klantbeeld/   → klantbeeld   (Node, poort 3000)
    ▼

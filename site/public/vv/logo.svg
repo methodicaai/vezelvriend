@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <!-- Vezelvriend logo (fictional company): a light pulse travelling through a fibre. -->
+  <rect width="40" height="40" rx="11" fill="#0B6E6E"/>
+  <path d="M7 25c5 0 6-10 11-10s6 10 11 10 4-4 4-4" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round"/>
+  <circle cx="29" cy="25" r="3.4" fill="#FF7A59"/>
+</svg>
