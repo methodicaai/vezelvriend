@@ -25,24 +25,28 @@ Klanten om mee te oefenen: Familie De Wit, Mevrouw Jansen, De heer El Amrani, Fa
 
 ## Voorbeeldprompt zonder context (A)
 
-> Een klant belt en zegt: "Mijn modem doet het niet." Wat moet ik doen?
+```prompt
+Een klant belt en zegt: "Mijn modem doet het niet." Wat moet ik doen?
+```
 
 ## Voorbeeldprompt met context (B)
 
-> Je helpt een medewerker van de klantenservice van een glasvezelbedrijf.
-> Het is nu zaterdag 17-10-2026 10:15.
->
-> De klant zegt: "Mijn modem doet het niet."
->
-> Modemgegevens uit ons systeem:
-> [plak hier de gegevens van "Modem controleren": status, sessie, snelheid, meettijd, straatstatus, laatste herstart]
->
-> Relevante klanthistorie op dit adres:
-> [plak hier alleen wat over deze klant en dit probleem gaat]
->
-> Onze werkwijze: [plak hier de beslisboom uit de documentatie]
->
-> Wat is de volgende stap, en wat zeg ik tegen de klant? Leg kort uit waarom.
+```prompt
+Je helpt een medewerker van de klantenservice van een glasvezelbedrijf.
+Het is nu zaterdag 17-10-2026 10:15.
+
+De klant zegt: "Mijn modem doet het niet."
+
+Modemgegevens uit ons systeem:
+{{plak hier de gegevens van "Modem controleren": status, sessie, snelheid, meettijd, straatstatus, laatste herstart}}
+
+Relevante klanthistorie op dit adres:
+{{plak hier alleen wat over deze klant en dit probleem gaat}}
+
+Onze werkwijze: {{plak hier de beslisboom uit de documentatie}}
+
+Wat is de volgende stap, en wat zeg ik tegen de klant? Leg kort uit waarom.
+```
 
 ## Reflectievragen
 

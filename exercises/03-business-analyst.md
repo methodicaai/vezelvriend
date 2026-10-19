@@ -30,18 +30,22 @@ Doe dan het volgende:
 
 ## Voorbeeldprompt zonder context (A)
 
-> Maak een user story met acceptatiecriteria voor dit klantverhaal:
-> [plak het klantverhaal]
+```prompt
+Maak een user story met acceptatiecriteria voor dit klantverhaal:
+{{plak het klantverhaal}}
+```
 
 ## Voorbeeldprompt met context (B)
 
-> Je bent een ervaren businessanalist. Hieronder staan een klantverhaal, de huidige user story US-014 en de bronnen waar die op gebaseerd is.
->
-> [plak alle bronnen, elk met een kopje met de bestandsnaam]
->
-> 1. Verbeter US-014 met concrete, toetsbare acceptatiecriteria.
-> 2. Noem elke tegenstrijdigheid tussen de bronnen. Kies geen kant: zet het als open vraag.
-> 3. Noem bij elk acceptatiecriterium uit welke bron het komt.
+```prompt
+Je bent een ervaren businessanalist. Hieronder staan een klantverhaal, de huidige user story US-014 en de bronnen waar die op gebaseerd is.
+
+{{plak alle bronnen, elk met een kopje met de bestandsnaam}}
+
+1. Verbeter US-014 met concrete, toetsbare acceptatiecriteria.
+2. Noem elke tegenstrijdigheid tussen de bronnen. Kies geen kant: zet het als open vraag.
+3. Noem bij elk acceptatiecriterium uit welke bron het komt.
+```
 
 ## Reflectievragen
 

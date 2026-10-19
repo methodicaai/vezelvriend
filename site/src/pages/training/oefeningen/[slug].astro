@@ -14,6 +14,8 @@ const { Content } = ex;
       <p><a href="/training/oefeningen/">Alle oefeningen</a></p>
       <p class="label">Oefening {ex.number} · {ex.role}</p>
       <article class="markdown"><Content /></article>
+      {/* Turns the prompt blocks into fill-in fields with a copy button. External file: no inline scripts (CSP). */}
+      <script is:inline src="/assets/prompt.js" defer></script>
     </div>
   </section>
 </Base>

@@ -30,16 +30,20 @@ Werkwijze per vraag:
 
 ## Voorbeeldprompt zonder context (A)
 
-> Schrijf een SQL-query die laat zien welke klanten op hetzelfde adres wonen.
+```prompt
+Schrijf een SQL-query die laat zien welke klanten op hetzelfde adres wonen.
+```
 
 ## Voorbeeldprompt met context (B)
 
-> Schrijf een SQL-query voor SQLite. Gebruik alleen de tabellen en kolommen uit dit schema:
->
-> [plak het schema uit het SQL-scherm]
->
-> Vraag: welke actieve klanten wonen op hetzelfde adres? Toon klantnummer, naam en adres.
-> Leg in één zin per regel uit wat de query doet.
+```prompt
+Schrijf een SQL-query voor SQLite. Gebruik alleen de tabellen en kolommen uit dit schema:
+
+{{plak het schema uit het SQL-scherm}}
+
+Vraag: welke actieve klanten wonen op hetzelfde adres? Toon klantnummer, naam en adres.
+Leg in één zin per regel uit wat de query doet.
+```
 
 ## Reflectievragen
 

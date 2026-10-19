@@ -28,16 +28,20 @@ Het team wil met AI een overzicht maken van waar klanten gisteren over belden. D
 
 ## Voorbeeldprompt zonder context
 
-> Hier zijn onze servicedesknotities van gisteren. Maak een overzicht van de onderwerpen.
-> [plak alle 50 regels]
+```prompt
+Hier zijn onze servicedesknotities van gisteren. Maak een overzicht van de onderwerpen.
+{{plak alle 50 regels}}
+```
 
 ## Voorbeeldprompt met context
 
-> Hieronder staan 50 notities van onze servicedesk. Persoonsgegevens en bankgegevens zijn vervangen door labels zoals [IBAN] en [KLANT].
-> Maak een overzicht: welke onderwerpen komen voor, hoe vaak, en welke vragen zouden we kunnen voorkomen met betere informatie op de website?
-> Neem geen labels of klantnummers over in je antwoord.
->
-> [plak de opgeschoonde regels]
+```prompt
+Hieronder staan 50 notities van onze servicedesk. Persoonsgegevens en bankgegevens zijn vervangen door labels zoals [IBAN] en [KLANT].
+Maak een overzicht: welke onderwerpen komen voor, hoe vaak, en welke vragen zouden we kunnen voorkomen met betere informatie op de website?
+Neem geen labels of klantnummers over in je antwoord.
+
+{{plak de opgeschoonde regels}}
+```
 
 ## Reflectievragen
 

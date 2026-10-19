@@ -26,19 +26,23 @@ Een voorbeeld van één regel: *"Plan nooit een monteur in zonder een gecontrole
 
 ## Voorbeeldprompt zonder context
 
-> Help me een klant met internetproblemen. De klant wil een monteur.
+```prompt
+Help me een klant met internetproblemen. De klant wil een monteur.
+```
 
 ## Voorbeeldprompt met context
 
-> Je bent een assistent voor de klantenservice van een glasvezelbedrijf. Houd je aan deze regels:
-> 1. [jouw regel]
-> 2. [jouw regel]
-> 3. [jouw regel]
->
-> Ontbreekt informatie die je volgens deze regels nodig hebt, vraag er dan om in plaats van te gokken.
->
-> Het is nu zaterdag 17-10-2026 10:15. De klant zegt: "Ik wil gewoon een monteur!"
-> Modemgegevens: [plak hier de gegevens van "Modem controleren"]
+```prompt
+Je bent een assistent voor de klantenservice van een glasvezelbedrijf. Houd je aan deze regels:
+1. {{jouw regel}}
+2. {{jouw regel}}
+3. {{jouw regel}}
+
+Ontbreekt informatie die je volgens deze regels nodig hebt, vraag er dan om in plaats van te gokken.
+
+Het is nu zaterdag 17-10-2026 10:15. De klant zegt: "Ik wil gewoon een monteur!"
+Modemgegevens: {{plak hier de gegevens van "Modem controleren"}}
+```
 
 ## Reflectievragen
 

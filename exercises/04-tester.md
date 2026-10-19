@@ -25,17 +25,21 @@ Je gebruikt AI om testcases te bedenken en leert dat de AI vooral de voor de han
 
 ## Voorbeeldprompt zonder context (A)
 
-> Maak testcases voor een systeem dat bepaalt of er een monteur naar een klant moet.
+```prompt
+Maak testcases voor een systeem dat bepaalt of er een monteur naar een klant moet.
+```
 
 ## Voorbeeldprompt met context (B)
 
-> Je bent een ervaren tester. Hieronder staat een beslisboom die de klantenservice gebruikt.
->
-> [plak de beslisboom en de begrippen]
->
-> 1. Maak een tabel met testcases: per stap van de boom minstens één geval dat de stap raakt en één dat er net niet onder valt.
-> 2. Benoem expliciet de grenswaarden.
-> 3. Noem gevallen waarin de boom onduidelijk is of tegenstrijdige uitkomsten kan geven.
+```prompt
+Je bent een ervaren tester. Hieronder staat een beslisboom die de klantenservice gebruikt.
+
+{{plak de beslisboom en de begrippen}}
+
+1. Maak een tabel met testcases: per stap van de boom minstens één geval dat de stap raakt en één dat er net niet onder valt.
+2. Benoem expliciet de grenswaarden.
+3. Noem gevallen waarin de boom onduidelijk is of tegenstrijdige uitkomsten kan geven.
+```
 
 ## Reflectievragen
 

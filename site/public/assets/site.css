@@ -122,3 +122,30 @@ h3{margin:0 0 .5rem;line-height:1.3}
 .vlak-link a:hover{text-decoration:underline}
 @media (max-width:820px){.vlak--3{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:700px){.vlak--2{grid-template-columns:minmax(0,1fr)}}
+
+/* Prompt blocks in the exercises (built by /assets/prompt.js). The fixed text
+   and the fields to fill in look clearly different. */
+.markdown pre:has(> code.language-prompt){background:var(--kleur-vlak);color:var(--kleur-ink);border:1px solid var(--kleur-lijn);white-space:pre-wrap}
+.prompt{border:1px solid var(--kleur-lijn);border-radius:var(--radius);background:var(--kleur-vlak);overflow:hidden;margin:1rem 0 1.5rem}
+.prompt-kop{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.25rem 1rem;align-items:baseline;padding:.8rem 1.25rem;background:var(--kleur-zacht);border-bottom:1px solid var(--kleur-lijn)}
+.prompt-titel{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--kleur-accent-tekst)}
+.prompt-telling{font-size:.85rem;color:var(--kleur-muted)}
+.prompt-tekst{white-space:pre-wrap;padding:.9rem 1.25rem 0;font:.95rem/1.6 Consolas,'Cascadia Mono','Courier New',monospace;color:var(--kleur-ink)}
+.prompt-veld{display:block;margin:.9rem 1.25rem 0;padding:.75rem;border:2px dashed var(--kleur-accent);border-radius:var(--radius-klein);background:var(--kleur-achtergrond)}
+.prompt-veld-label{display:block;font-weight:700;font-size:.9rem;color:var(--kleur-accent-tekst);margin-bottom:.4rem}
+.prompt-veld textarea{width:100%;font:.95rem/1.5 Consolas,'Cascadia Mono','Courier New',monospace;padding:.6rem .75rem;border:1px solid var(--kleur-lijn);border-radius:8px;background:var(--kleur-vlak);color:var(--kleur-ink);resize:vertical}
+.prompt-veld textarea:focus{outline:2px solid var(--kleur-accent-tekst);outline-offset:1px}
+.prompt-acties{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;padding:1rem 1.25rem 1.1rem}
+.prompt-knop{font:inherit;font-weight:700;padding:.6rem 1.25rem;border-radius:999px;border:2px solid var(--kleur-ink);background:var(--kleur-ink);color:var(--kleur-achtergrond);cursor:pointer}
+.prompt-knop:hover{background:var(--kleur-accent-tekst);border-color:var(--kleur-accent-tekst);color:#fff}
+.prompt-knop--rand{background:transparent;color:var(--kleur-ink)}
+.prompt-status{margin:0;font-size:.92rem;font-weight:600;color:var(--kleur-accent-tekst)}
+.prompt-status--let-op{color:#B3261E}
+@media (prefers-color-scheme:dark){.prompt-status--let-op{color:#F2B8B5}}
+.prompt-verborgen{position:fixed;left:-9999px;top:0}
+.prompt-veld--leeg{border-color:#B3261E;background:#FBE9E7}
+@media (prefers-color-scheme:dark){.prompt-veld--leeg{border-color:#F2B8B5;background:#3A1E1C}}
+.prompt-antwoord{border-top:1px solid var(--kleur-lijn);padding:1rem 1.25rem 1.25rem;background:var(--kleur-achtergrond)}
+.prompt-antwoord-kop{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--kleur-accent-tekst);margin:0 0 .5rem}
+.prompt-antwoord-tekst{white-space:pre-wrap}
+.prompt-knop[hidden],.prompt-antwoord[hidden]{display:none}
