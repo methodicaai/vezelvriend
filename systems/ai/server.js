@@ -12,31 +12,14 @@
 import crypto from 'node:crypto';
 import { aiEnabled, aiModel, askClaude } from './claude.js';
 import { openStore } from './store.js';
-import { cookies, esc, html, raw, readForm, readJson, routesOf, serve } from '../shared/web.js';
+import { cookie, sign, tooManyAttempts, unsign } from '../shared/session.js';
+import { cookies, html, readForm, readJson, routesOf, serve } from '../shared/web.js';
 
 const PORT = Number(process.env.PORT ?? 3003);
 const store = openStore(process.env.AI_DB_FILE ?? '/data/ai.db');
 const MAX_PER_DAY = Number(process.env.AI_MAX_PER_DAY || 40);
 const MAX_PROMPT_CHARS = Number(process.env.AI_MAX_PROMPT_CHARS || 30_000);
 const TRAINER_PASSWORD = process.env.TRAINER_PASSWORD || '';
-const SECURE_COOKIES = process.env.COOKIE_SECURE !== '0';
-
-// Signs cookies. Without SESSION_SECRET a random one is used: everybody then
-// has to log in again after a restart, which is acceptable but noted in the log.
-const SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
-if (!process.env.SESSION_SECRET) console.warn('SESSION_SECRET not set: sessions end on restart');
-
-const sign = (value) => `${value}.${crypto.createHmac('sha256', SECRET).update(value).digest('base64url')}`;
-function unsign(signed) {
-  const i = (signed ?? '').lastIndexOf('.');
-  if (i < 0) return null;
-  const value = signed.slice(0, i);
-  const expected = Buffer.from(sign(value));
-  const given = Buffer.from(signed);
-  return expected.length === given.length && crypto.timingSafeEqual(expected, given) ? value : null;
-}
-const cookie = (name, value, maxAge) =>
-  `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${SECURE_COOKIES ? '; Secure' : ''}`;
 
 const PARTICIPANT_COOKIE = 'vv_ai';
 const TRAINER_COOKIE = 'vv_trainer';
@@ -52,18 +35,6 @@ function participantFrom(req) {
 function isTrainer(req) {
   const value = unsign(cookies(req)[TRAINER_COOKIE]);
   return value !== null && Number(value) > Date.now();
-}
-
-// Brake on guessing codes or the trainer password (per visitor, in memory).
-// nginx has its own limit in front of this as well.
-const attempts = new Map();
-function tooManyAttempts(req) {
-  const ip = String(req.headers['x-forwarded-for'] ?? req.socket.remoteAddress).split(',')[0].trim();
-  const now = Date.now();
-  const recent = (attempts.get(ip) ?? []).filter((t) => now - t < 15 * 60 * 1000);
-  recent.push(now);
-  attempts.set(ip, recent);
-  return recent.length > 20;
 }
 
 // Forms of the trainer screen must come from this site (on top of SameSite cookies).
@@ -332,5 +303,3 @@ serve({
   notFound: () => trainerPage('Niet gevonden', html`<h1>Niet gevonden</h1>`),
 });
 
-// Unused imports guard (esc/raw are re-exported helpers some views may need).
-void esc; void raw;

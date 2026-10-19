@@ -9,7 +9,7 @@ services:
     build: { context: ., dockerfile: gateway/Dockerfile }
     ports:
       - "127.0.0.1:${VEZELVRIEND_PORT:-8080}:80"
-    depends_on: [klantsysteem, klantbeeld, ai]
+    depends_on: [klantsysteem, klantbeeld, ai, mijn]
     restart: unless-stopped
     mem_limit: 128m
     read_only: true          # nginx only needs a few writable temp folders
@@ -37,6 +37,20 @@ services:
     environment:
       BASE_PATH: /klantbeeld
       KLANTSYSTEEM_URL: /klantsysteem
+    restart: unless-stopped
+    mem_limit: 256m
+    read_only: true
+    tmpfs: [/tmp]
+
+  # "Mijn Vezelvriend": API of the customer app at /app/ (reads the fake data only).
+  # Gets only the cookie secret from .env, not the AI key: least privilege.
+  mijn:
+    build: { context: ., dockerfile: systems/Dockerfile }
+    command: ["node", "systems/mijn/server.js"]
+    environment:
+      SESSION_SECRET: ${SESSION_SECRET:-}
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
     restart: unless-stopped
     mem_limit: 256m
     read_only: true

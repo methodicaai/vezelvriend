@@ -1,0 +1,74 @@
+/* "Mijn Vezelvriend" oefen-app. Phone-first, in the Vezelvriend colours.
+   Safe-area insets keep content clear of the notch and home bar when the app
+   runs full screen from the home screen. */
+:root{
+  --ink:#0E2A33;--muted:#4B6670;--primary:#0B6E6E;--primary-dark:#084F4F;--accent:#FF7A59;
+  --bg:#F2F8F7;--panel:#FFFFFF;--soft:#E2F2EF;--line:#D3E5E1;
+  --ok:#1E6B3A;--ok-bg:#E3F2E7;--bad:#9B1C1C;--bad-bg:#FBE4E4;--warn:#7A4B00;--warn-bg:#FDF0D5;
+  --font:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--ink:#E8F3F1;--muted:#A9C2BE;--primary:#3CB8AE;--primary-dark:#7AD3CB;--bg:#0C1D21;--panel:#12292E;--soft:#173A3D;--line:#24484C;
+    --ok:#9FE0B2;--ok-bg:#163A26;--bad:#F2B8B5;--bad-bg:#4A1C1C;--warn:#F6D28B;--warn-bg:#46350F}
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);-webkit-tap-highlight-color:transparent;
+  padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+button,input{font:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+
+.app-fictief{background:#1B1B1B;color:#fff;font-size:.78rem;text-align:center;padding:calc(.3rem + env(safe-area-inset-top)) 1rem .3rem}
+.app-kop{display:flex;align-items:center;gap:.6rem;padding:.75rem 1rem;background:var(--primary);color:#fff}
+.app-kop img{border-radius:8px}
+.app-naam{font-weight:800;font-size:1.15rem;flex:1}
+.app-uitloggen{background:transparent;border:1px solid rgba(255,255,255,.6);color:#fff;border-radius:999px;padding:.3rem .8rem;font-size:.85rem}
+
+.app-inhoud{max-width:560px;margin:0 auto;padding:1rem}
+.app-scherm h1{font-size:1.6rem;margin:.5rem 0 .25rem}
+.app-scherm h2{font-size:1.05rem;margin:0 0 .5rem}
+.app-zacht{color:var(--muted);margin:0 0 1rem}
+
+.app-kaart{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:1rem 1.1rem;margin-bottom:.9rem}
+.app-kaart p{margin:0 0 .5rem}
+.app-kaart p:last-child{margin-bottom:0}
+.app-kaart--let-op{background:var(--warn-bg);border-color:transparent}
+.app-kaart label{display:block;font-weight:600;font-size:.9rem;margin:.5rem 0 .25rem}
+.app-kaart input{width:100%;padding:.75rem .9rem;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font-size:1.05rem;text-transform:uppercase}
+
+.app-knop{display:block;width:100%;margin-top:1rem;padding:.85rem 1rem;border:0;border-radius:999px;background:var(--primary);color:#fff;font-weight:700;font-size:1rem;cursor:pointer}
+.app-knop:active{background:var(--primary-dark)}
+.app-knop--rand{background:transparent;color:var(--primary);border:2px solid var(--primary)}
+.app-knop:disabled{opacity:.6}
+.app-melding{color:var(--bad);font-weight:600;min-height:1.2em;margin:.6rem 0 0}
+.app-melding--ok{color:var(--ok)}
+
+.app-demo{list-style:none;margin:.6rem 0 0;padding:0;display:grid;gap:.4rem}
+.app-demo button{width:100%;text-align:left;padding:.6rem .8rem;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink)}
+details summary{cursor:pointer;font-weight:600}
+
+/* Connection status card */
+.app-status{display:flex;gap:.9rem;align-items:flex-start}
+.app-status-bol{flex:none;width:2.6rem;height:2.6rem;border-radius:50%;display:grid;place-items:center;font-size:1.3rem;font-weight:800}
+.app-status--goed .app-status-bol{background:var(--ok-bg);color:var(--ok)}
+.app-status--fout .app-status-bol,.app-status--storing .app-status-bol{background:var(--bad-bg);color:var(--bad)}
+.app-status--let-op .app-status-bol,.app-status--onbekend .app-status-bol{background:var(--warn-bg);color:var(--warn)}
+.app-status h2{margin:0 0 .25rem}
+.app-klein{font-size:.85rem;color:var(--muted)}
+
+.app-rij{display:flex;justify-content:space-between;gap:1rem;padding:.5rem 0;border-bottom:1px solid var(--line)}
+.app-rij:last-child{border-bottom:0}
+.app-rij span:first-child{color:var(--muted)}
+.app-rij span:last-child{font-weight:600;text-align:right}
+
+.app-lijst{list-style:none;margin:0;padding:0}
+.app-lijst li{padding:.7rem 0;border-bottom:1px solid var(--line)}
+.app-lijst li:last-child{border-bottom:0}
+.app-lijst strong{display:block}
+
+/* Bottom tab bar, like a native app */
+.app-tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.app-tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:.1rem;padding:.55rem 0 .5rem;border:0;background:transparent;color:var(--muted);font-size:.78rem;font-weight:600;cursor:pointer}
+.app-tabs button span{font-size:1.3rem;line-height:1}
+.app-tabs button[aria-current="page"]{color:var(--primary)}

@@ -14,9 +14,10 @@ const ROUTES = [
   ['/klantsysteem/', 3001],
   ['/klantbeeld/', 3002],
   ['/api/ai/', 3003],
+  ['/api/mijn/', 3005],
   ['/trainer/', 3003],
 ];
-const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.txt': 'text/plain' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.txt': 'text/plain', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
 
 http.createServer((req, res) => {
   const route = ROUTES.find(([prefix]) => req.url.startsWith(prefix));

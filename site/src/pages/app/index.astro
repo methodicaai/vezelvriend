@@ -1,0 +1,82 @@
+---
+// "Mijn Vezelvriend": the customer app of the fictional company, as an
+// installable web app (PWA). Save it to the home screen for an app feel:
+// own icon, no address bar, opens offline. All logic is in /app/app.js;
+// the data comes from the 'mijn' system via /api/mijn/.
+import world from '../../../../config/world.json';
+---
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mijn Vezelvriend (oefen-app)</title>
+  <meta name="description" content={`Oefen-app van ${world.company}, een fictief bedrijf voor de AI-training van Methodica.`}>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0B6E6E">
+  <link rel="manifest" href="/app/manifest.webmanifest">
+  <link rel="icon" href="/app/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/app/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Vezelvriend">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="/app/app.css">
+</head>
+<body>
+  <div class="app-fictief" role="note">Oefen-app · {world.company} is een fictief bedrijf</div>
+
+  <header class="app-kop">
+    <img src="/app/icon.svg" alt="" width="32" height="32">
+    <span class="app-naam">Mijn Vezelvriend</span>
+    <button type="button" class="app-uitloggen" id="uitloggen" hidden>Uitloggen</button>
+  </header>
+
+  <main id="inhoud" class="app-inhoud">
+    <!-- Login screen -->
+    <section id="scherm-login" class="app-scherm" hidden>
+      <h1>Welkom</h1>
+      <p class="app-zacht">Log in met je klantnummer en postcode.</p>
+      <form id="login-form" class="app-kaart" autocomplete="off">
+        <label for="klantnummer">Klantnummer</label>
+        <input id="klantnummer" name="klantnummer" placeholder="K-1001" autocapitalize="characters" required>
+        <label for="postcode">Postcode</label>
+        <input id="postcode" name="postcode" placeholder="0000 KA" autocapitalize="characters" required>
+        <button type="submit" class="app-knop">Inloggen</button>
+        <p id="login-melding" class="app-melding" role="alert"></p>
+      </form>
+      <div class="app-kaart app-kaart--let-op">
+        <p><strong>Dit is een oefen-app.</strong> {world.company} bestaat niet. Vul hier nooit echte gegevens in.</p>
+        <details>
+          <summary>Inloggen met een demoklant</summary>
+          <ul class="app-demo">
+            <li><button type="button" data-demo="K-1001|0000 KA">Familie De Wit</button></li>
+            <li><button type="button" data-demo="K-1002|0000 GL">Mevrouw J. Jansen</button></li>
+            <li><button type="button" data-demo="K-1003|0000 LS">De heer Y. El Amrani</button></li>
+            <li><button type="button" data-demo="K-1004|0000 RP">Familie Bakker</button></li>
+            <li><button type="button" data-demo="K-1005|0000 MH">Bloemenhuis Lente</button></li>
+          </ul>
+        </details>
+      </div>
+      <div id="installeer" class="app-kaart" hidden>
+        <p><strong>Zet de app op je beginscherm</strong></p>
+        <p class="app-zacht" id="installeer-uitleg">iPhone: tik op Delen en kies "Zet op beginscherm". Android: open het menu en kies "App installeren".</p>
+        <button type="button" class="app-knop app-knop--rand" id="installeer-knop" hidden>App installeren</button>
+      </div>
+    </section>
+
+    <!-- Logged-in screens -->
+    <section id="scherm-overzicht" class="app-scherm" hidden></section>
+    <section id="scherm-meldingen" class="app-scherm" hidden></section>
+    <section id="scherm-account" class="app-scherm" hidden></section>
+  </main>
+
+  <nav class="app-tabs" id="tabs" aria-label="App-menu" hidden>
+    <button type="button" data-tab="overzicht" aria-current="page"><span aria-hidden="true">⌂</span>Overzicht</button>
+    <button type="button" data-tab="meldingen"><span aria-hidden="true">✉</span>Meldingen</button>
+    <button type="button" data-tab="account"><span aria-hidden="true">☺</span>Account</button>
+  </nav>
+
+  <script is:inline src="/app/app.js" defer></script>
+</body>
+</html>

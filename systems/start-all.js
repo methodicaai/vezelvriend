@@ -24,6 +24,7 @@ const APPS = {
     TRAINER_PASSWORD: process.env.TRAINER_PASSWORD ?? 'test',
     COOKIE_SECURE: '0', // plain http on localhost
   },
+  'mijn/server.js': { PORT: '3005', COOKIE_SECURE: '0' },
   'dev-gateway.js': { PORT: '8080' },
 };
 
