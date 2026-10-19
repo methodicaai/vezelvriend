@@ -1,0 +1,15 @@
+{
+  "name": "vezelvriend-ai",
+  "private": true,
+  "type": "module",
+  "description": "AI box for the exercises: participant codes, Claude calls, stored conversations.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.135.0"
+  }
+}

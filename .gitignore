@@ -26,3 +26,4 @@ Thumbs.db
 
 # Server-specific Docker settings (see docs/server.md)
 docker-compose.override.yml
+!.env.example

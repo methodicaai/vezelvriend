@@ -1,24 +1,24 @@
 // Turns the example prompts of an exercise into fill-in blocks.
 //
-// In the Markdown an exercise prompt is a ```prompt code block; every part the
-// participant must fill in is written as {{what to fill in}}. This script shows
-// the fixed text as is and turns each {{...}} into a clearly labelled field,
-// with a "Kopieer prompt" button that copies the whole prompt including what
-// was filled in. Without JavaScript the plain block stays readable.
+// In the Markdown an exercise prompt is a ```prompt code block:
+//   {{what to fill in}}          a field the participant fills in by hand
+//   {{auto:key|what it holds}}   a field filled automatically from the
+//                                Klantbeeld once a customer is chosen
+// The fixed text is shown as is; every field is a clearly labelled box.
+// "Kopieer prompt" copies the whole prompt, "Stuur naar AI" sends the same
+// text (only when the server has an AI connection and the participant is
+// logged in with a code). Without JavaScript the plain block stays readable.
 //
 // Why fields instead of one big text box: participants see exactly which
-// context they still have to add, and cannot accidentally change the fixed
-// part of the prompt (which keeps the A/B comparison fair).
-//
-// "Stuur naar AI" sends exactly the same text as "Kopieer prompt". The button
-// only appears when the server reports that the AI connection is switched on
-// (GET /api/ai/status). Empty fields are never sent silently: the first click
-// shows what is missing, a second click sends anyway.
+// context they still have to add and cannot change the fixed part, which
+// keeps the comparison between prompt A, B and C fair.
 (() => {
   const FIELD = /\{\{(.+?)\}\}/g;
+  const KLANTBEELD = '/klantbeeld';
+  const exercise = location.pathname.split('/').filter(Boolean).pop();
   const storageKey = (block, field) => `prompt:${location.pathname}:${block}:${field}`;
   const load = (key) => { try { return sessionStorage.getItem(key) ?? ''; } catch { return ''; } };
-  const save = (key, value) => { try { sessionStorage.setItem(key, value); } catch { /* storage blocked: fields just are not remembered */ } };
+  const save = (key, value) => { try { sessionStorage.setItem(key, value); } catch { /* storage blocked: not remembered */ } };
 
   function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -32,7 +32,6 @@
       await navigator.clipboard.writeText(text);
       return true;
     } catch {
-      // Fallback for browsers without clipboard permission.
       const area = el('textarea', 'prompt-verborgen');
       area.value = text;
       document.body.append(area);
@@ -43,42 +42,103 @@
     }
   }
 
+  async function getJson(url, options) {
+    const response = await fetch(url, options);
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Er ging iets mis.');
+    return data;
+  }
+
   const sendButtons = [];
 
   document.querySelectorAll('pre > code.language-prompt').forEach((code, blockIndex) => {
     const source = code.textContent.replace(/\n$/, '');
-    const parts = source.split(FIELD); // even = fixed text, odd = field label
+    const parts = source.split(FIELD); // even index = fixed text, odd index = field
     const fieldCount = (parts.length - 1) / 2;
 
+    // The heading above the block ("Voorbeeldprompt met context (B)") tells the
+    // trainer later which prompt a stored conversation came from.
+    let heading = code.parentElement.previousElementSibling;
+    while (heading && !/^H[23]$/.test(heading.tagName)) heading = heading.previousElementSibling;
+    const blockTitle = heading ? heading.textContent.trim() : `Prompt ${blockIndex + 1}`;
+
     const box = el('section', 'prompt');
-    box.setAttribute('aria-label', 'Prompt');
+    box.setAttribute('aria-label', blockTitle);
     const head = el('div', 'prompt-kop');
     head.append(el('span', 'prompt-titel', 'Prompt'));
-    head.append(el('span', 'prompt-telling', fieldCount === 0
-      ? 'Klaar om te kopiëren'
-      : `${fieldCount} ${fieldCount === 1 ? 'vak' : 'vakken'} om zelf in te vullen`));
+    const counter = el('span', 'prompt-telling');
+    head.append(counter);
     box.append(head);
 
     const fields = [];
-    let fieldNumber = 0;
     parts.forEach((part, i) => {
       if (i % 2 === 0) {
         if (part.trim() !== '') box.append(el('div', 'prompt-tekst', part.replace(/^\n+|\n+$/g, '')));
         return;
       }
-      fieldNumber += 1;
-      const key = storageKey(blockIndex, fieldNumber);
-      const label = el('label', 'prompt-veld');
-      label.append(el('span', 'prompt-veld-label', `Vul in (${fieldNumber}/${fieldCount}): ${part}`));
+      const auto = part.match(/^auto:(\w+)\|(.+)$/);
+      const number = fields.length + 1;
+      const labelText = auto ? auto[2] : part;
+      const key = storageKey(blockIndex, number);
+      const label = el('label', `prompt-veld${auto ? ' prompt-veld--auto' : ''}`);
+      const caption = el('span', 'prompt-veld-label', auto
+        ? `Automatisch (${number}/${fieldCount}): ${labelText}`
+        : `Vul in (${number}/${fieldCount}): ${labelText}`);
+      label.append(caption);
       const input = el('textarea');
-      input.rows = 3;
-      input.placeholder = part;
+      input.rows = auto ? 5 : 3;
+      input.placeholder = auto ? 'Wordt automatisch ingevuld zodra je een klant kiest' : labelText;
       input.value = load(key);
-      input.addEventListener('input', () => save(key, input.value));
+      input.addEventListener('input', () => {
+        save(key, input.value);
+        if (input.value.trim()) label.classList.remove('prompt-veld--leeg');
+      });
       label.append(input);
       box.append(label);
-      fields.push({ label: part, input });
+      fields.push({ label: labelText, input, auto: auto ? auto[1] : null, key });
     });
+
+    const autoFields = fields.filter((f) => f.auto);
+    const manualCount = fields.length - autoFields.length;
+    counter.textContent = fields.length === 0 ? 'Klaar om te kopiëren'
+      : autoFields.length === 0 ? `${manualCount} ${manualCount === 1 ? 'vak' : 'vakken'} om zelf in te vullen`
+      : `${autoFields.length} ${autoFields.length === 1 ? 'vak wordt' : 'vakken worden'} automatisch ingevuld`;
+
+    // Blocks with automatic fields start with a customer picker.
+    if (autoFields.length) {
+      const picker = el('div', 'prompt-kies');
+      const pickLabel = el('label', 'prompt-veld-label', 'Kies de klant aan de lijn');
+      pickLabel.htmlFor = `klant-${blockIndex}`;
+      const select = el('select');
+      select.id = `klant-${blockIndex}`;
+      select.append(new Option('Kies een klant...', ''));
+      const pickStatus = el('p', 'prompt-status');
+      pickStatus.setAttribute('aria-live', 'polite');
+      picker.append(pickLabel, select, pickStatus);
+      head.after(picker);
+
+      getJson(`${KLANTBEELD}/api/klanten`).then((list) => {
+        list.forEach((c) => select.append(new Option(`${c.name} (${c.customer_id}), ${c.address}`, c.customer_id)));
+      }).catch(() => { pickStatus.textContent = 'De klantenlijst kon niet worden opgehaald.'; });
+
+      select.addEventListener('change', async () => {
+        if (!select.value) return;
+        pickStatus.className = 'prompt-status';
+        pickStatus.textContent = 'Context ophalen uit het Klantbeeld...';
+        try {
+          const context = await getJson(`${KLANTBEELD}/api/context/${encodeURIComponent(select.value)}`);
+          autoFields.forEach((f) => {
+            f.input.value = context[f.auto] ?? '';
+            save(f.key, f.input.value);
+            f.input.parentElement.classList.remove('prompt-veld--leeg');
+          });
+          pickStatus.textContent = 'Alle context is automatisch ingevuld. Bekijk wat erin staat voordat je het verstuurt.';
+        } catch (err) {
+          pickStatus.className = 'prompt-status prompt-status--let-op';
+          pickStatus.textContent = `Ophalen lukte niet: ${err.message}`;
+        }
+      });
+    }
 
     const actions = el('div', 'prompt-acties');
     const copyButton = el('button', 'prompt-knop', 'Kopieer prompt');
@@ -95,35 +155,33 @@
     box.append(answer);
     sendButtons.push(sendButton);
 
+    const setStatus = (text, warn) => {
+      status.className = 'prompt-status' + (warn ? ' prompt-status--let-op' : '');
+      status.textContent = text;
+    };
     // Marks empty fields and returns their labels.
     const checkMissing = () => fields.filter((f) => {
       const empty = !f.input.value.trim();
       f.input.parentElement.classList.toggle('prompt-veld--leeg', empty);
       return empty;
     }).map((f) => f.label);
-    fields.forEach((f) => f.input.addEventListener('input', () => {
-      if (f.input.value.trim()) f.input.parentElement.classList.remove('prompt-veld--leeg');
-    }));
-    const setStatus = (text, warn) => {
-      status.className = 'prompt-status' + (warn ? ' prompt-status--let-op' : '');
-      status.textContent = text;
-    };
 
-    // The same text is used for copying and, once enabled, for sending to the AI.
-    box.promptText = () => parts.map((part, i) => {
+    // One text for copying and for sending, so both are always identical.
+    const promptText = () => parts.map((part, i) => {
       if (i % 2 === 0) return part;
-      const value = fields[(i - 1) / 2].input.value.trim();
-      return value || `[NOG INVULLEN: ${part}]`;
+      const f = fields[(i - 1) / 2];
+      return f.input.value.trim() || `[NOG INVULLEN: ${f.label}]`;
     }).join('');
 
     copyButton.addEventListener('click', async () => {
       const missing = checkMissing();
-      const ok = await copyText(box.promptText());
+      const ok = await copyText(promptText());
       if (!ok) setStatus('Kopiëren lukte niet. Selecteer de tekst en kopieer met Ctrl+C.', true);
       else if (missing.length) setStatus(`Gekopieerd, maar nog niet alles is ingevuld: ${missing.join('; ')}.`, true);
       else setStatus('Gekopieerd. Plak de prompt in je AI-assistent.', false);
     });
 
+    // Empty fields are never sent silently: the first click warns, a second click sends anyway.
     let confirmedIncomplete = false;
     fields.forEach((f) => f.input.addEventListener('input', () => { confirmedIncomplete = false; }));
     sendButton.addEventListener('click', async () => {
@@ -137,16 +195,15 @@
       sendButton.disabled = true;
       setStatus('Bezig met versturen naar de AI...', false);
       try {
-        const response = await fetch('/api/ai/ask', {
+        const data = await getJson('/api/ai/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: box.promptText() }),
+          body: JSON.stringify({ prompt: promptText(), exercise, block: blockTitle }),
         });
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.error || 'De AI gaf geen antwoord.');
         answer.hidden = false;
-        answer.replaceChildren(el('p', 'prompt-antwoord-kop', 'Antwoord van de AI'), el('div', 'prompt-antwoord-tekst', data.answer));
-        setStatus(missing.length ? 'Verstuurd, met lege vakken. Let daarop bij het antwoord.' : 'Antwoord ontvangen.', missing.length > 0);
+        answer.replaceChildren(el('p', 'prompt-antwoord-kop', 'Antwoord van de AI'), el('div', 'prompt-antwoord-tekst', data.answer || data.note || ''));
+        if (data.note) setStatus(data.note, true);
+        else setStatus(missing.length ? 'Verstuurd, met lege vakken. Let daarop bij het antwoord.' : 'Antwoord ontvangen.', missing.length > 0);
       } catch (err) {
         setStatus(err.message, true);
       } finally {
@@ -157,10 +214,63 @@
     code.parentElement.replaceWith(box);
   });
 
-  // Show "Stuur naar AI" only when the server says the AI connection is on.
+  // "Stuur naar AI" and the login bar only appear when the server has an AI connection.
   if (sendButtons.length) {
-    fetch('/api/ai/status').then((r) => (r.ok ? r.json() : null)).then((data) => {
-      if (data && data.enabled) sendButtons.forEach((b) => { b.hidden = false; });
+    getJson('/api/ai/status').then((state) => {
+      if (!state.enabled) return;
+      sendButtons.forEach((b) => { b.hidden = false; });
+      showLoginBar(state);
     }).catch(() => { /* no AI connection: copy only */ });
+  }
+
+  function showLoginBar(state) {
+    const article = document.querySelector('section.prompt')?.closest('article');
+    if (!article) return;
+    const bar = el('section', 'prompt-login');
+    bar.setAttribute('aria-label', 'Inloggen voor de AI');
+    article.prepend(bar);
+
+    const render = (s) => {
+      bar.replaceChildren();
+      if (s.loggedIn) {
+        bar.append(el('p', 'prompt-login-tekst', `Ingelogd als ${s.participant.label} (${s.participant.training}). Je kunt prompts naar de AI sturen.`));
+        const out = el('button', 'prompt-knop prompt-knop--rand', 'Uitloggen');
+        out.type = 'button';
+        out.addEventListener('click', async () => {
+          await fetch('/api/ai/logout', { method: 'POST' });
+          render({ loggedIn: false });
+        });
+        bar.append(out);
+      } else {
+        bar.append(el('p', 'prompt-login-tekst', 'Wil je prompts direct naar de AI sturen? Log in met de code die je van de trainer kreeg.'));
+        const form = el('form', 'prompt-login-form');
+        const label = el('label', 'prompt-veld-label', 'Je deelnemerscode');
+        label.htmlFor = 'deelnemerscode';
+        const input = el('input');
+        input.id = 'deelnemerscode';
+        input.autocomplete = 'off';
+        input.placeholder = 'VV-XXXX-XXXX';
+        const go = el('button', 'prompt-knop', 'Inloggen');
+        go.type = 'submit';
+        const msg = el('p', 'prompt-status');
+        msg.setAttribute('aria-live', 'polite');
+        form.append(label, input, go, msg);
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          try {
+            const participant = await getJson('/api/ai/login', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: input.value }),
+            });
+            render({ loggedIn: true, participant });
+          } catch (err) {
+            msg.className = 'prompt-status prompt-status--let-op';
+            msg.textContent = err.message;
+          }
+        });
+        bar.append(form);
+      }
+      bar.append(el('p', 'prompt-login-privacy', 'Let op: wat je naar de AI stuurt en het antwoord worden bewaard, zodat de trainer ze met de groep kan bespreken. Plak geen echte persoonsgegevens.'));
+    };
+    render(state);
   }
 })();

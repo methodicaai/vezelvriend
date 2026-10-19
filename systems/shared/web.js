@@ -54,17 +54,36 @@ export function page({ base, system, title, body, links = [] }) {
 </html>`.value;
 }
 
-/** Reads a small urlencoded form body (max 20 kB). */
-export function readForm(req) {
+function readBody(req, limit) {
   return new Promise((resolve, reject) => {
     let data = '';
+    req.setEncoding('utf8');
     req.on('data', (chunk) => {
       data += chunk;
-      if (data.length > 20_000) { reject(new Error('Body too large')); req.destroy(); }
+      if (data.length > limit) { reject(Object.assign(new Error('Body too large'), { status: 413 })); req.destroy(); }
     });
-    req.on('end', () => resolve(new URLSearchParams(data)));
+    req.on('end', () => resolve(data));
     req.on('error', reject);
   });
+}
+
+/** Reads a small urlencoded form body (max 20 kB by default). */
+export async function readForm(req, limit = 20_000) {
+  return new URLSearchParams(await readBody(req, limit));
+}
+
+/** Reads a JSON body (max 200 kB by default). */
+export async function readJson(req, limit = 200_000) {
+  try { return JSON.parse(await readBody(req, limit)); } catch (err) {
+    if (err.status) throw err;
+    throw Object.assign(new Error('Invalid JSON'), { status: 400 });
+  }
+}
+
+/** Parses the Cookie header into an object. */
+export function cookies(req) {
+  return Object.fromEntries((req.headers.cookie ?? '').split(';').map((c) => c.trim().split('=')).filter(([k]) => k)
+    .map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
 }
 
 /**
@@ -77,8 +96,9 @@ export function serve({ port, base, routes, notFound }) {
     const url = new URL(req.url, 'http://localhost');
     let pathname = url.pathname;
     if (base && pathname.startsWith(base)) pathname = pathname.slice(base.length) || '/';
-    const send = (status, type, body) => {
+    const send = (status, type, body, extraHeaders = {}) => {
       res.writeHead(status, {
+        ...extraHeaders,
         'Content-Type': type,
         'X-Content-Type-Options': 'nosniff',
         'Referrer-Policy': 'same-origin',
@@ -93,8 +113,9 @@ export function serve({ port, base, routes, notFound }) {
       const handler = routes[`${req.method} ${pathname}`] ?? findPatternRoute(routes, req.method, pathname);
       if (!handler) return send(404, 'text/html; charset=utf-8', notFound());
       const result = await handler.fn({ req, url, params: handler.params ?? {} });
-      send(result.status ?? 200, result.type ?? 'text/html; charset=utf-8', result.body);
+      send(result.status ?? 200, result.type ?? 'text/html; charset=utf-8', result.body ?? '', result.headers);
     } catch (err) {
+      if (err.status && err.status < 500) return send(err.status, 'text/plain; charset=utf-8', err.message);
       console.error(err);
       send(500, 'text/plain; charset=utf-8', 'Er ging iets mis in het systeem.');
     }

@@ -9,12 +9,18 @@ services:
     build: { context: ., dockerfile: gateway/Dockerfile }
     ports:
       - "127.0.0.1:${VEZELVRIEND_PORT:-8080}:80"
-    depends_on: [klantsysteem, klantbeeld]
+    depends_on: [klantsysteem, klantbeeld, ai]
     restart: unless-stopped
+    mem_limit: 128m
+    read_only: true          # nginx only needs a few writable temp folders
+    tmpfs: [/var/cache/nginx, /var/run, /tmp]
+    security_opt: [no-new-privileges:true]
 
   klantsysteem:
     build: { context: ., dockerfile: systems/Dockerfile }
     command: ["node", "systems/klantsysteem/server.js"]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]          # a Node app on port 3000 needs no Linux capabilities
     environment:
       BASE_PATH: /klantsysteem
       KLANTBEELD_URL: /klantbeeld
@@ -26,6 +32,8 @@ services:
   klantbeeld:
     build: { context: ., dockerfile: systems/Dockerfile }
     command: ["node", "systems/klantbeeld/server.js"]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]          # a Node app on port 3000 needs no Linux capabilities
     environment:
       BASE_PATH: /klantbeeld
       KLANTSYSTEEM_URL: /klantsysteem
@@ -33,3 +41,22 @@ services:
     mem_limit: 256m
     read_only: true
     tmpfs: [/tmp]
+
+  # AI box for the exercises: participant codes, Claude calls, stored conversations.
+  # Secrets (API key, trainer password) come from .env on the server only.
+  ai:
+    build: { context: ., dockerfile: systems/ai/Dockerfile }
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    env_file:
+      - path: .env
+        required: false
+    restart: unless-stopped
+    mem_limit: 256m
+    read_only: true
+    tmpfs: [/tmp]
+    volumes:
+      - ai-data:/data      # the conversations database survives restarts and updates
+
+volumes:
+  ai-data:

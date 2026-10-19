@@ -23,10 +23,29 @@ De omgeving draait met dezelfde `docker-compose.yml` als lokaal. Alleen de gatew
 
 Het override-bestand bevat geen geheimen, maar is wel specifiek voor de server; zet het daarom niet in de repository.
 
-## Veiligheid
+## AI-koppeling en trainerscherm
 
-- De systemen kunnen alleen lezen; een herstart zet alle data terug.
-- Het SQL-scherm heeft een tijdslimiet, een rijlimiet en een rem op het aantal verzoeken per bezoeker (nginx `limit_req`).
-- De systemen vragen zoekmachines ze niet te indexeren (`X-Robots-Tag: noindex`).
-- Containers draaien alleen-lezen en met een geheugenlimiet.
-- Er zijn geen geheimen nodig: geen `.env`, geen sleutels.
+De container `ai` stuurt prompts van deelnemers naar Claude en bewaart alle gesprekken in een SQLite-database op het Docker-volume `ai-data`. Zonder instellingen staat de AI uit: deelnemers zien dan alleen "Kopieer prompt".
+
+1. Kopieer `.env.example` naar `.env` in `/root/apps/vezelvriend` en vul in:
+   - `ANTHROPIC_API_KEY`: de sleutel uit console.anthropic.com (workspace "Vezelvriend", met bestedingslimiet);
+   - `TRAINER_PASSWORD`: wachtwoord voor het trainerscherm;
+   - `SESSION_SECRET`: een lange willekeurige reeks (`openssl rand -hex 32`).
+2. `docker compose up -d --build ai`.
+3. Ga naar `https://vezelvriend.nl/trainer/`, log in, maak een training aan en print de codes. Elke deelnemer logt op een oefenpagina in met een eigen code.
+
+`.env` staat in `.gitignore` en komt nooit in de repository.
+
+**Privacy.** De database bevat namen van deelnemers en alles wat ze verstuurd hebben. Vertel deelnemers dat vooraf (de site meldt het bij het inloggen), zet codes uit na de training, en verwijder trainingen als je ze niet meer nodig hebt (knop onderaan de trainingspagina).
+
+**Kosten.** Maximaal `AI_MAX_PER_DAY` vragen per deelnemer per dag (standaard 40) en een bestedingslimiet in de Anthropic Console. Het model staat in `AI_MODEL`.
+
+## Beveiliging
+
+- Alleen poort 80/443 (Nginx Proxy Manager) en 22 (SSH) staan open. De Vezelvriend-containers publiceren geen poort op de server.
+- Containers draaien zonder extra rechten (`no-new-privileges`), de Node-containers als gewone gebruiker zonder Linux-capabilities, en alle containers met een alleen-lezen bestandssysteem en een geheugenlimiet.
+- Geen enkele container heeft toegang tot de Docker-socket.
+- Inlogpogingen en AI-vragen worden geremd (nginx `limit_req` en een teller per bezoeker).
+- De nepsystemen kunnen alleen lezen; een herstart zet hun data terug. Het SQL-scherm heeft een tijdslimiet en een rijlimiet.
+- Alles vraagt zoekmachines om niet te indexeren (`X-Robots-Tag: noindex`).
+- Het enige geheim is `.env` (API-sleutel, trainerwachtwoord), alleen op de server.

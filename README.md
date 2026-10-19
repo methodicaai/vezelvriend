@@ -20,7 +20,7 @@ Je werkt een ochtend bij het verzonnen glasvezelbedrijf Vezelvriend in Breda Cen
 4. **Open** [http://localhost:8080](http://localhost:8080). Je ziet de website van het (fictieve) bedrijf. De training met uitleg, systemen en oefeningen staat op [http://localhost:8080/training/](http://localhost:8080/training/).
 5. **Kies een oefening** bij *Oefeningen* en werk met je eigen AI-assistent. Stoppen doe je met `Ctrl+C` in de terminal.
 
-Zonder Docker kan het ook, met [Node.js 24](https://nodejs.org/): `npm start` start de twee systemen (http://localhost:3001 en http://localhost:3002) en `npm run site` de site.
+Zonder Docker kan het ook, met [Node.js 24](https://nodejs.org/): bouw eenmalig de site (`npm ci --prefix site && npm run --prefix site build`) en start alles met `npm start` op http://localhost:8080. De AI draait dan in testmodus (nepantwoorden); het trainerscherm heeft wachtwoord `test`.
 
 ## Wat zit er in deze repository
 
@@ -36,6 +36,12 @@ Zonder Docker kan het ook, met [Node.js 24](https://nodejs.org/): `npm start` st
 | `trainer-private.example/` | Lege structuur van het trainersmateriaal | Laat zien wat er in de privé-map hoort, zonder antwoorden. |
 
 Meer uitleg: [docs/architecture.md](docs/architecture.md).
+
+## Prompts invullen, kopiëren en naar de AI sturen
+
+De voorbeeldprompts in de oefeningen zijn invulblokken: vaste tekst plus duidelijk gelabelde vakken voor wat je zelf invult, met een knop om de prompt te kopiëren. Bij oefening 1 is er ook prompt C, waarin alle context automatisch uit het Klantbeeld wordt opgehaald.
+
+Als de trainer de AI-koppeling aanzet (zie [docs/server.md](docs/server.md)), kunnen deelnemers met een persoonlijke code inloggen en een prompt direct naar Claude sturen. Gesprekken worden bewaard, zodat de trainer ze kan bespreken; het trainerscherm staat op `/trainer/`.
 
 ## Waarom de systemen niet met een AI praten
 

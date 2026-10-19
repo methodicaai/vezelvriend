@@ -149,3 +149,19 @@ h3{margin:0 0 .5rem;line-height:1.3}
 .prompt-antwoord-kop{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--kleur-accent-tekst);margin:0 0 .5rem}
 .prompt-antwoord-tekst{white-space:pre-wrap}
 .prompt-knop[hidden],.prompt-antwoord[hidden]{display:none}
+.prompt-login{border:1px solid var(--kleur-lijn);border-left:4px solid var(--kleur-accent);border-radius:var(--radius-klein);background:var(--kleur-vlak);padding:1rem 1.25rem;margin:0 0 1.5rem}
+.prompt-login-tekst{margin:0 0 .6rem;font-weight:600}
+.prompt-login-form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:.5rem .75rem}
+.prompt-login-form .prompt-veld-label{flex-basis:100%;margin:0}
+.prompt-login-form input{font:1rem Consolas,'Cascadia Mono','Courier New',monospace;padding:.55rem .75rem;border:1px solid var(--kleur-lijn);border-radius:8px;background:var(--kleur-achtergrond);color:var(--kleur-ink);min-width:12rem}
+.prompt-login-form .prompt-status{flex-basis:100%}
+.prompt-login-privacy{margin:.75rem 0 0;font-size:.88rem;color:var(--kleur-muted)}
+.prompt-login .prompt-knop{margin-top:.25rem}
+.prompt-veld--auto{border-style:solid;border-color:var(--kleur-lijn);background:var(--kleur-zacht)}
+.prompt-veld--auto .prompt-veld-label{color:var(--kleur-ink)}
+.prompt-kies{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .75rem;padding:.9rem 1.25rem;border-bottom:1px solid var(--kleur-lijn)}
+.prompt-kies .prompt-veld-label{margin:0;flex-basis:100%}
+.prompt-kies select{font:inherit;padding:.55rem .75rem;border:1px solid var(--kleur-lijn);border-radius:8px;background:var(--kleur-vlak);color:var(--kleur-ink);max-width:100%}
+.prompt-kies .prompt-status{flex-basis:100%}
+.prompt-veld.prompt-veld--leeg{border:2px dashed #B3261E;background:#FBE9E7}
+@media (prefers-color-scheme:dark){.prompt-veld.prompt-veld--leeg{border-color:#F2B8B5;background:#3A1E1C}}

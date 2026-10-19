@@ -163,7 +163,9 @@ function technicalTab(c, action) {
   </section>` : ''}`;
 }
 
-function modemResult(r) {
+// Facts shown by "Modem controleren", shared by the screen, its plain-text
+// version and the automatic context of prompt C.
+function modemFacts(r) {
   const m = r.measurement;
   const speed = m ? `${m.download_mbps} / ${m.upload_mbps} Mbit/s` : '-';
   const contractSpeed = r.contract ? `${r.contract.download_mbps} / ${r.contract.upload_mbps} Mbit/s` : '-';
@@ -172,9 +174,12 @@ function modemResult(r) {
     : 'geen storing bekend';
   const restart = r.restart ? `${formatStamp(r.restart.requested_at)}, ${r.restart.result}` : 'geen';
   const measuredAt = m ? `${formatStamp(m.measured_at)} (${r.measurementAgeMinutes} minuten geleden)` : 'geen meting';
+  return { m, speed, contractSpeed, area, restart, measuredAt };
+}
 
-  // Plain-text version so the employee can copy exactly what they choose.
-  const asText = [
+function modemText(r) {
+  const { m, speed, contractSpeed, area, restart, measuredAt } = modemFacts(r);
+  return [
     `Modemcontrole ${formatStamp(r.checkedAt)}`,
     `Status: ${m?.status ?? '-'}`,
     `Sessie: ${m?.session ?? '-'}`,
@@ -185,6 +190,13 @@ function modemResult(r) {
     `Andere aansluitingen op dit netwerksegment offline: ${r.offlineNeighbours}`,
     `Laatste herstart op afstand: ${restart}`,
   ].join('\n');
+}
+
+function modemResult(r) {
+  const { m, speed, contractSpeed, area, restart, measuredAt } = modemFacts(r);
+
+  // Plain-text version so the employee can copy exactly what they choose.
+  const asText = modemText(r);
 
   return html`
     <div class="tabel-vak"><table>
@@ -205,9 +217,54 @@ function modemResult(r) {
     <p class="uitleg">Klok in de oefenwereld: ${world.clockLabel}.</p>`;
 }
 
+// ---------------------------------------------------------------- automatic context (prompt C)
+//
+// Used by prompt C of exercise 1 on the training site: picks up "everything
+// the system knows" about a customer and fills the prompt automatically.
+// Deliberately naive, like many real integrations: it passes on all customer
+// details and the complete history at the address, unfiltered. Whether that
+// is wise is for the participant to judge.
+
+const DECISION_TREE = fs.readFileSync(path.join(ROOT, 'docs', 'decision-tree.md'), 'utf8').trim();
+const json = (data, status = 200) => ({ status, type: 'application/json; charset=utf-8', body: JSON.stringify(data) });
+
+function apiCustomers() {
+  const rows = searchCustomers(db, '').filter((r) => r.status === 'actief');
+  const withModem = new Set(db.prepare('SELECT customer_id FROM modems').all().map((r) => r.customer_id));
+  return json(rows.filter((r) => withModem.has(r.customer_id))
+    .map((r) => ({ customer_id: r.customer_id, name: r.name, address: formatAddress(r) })));
+}
+
+function apiContext({ params }) {
+  const c = getCustomer(db, params.id);
+  if (!c) return json({ error: 'Klant niet gevonden' }, 404);
+  const check = getModemCheck(db, c.customer_id);
+  const history = getAddressHistory(db, c.address_id);
+  return json({
+    klant: [
+      `Klant: ${c.name} (${c.customer_id}), ${c.customer_type}`,
+      `Adres: ${formatAddress(c)}`,
+      `Telefoon: ${c.phone}`,
+      `E-mail: ${c.email}`,
+      `Contract: ${c.product ?? '-'}${c.product ? `, ${c.download_mbps}/${c.upload_mbps} Mbit/s, ${formatEuro(c.monthly_fee_eur)} per maand` : ''}`,
+      `Klant sinds: ${formatStamp(c.customer_since)}`,
+      `Openstaand bedrag: ${formatEuro(c.open_balance_eur)}`,
+    ].join('\n'),
+    modem: check ? modemText(check) : 'Geen modem gekoppeld aan deze klant.',
+    historie: history.length === 0 ? 'Geen historie op dit adres.' : history.map((i) =>
+      `${formatStamp(i.at)} | ${i.channel}${i.direction ? ` (${i.direction})` : ''} | ${i.customer_name} (${i.customer_id}) | ${i.subject}: ${i.summary}`).join('\n'),
+    beslisboom: DECISION_TREE,
+  });
+}
+
 serve({
   port: PORT,
   base: BASE,
-  routes: routesOf({ 'GET /': chooseCustomer, 'GET /klant/:id': customerView }),
+  routes: routesOf({
+    'GET /': chooseCustomer,
+    'GET /klant/:id': customerView,
+    'GET /api/klanten': apiCustomers,
+    'GET /api/context/:id': apiContext,
+  }),
   notFound: () => page({ base: BASE, system: SYSTEM, title: 'Niet gevonden', body: html`<h1>Deze pagina bestaat niet</h1><p><a href="${BASE}/">Kies een klant</a></p>`, links }),
 });

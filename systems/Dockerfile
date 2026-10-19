@@ -6,6 +6,7 @@ WORKDIR /app
 COPY package.json ./
 COPY config ./config
 COPY data ./data
+COPY docs ./docs
 COPY systems ./systems
 COPY site/public/favicon.svg ./site/public/favicon.svg
 USER node
