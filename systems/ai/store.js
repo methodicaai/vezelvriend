@@ -1,5 +1,6 @@
-// Database of the AI box: trainings, participants with a login code, and every
-// prompt that was sent with the AI's answer.
+// Database of the AI box: trainings, participants with a login code, every
+// prompt that was sent with the AI's answer, and work that participants handed
+// in from their own AI.
 //
 // Unlike the fake company systems, this database is real and persistent: it
 // lives on a Docker volume and survives restarts and updates, so the trainer
@@ -45,6 +46,22 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 
 CREATE INDEX IF NOT EXISTS messages_by_participant ON messages(participant_id, sent_at);
+
+-- Work handed in by participants who used their own AI (e.g. Copilot at work).
+-- Only what the participant chooses to paste in; nothing is collected automatically.
+CREATE TABLE IF NOT EXISTS submissions (
+  submission_id  INTEGER PRIMARY KEY,
+  participant_id INTEGER NOT NULL REFERENCES participants(participant_id) ON DELETE CASCADE,
+  submitted_at   TEXT NOT NULL,
+  exercise       TEXT,
+  prompt_block   TEXT,
+  tool           TEXT,                      -- e.g. 'Microsoft Copilot', as chosen by the participant
+  prompt         TEXT NOT NULL,
+  answer         TEXT NOT NULL,
+  note           TEXT
+);
+
+CREATE INDEX IF NOT EXISTS submissions_by_participant ON submissions(participant_id, submitted_at);
 `;
 
 // No 0/O, 1/I/L: codes are read aloud and typed over from paper.
@@ -137,11 +154,31 @@ export function openStore(file) {
           m.status, m.error ?? null, m.model ?? null, m.inputTokens ?? null, m.outputTokens ?? null, m.durationMs ?? null);
     },
 
+    saveSubmission(m) {
+      db.prepare(`INSERT INTO submissions (participant_id, submitted_at, exercise, prompt_block, tool, prompt, answer, note)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+        .run(m.participantId, nowIso(), m.exercise ?? null, m.promptBlock ?? null, m.tool ?? null, m.prompt, m.answer, m.note ?? null);
+    },
+
+    countSubmissionsToday(participantId) {
+      const since = new Date(); since.setHours(0, 0, 0, 0);
+      return db.prepare('SELECT COUNT(*) AS n FROM submissions WHERE participant_id = ? AND submitted_at >= ?').get(participantId, since.toISOString()).n;
+    },
+
+    submissions(trainingId, participantId = null) {
+      return db.prepare(`
+        SELECT s.*, p.label FROM submissions s JOIN participants p ON p.participant_id = s.participant_id
+        WHERE p.training_id = ? AND (? IS NULL OR p.participant_id = ?)
+        ORDER BY s.submitted_at DESC`).all(trainingId, participantId, participantId);
+    },
+
     trainings() {
       return db.prepare(`
         SELECT t.*, (SELECT COUNT(*) FROM participants p WHERE p.training_id = t.training_id) AS participants,
                (SELECT COUNT(*) FROM messages m JOIN participants p ON p.participant_id = m.participant_id
-                 WHERE p.training_id = t.training_id) AS messages
+                 WHERE p.training_id = t.training_id) AS messages,
+               (SELECT COUNT(*) FROM submissions s JOIN participants p ON p.participant_id = s.participant_id
+                 WHERE p.training_id = t.training_id) AS submissions
         FROM trainings t ORDER BY t.created_at DESC`).all();
     },
 
@@ -151,7 +188,8 @@ export function openStore(file) {
 
     participants(trainingId) {
       return db.prepare(`
-        SELECT p.*, (SELECT COUNT(*) FROM messages m WHERE m.participant_id = p.participant_id) AS messages
+        SELECT p.*, (SELECT COUNT(*) FROM messages m WHERE m.participant_id = p.participant_id) AS messages,
+               (SELECT COUNT(*) FROM submissions s WHERE s.participant_id = p.participant_id) AS submissions
         FROM participants p WHERE p.training_id = ? ORDER BY p.participant_id`).all(trainingId);
     },
 

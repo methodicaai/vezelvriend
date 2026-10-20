@@ -50,6 +50,7 @@
   }
 
   const sendButtons = [];
+  const handInButtons = [];
 
   document.querySelectorAll('pre > code.language-prompt').forEach((code, blockIndex) => {
     const source = code.textContent.replace(/\n$/, '');
@@ -146,14 +147,18 @@
     const sendButton = el('button', 'prompt-knop prompt-knop--rand', 'Stuur naar AI');
     sendButton.type = 'button';
     sendButton.hidden = true;
+    const handInButton = el('button', 'prompt-knop prompt-knop--rand', 'Inleveren');
+    handInButton.type = 'button';
+    handInButton.hidden = true;
     const status = el('p', 'prompt-status');
     status.setAttribute('aria-live', 'polite');
-    actions.append(copyButton, sendButton, status);
+    actions.append(copyButton, sendButton, handInButton, status);
     box.append(actions);
     const answer = el('div', 'prompt-antwoord');
     answer.hidden = true;
     box.append(answer);
     sendButtons.push(sendButton);
+    handInButtons.push(handInButton);
 
     const setStatus = (text, warn) => {
       status.className = 'prompt-status' + (warn ? ' prompt-status--let-op' : '');
@@ -211,16 +216,73 @@
       }
     });
 
+    // "Inleveren": for participants who used their own AI (e.g. Copilot at work).
+    // They paste in what they want the trainer to see; the prompt is prefilled
+    // with this block's text, the answer comes from their own AI.
+    const handIn = el('form', 'prompt-inleveren');
+    handIn.hidden = true;
+    const field = (label, control) => {
+      const wrap = el('label', 'prompt-veld');
+      wrap.append(el('span', 'prompt-veld-label', label), control);
+      return wrap;
+    };
+    const toolSelect = el('select');
+    ['Microsoft Copilot', 'ChatGPT', 'Claude', 'Gemini', 'Anders'].forEach((t) => toolSelect.append(new Option(t, t)));
+    const promptInput = el('textarea'); promptInput.rows = 6;
+    const answerInput = el('textarea'); answerInput.rows = 8; answerInput.placeholder = 'Plak hier het antwoord van je AI';
+    const noteInput = el('textarea'); noteInput.rows = 2; noteInput.placeholder = 'Optioneel: wat viel je op?';
+    const handInSubmit = el('button', 'prompt-knop', 'Verstuur naar de trainer');
+    handInSubmit.type = 'submit';
+    const handInStatus = el('p', 'prompt-status');
+    handInStatus.setAttribute('aria-live', 'polite');
+    handIn.append(
+      el('p', 'prompt-login-privacy', 'Haal eerst werkgegevens en persoonsgegevens weg uit je prompt en het antwoord. Alleen wat je hier invult, gaat naar de trainer.'),
+      field('Welke AI gebruikte je?', toolSelect),
+      field('Je prompt, zoals je hem gebruikte', promptInput),
+      field('Het antwoord van je AI', answerInput),
+      field('Toelichting (optioneel)', noteInput),
+      handInSubmit,
+      handInStatus,
+    );
+    box.append(handIn);
+
+    handInButton.addEventListener('click', () => {
+      handIn.hidden = !handIn.hidden;
+      if (!handIn.hidden && !promptInput.value) promptInput.value = promptText();
+      if (!handIn.hidden) answerInput.focus();
+    });
+    handIn.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      handInSubmit.disabled = true;
+      try {
+        await getJson('/api/ai/inleveren', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ exercise, block: blockTitle, tool: toolSelect.value, prompt: promptInput.value, answer: answerInput.value, note: noteInput.value }),
+        });
+        handInStatus.className = 'prompt-status';
+        handInStatus.textContent = 'Ingeleverd. De trainer kan het nu zien.';
+        answerInput.value = '';
+        noteInput.value = '';
+      } catch (err) {
+        handInStatus.className = 'prompt-status prompt-status--let-op';
+        handInStatus.textContent = err.message;
+      } finally {
+        handInSubmit.disabled = false;
+      }
+    });
+
     code.parentElement.replaceWith(box);
   });
 
-  // "Stuur naar AI" and the login bar only appear when the server has an AI connection.
+  // "Stuur naar AI" only appears when the server has an AI connection; "Inleveren"
+  // and the login bar appear whenever participant codes work (no AI key needed).
   if (sendButtons.length) {
     getJson('/api/ai/status').then((state) => {
-      if (!state.enabled) return;
-      sendButtons.forEach((b) => { b.hidden = false; });
-      showLoginBar(state);
-    }).catch(() => { /* no AI connection: copy only */ });
+      if (state.enabled) sendButtons.forEach((b) => { b.hidden = false; });
+      if (state.handIn) handInButtons.forEach((b) => { b.hidden = false; });
+      if (state.enabled || state.handIn) showLoginBar(state);
+    }).catch(() => { /* no server: copy only */ });
   }
 
   function showLoginBar(state) {
@@ -233,7 +295,7 @@
     const render = (s) => {
       bar.replaceChildren();
       if (s.loggedIn) {
-        bar.append(el('p', 'prompt-login-tekst', `Ingelogd als ${s.participant.label} (${s.participant.training}). Je kunt prompts naar de AI sturen.`));
+        bar.append(el('p', 'prompt-login-tekst', `Ingelogd als ${s.participant.label} (${s.participant.training}). Je kunt nu inleveren.`));
         const out = el('button', 'prompt-knop prompt-knop--rand', 'Uitloggen');
         out.type = 'button';
         out.addEventListener('click', async () => {
@@ -242,7 +304,7 @@
         });
         bar.append(out);
       } else {
-        bar.append(el('p', 'prompt-login-tekst', 'Wil je prompts direct naar de AI sturen? Log in met de code die je van de trainer kreeg.'));
+        bar.append(el('p', 'prompt-login-tekst', 'Wil je je werk inleveren bij de trainer? Log in met de code die je van de trainer kreeg.'));
         const form = el('form', 'prompt-login-form');
         const label = el('label', 'prompt-veld-label', 'Je deelnemerscode');
         label.htmlFor = 'deelnemerscode';
@@ -269,7 +331,7 @@
         });
         bar.append(form);
       }
-      bar.append(el('p', 'prompt-login-privacy', 'Let op: wat je naar de AI stuurt en het antwoord worden bewaard, zodat de trainer ze met de groep kan bespreken. Plak geen echte persoonsgegevens.'));
+      bar.append(el('p', 'prompt-login-privacy', 'Let op: wat je inlevert of naar de AI stuurt, wordt bewaard, zodat de trainer het met je kan bespreken. Plak geen echte persoonsgegevens of werkgegevens.'));
     };
     render(state);
   }

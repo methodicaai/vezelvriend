@@ -51,7 +51,8 @@ const redirect = (location, headers = {}) => ({ status: 303, headers: { Location
 function status({ req }) {
   const p = participantFrom(req);
   return json(200, {
-    enabled: aiEnabled(),
+    enabled: aiEnabled(),   // "Stuur naar AI" (needs an API key)
+    handIn: true,           // "Inleveren" works with codes only, no AI key needed
     loggedIn: Boolean(p),
     participant: p ? { label: p.label, training: p.training_name } : null,
   });
@@ -95,6 +96,35 @@ async function ask({ req }) {
   if (result.status === 'error') return json(502, { error: result.participantMessage });
   if (result.status === 'refusal') return json(200, { answer: result.answer ?? '', note: result.error });
   return json(200, { answer: result.answer });
+}
+
+// Participants who work in their own AI (e.g. Copilot at work) paste in the
+// prompt and answer they want the trainer to see. They choose what to share,
+// so they can remove work data first; nothing is collected automatically.
+const TOOLS = ['Microsoft Copilot', 'ChatGPT', 'Claude', 'Gemini', 'Anders'];
+const MAX_HAND_INS_PER_DAY = 60;
+
+async function handIn({ req }) {
+  const p = participantFrom(req);
+  if (!p) return json(401, { error: 'Log eerst in met je deelnemerscode (bovenaan de pagina).' });
+  const body = await readJson(req);
+  const text = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+  const prompt = text(body.prompt, MAX_PROMPT_CHARS);
+  const answer = text(body.answer, MAX_PROMPT_CHARS);
+  if (!prompt || !answer) return json(400, { error: 'Vul zowel je prompt als het antwoord van je AI in.' });
+  if (store.countSubmissionsToday(p.participant_id) >= MAX_HAND_INS_PER_DAY) {
+    return json(429, { error: 'Je hebt vandaag het maximum aantal inleveringen bereikt.' });
+  }
+  store.saveSubmission({
+    participantId: p.participant_id,
+    exercise: text(body.exercise, 100),
+    promptBlock: text(body.block, 200),
+    tool: TOOLS.includes(body.tool) ? body.tool : 'Anders',
+    prompt,
+    answer,
+    note: text(body.note, 2_000) || null,
+  });
+  return json(200, { ok: true });
 }
 
 // ---------------------------------------------------------------- trainer screen
@@ -161,10 +191,10 @@ function trainingList() {
     <h1>Trainingen</h1>
     <p class="uitleg">AI: ${aiEnabled() ? html`aan, model <span class="mono">${aiModel()}</span>` : 'uit (geen API-sleutel ingesteld)'} · maximaal ${MAX_PER_DAY} vragen per deelnemer per dag.</p>
     <div class="tabel-vak"><table>
-      <thead><tr><th>Training</th><th>Aangemaakt</th><th>Deelnemers</th><th>Vragen</th><th>Codes</th></tr></thead>
-      <tbody>${trainings.length === 0 ? html`<tr><td colspan="5" class="leeg">Nog geen trainingen.</td></tr>` : trainings.map((t) => html`<tr>
+      <thead><tr><th>Training</th><th>Aangemaakt</th><th>Deelnemers</th><th>AI-vragen</th><th>Ingeleverd</th><th>Codes</th></tr></thead>
+      <tbody>${trainings.length === 0 ? html`<tr><td colspan="6" class="leeg">Nog geen trainingen.</td></tr>` : trainings.map((t) => html`<tr>
         <td><a href="/trainer/training/${t.training_id}">${t.name}</a></td>
-        <td>${time(t.created_at)}</td><td>${t.participants}</td><td>${t.messages}</td>
+        <td>${time(t.created_at)}</td><td>${t.participants}</td><td>${t.messages}</td><td>${t.submissions}</td>
         <td>${t.active ? html`<span class="status status--ok">werken</span>` : html`<span class="status status--uit">uitgezet</span>`}</td></tr>`)}</tbody>
     </table></div>
     <h2>Nieuwe training</h2>
@@ -210,6 +240,9 @@ function trainingDetail({ params, url }) {
   const participants = store.participants(t.training_id);
   const filter = url.searchParams.get('deelnemer') ? Number(url.searchParams.get('deelnemer')) : null;
   const messages = store.messages(t.training_id, filter);
+  const submissions = store.submissions(t.training_id, filter);
+  const who = filter ? participants.find((p) => p.participant_id === filter)?.label ?? '' : '';
+  const allLink = html`<a href="/trainer/training/${t.training_id}">alle deelnemers</a>`;
   return { body: trainerPage(t.name, html`
     <p><a href="/trainer/">Alle trainingen</a></p>
     <h1>${t.name}</h1>
@@ -222,14 +255,26 @@ function trainingDetail({ params, url }) {
 
     <h2>Deelnemers</h2>
     <div class="tabel-vak"><table>
-      <thead><tr><th>Deelnemer</th><th>Laatst ingelogd</th><th>Vragen</th><th></th></tr></thead>
+      <thead><tr><th>Deelnemer</th><th>Laatst ingelogd</th><th>AI-vragen</th><th>Ingeleverd</th><th></th></tr></thead>
       <tbody>${participants.map((p) => html`<tr>
         <td><a href="/trainer/training/${t.training_id}?deelnemer=${p.participant_id}">${p.label}</a></td>
-        <td>${time(p.last_login_at)}</td><td>${p.messages}</td>
+        <td>${time(p.last_login_at)}</td><td>${p.messages}</td><td>${p.submissions}</td>
         <td><form method="post" action="/trainer/deelnemer/${p.participant_id}/nieuwe-code"><input type="hidden" name="training" value="${t.training_id}"><button class="knop--licht">Nieuwe code</button></form></td></tr>`)}</tbody>
     </table></div>
 
-    <h2>Gesprekken${filter ? html` van ${participants.find((p) => p.participant_id === filter)?.label ?? ''} · <a href="/trainer/training/${t.training_id}">alle deelnemers</a>` : ''}</h2>
+    <h2>Ingeleverd${filter ? html` door ${who} · ${allLink}` : ''}</h2>
+    <p class="uitleg">Wat deelnemers zelf hebben ingeleverd uit hun eigen AI (bijvoorbeeld Copilot op het werk).</p>
+    ${submissions.length === 0 ? html`<p class="leeg">Nog niets ingeleverd.</p>` : submissions.map((m) => html`
+      <section class="paneel">
+        <p class="uitleg"><strong>${m.label}</strong> · ${time(m.submitted_at)} · ${m.exercise || '-'}${m.prompt_block ? ` · ${m.prompt_block}` : ''} · ${m.tool || '-'}</p>
+        <div class="kolommen">
+          <div><h3>Prompt</h3><pre class="schema">${m.prompt}</pre></div>
+          <div><h3>Antwoord van de AI</h3><pre class="schema">${m.answer}</pre></div>
+        </div>
+        ${m.note ? html`<p><strong>Toelichting:</strong> ${m.note}</p>` : ''}
+      </section>`)}
+
+    <h2>Gesprekken via de Vezelvriend-AI${filter ? html` van ${who} · ${allLink}` : ''}</h2>
     ${messages.length === 0 ? html`<p class="leeg">Nog geen vragen verstuurd.</p>` : messages.map((m) => html`
       <section class="paneel">
         <p class="uitleg"><strong>${m.label}</strong> · ${time(m.sent_at)} · ${m.exercise || '-'}${m.prompt_block ? ` · ${m.prompt_block}` : ''}
@@ -242,7 +287,7 @@ function trainingDetail({ params, url }) {
 
     <h2>Verwijderen</h2>
     <form method="post" action="/trainer/training/${t.training_id}/verwijderen" class="paneel">
-      <p>Verwijdert deze training met alle deelnemers, codes en gesprekken. Dit kan niet ongedaan worden gemaakt.</p>
+      <p>Verwijdert deze training met alle deelnemers, codes, gesprekken en inleveringen. Dit kan niet ongedaan worden gemaakt.</p>
       <p><label><input type="checkbox" name="zeker" value="ja" required> Ik weet het zeker</label></p>
       <p><button type="submit">Training definitief verwijderen</button></p>
     </form>`) };
@@ -272,8 +317,10 @@ function exportCsv({ params }) {
   const t = store.training(Number(params.id));
   if (!t) return { status: 404, body: 'Niet gevonden' };
   const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-  const rows = [['deelnemer', 'verstuurd', 'oefening', 'prompt_blok', 'status', 'prompt', 'antwoord', 'model', 'tokens_in', 'tokens_uit']]
-    .concat(store.messages(t.training_id).map((m) => [m.label, time(m.sent_at), m.exercise, m.prompt_block, m.status, m.prompt, m.answer ?? m.error, m.model, m.input_tokens, m.output_tokens]));
+  // One sheet for both; 'soort' tells a hand-in (own AI) from a Vezelvriend-AI conversation.
+  const rows = [['soort', 'deelnemer', 'tijdstip', 'oefening', 'prompt_blok', 'ai', 'status', 'prompt', 'antwoord', 'toelichting', 'tokens_in', 'tokens_uit']]
+    .concat(store.submissions(t.training_id).map((m) => ['ingeleverd', m.label, time(m.submitted_at), m.exercise, m.prompt_block, m.tool, '', m.prompt, m.answer, m.note, '', '']))
+    .concat(store.messages(t.training_id).map((m) => ['vezelvriend-ai', m.label, time(m.sent_at), m.exercise, m.prompt_block, m.model, m.status, m.prompt, m.answer ?? m.error, '', m.input_tokens, m.output_tokens]));
   const safeName = t.name.replace(/[^\w-]+/g, '_').slice(0, 50);
   return {
     type: 'text/csv; charset=utf-8',
@@ -290,6 +337,7 @@ serve({
     'POST /api/ai/login': login,
     'POST /api/ai/logout': logout,
     'POST /api/ai/ask': ask,
+    'POST /api/ai/inleveren': handIn,
     'GET /trainer/': trainerOnly(trainingList),
     'POST /trainer/login': trainerLogin,
     'POST /trainer/uitloggen': trainerLogout,

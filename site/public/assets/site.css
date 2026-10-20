@@ -165,3 +165,9 @@ h3{margin:0 0 .5rem;line-height:1.3}
 .prompt-kies .prompt-status{flex-basis:100%}
 .prompt-veld.prompt-veld--leeg{border:2px dashed #B3261E;background:#FBE9E7}
 @media (prefers-color-scheme:dark){.prompt-veld.prompt-veld--leeg{border-color:#F2B8B5;background:#3A1E1C}}
+.prompt-inleveren{border-top:1px solid var(--kleur-lijn);padding:.5rem 1.25rem 1.25rem;background:var(--kleur-achtergrond)}
+.prompt-inleveren .prompt-veld{border-style:solid;border-color:var(--kleur-lijn)}
+.prompt-inleveren select{font:inherit;padding:.5rem .7rem;border:1px solid var(--kleur-lijn);border-radius:8px;background:var(--kleur-vlak);color:var(--kleur-ink)}
+.prompt-inleveren .prompt-knop{margin:1rem 0 0 1.25rem}
+.prompt-inleveren .prompt-status{margin:.5rem 0 0 1.25rem}
+.prompt-inleveren[hidden]{display:none}

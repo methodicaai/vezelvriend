@@ -25,7 +25,7 @@ Het override-bestand bevat geen geheimen, maar is wel specifiek voor de server; 
 
 ## AI-koppeling en trainerscherm
 
-De container `ai` stuurt prompts van deelnemers naar Claude en bewaart alle gesprekken in een SQLite-database op het Docker-volume `ai-data`. Zonder instellingen staat de AI uit: deelnemers zien dan alleen "Kopieer prompt".
+De container `ai` beheert de deelnemerscodes, stuurt prompts van deelnemers naar Claude ("Stuur naar AI") en bewaart wat deelnemers **inleveren** uit hun eigen AI (bijvoorbeeld Copilot op het werk). Alles staat in een SQLite-database op het Docker-volume `ai-data`. Zonder API-sleutel staat "Stuur naar AI" uit; inleveren werkt wel, zodra er een trainerwachtwoord is ingesteld.
 
 1. Kopieer `.env.example` naar `.env` in `/root/apps/vezelvriend` en vul in:
    - `ANTHROPIC_API_KEY`: de sleutel uit console.anthropic.com (workspace "Vezelvriend", met bestedingslimiet);
