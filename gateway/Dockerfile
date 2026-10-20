@@ -16,6 +16,9 @@ COPY site/package.json site/package-lock.json ./site/
 RUN npm ci --prefix site --no-audit --no-fund
 COPY site ./site
 RUN npm run --prefix site build
+# The accounting export belongs to exercise 6. It is served next to the
+# exercises (behind the login) so it always matches the world in this image.
+RUN cp data/accounting/open-items.csv site/dist/training/oefeningen/open-items.csv
 
 # Stage 2: nginx with the built site
 FROM nginx:1.29-alpine

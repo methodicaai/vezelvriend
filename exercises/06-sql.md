@@ -20,7 +20,7 @@ Beantwoord deze vragen met een SQL-vraag die je door de AI laat schrijven:
 1. Welke actieve klanten wonen op hetzelfde adres?
 2. Welke klanten hebben een modem met een firmwareversie die niet de nieuwste is (4.2.1)?
 3. Wat is per klant de tijd van de laatste modemmeting, en hoeveel minuten was dat voor 10:15 op 17-10-2026?
-4. Wat staat er per klant open volgens het Klantsysteem? Vergelijk dat met de export van de boekhouding in `data/accounting/open-items.csv`.
+4. Wat staat er per klant open volgens het Klantsysteem? Vergelijk dat met de export van de boekhouding: download [open-items.csv](/training/oefeningen/open-items.csv). Een apart systeem, dus een apart bestand.
 
 Werkwijze per vraag:
 

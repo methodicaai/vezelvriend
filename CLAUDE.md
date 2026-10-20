@@ -24,6 +24,9 @@ Vezelvriend B.V. is a FICTIONAL fibre company: the practice environment of the D
 - `mijn`: API of the customer app (`/api/mijn/`), reads the fake data, only gets SESSION_SECRET.
 - `ai`: participant codes, Claude calls (official SDK, model from `AI_MODEL`, default `claude-opus-5-5`), conversations stored in SQLite on volume `ai-data`. Trainer screen `/trainer/`. Secrets only in `.env` on the server (see `.env.example`).
 - World clock fixed at Saturday 17-10-2026 10:15, city in `config/world.json`.
+- World on real addresses: `tools/world/fetch-bag.mjs --city X --district Y` (PDOK, no key, slow at times) writes `data/generated/bag.json`; `tools/world/generate.mjs --customers 2000` writes `data/generated/seed/`, the accounting CSV and `world-facts.md` (where the five scenarios live; trainer only). `data/generated/` is gitignored and exists only on the server; the Dockerfiles copy it over `data/seed/` at build time. Without it the template world in `data/seed/` is used. Steps: `docs/change-city.md`.
+- Scenario customers keep fixed IDs (K-1001 to K-1012, K-0871); `SEED_DIR=data/generated/seed` runs systems and the trainer test against the generated world.
+- Package builder `/pakket/`: products and rules in `data/products.json`, maths in `site/public/vv/pakket.js`, address check via `/api/mijn/adrescheck` on `data/generated/bag.json`.
 - Local without Docker: `npm run --prefix site build`, then `npm start` -> http://localhost:8080 (AI in test mode, trainer password `test`).
 
 ## Server and deploy
@@ -33,9 +36,9 @@ Vezelvriend B.V. is a FICTIONAL fibre company: the practice environment of the D
 - Proxy: NOT in the Nginx Proxy Manager database. Hand-written config in `/root/infra/nginx-proxy/data/nginx/custom/http.conf`; certificate `/etc/letsencrypt/live/vezelvriend` (inside the nginx-proxy container), renewed by `/etc/cron.d/vezelvriend-cert`.
 - Ask the owner first for: DNS, certificates, firewall, deleting data, changes outside `/root/apps/vezelvriend`. The owner pastes passwords and API keys themselves; never type them in for them.
 
-## Status (2026-10-19) and next steps
+## Status (2026-10-20) and next steps
 - Done: customer app "Mijn Vezelvriend" at /app/ (PWA, login with fake customer number + postcode, service `mijn`), company website, training pages, Klantsysteem (with SQL screen), Klantbeeld, decision tree, six exercises, fill-in prompt blocks, prompt C with automatic context, AI box with codes, stored conversations and trainer screen (deployed, but AI still off: no `.env` yet).
 - Waiting for the owner: Anthropic API account + key, then `.env` on the server (ANTHROPIC_API_KEY, TRAINER_PASSWORD, SESSION_SECRET).
 - Open security improvement (needs the owner's OK, touches the proxy): put the Vezelvriend gateway on its own network with Nginx Proxy Manager instead of `governorth_shared`, which it now shares with the other apps' containers (including the Postgres database).
-- Roadmap (`docs/roadmap.md`): next system is mail and documents, then servicedesk, backlog, the rest; later real BAG addresses (PDOK) and MCP.
+- Roadmap (`docs/roadmap.md`): next system is mail and documents, then servicedesk, backlog, the rest; later MCP. Real BAG addresses: done (Breda centrum, 2000 customers).
 - Possibly: automatic deploy via GitHub Actions like the owner's other sites (needs a change to `/usr/local/bin/methodica-deploy` on the server: ask first).
