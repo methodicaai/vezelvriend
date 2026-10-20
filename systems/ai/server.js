@@ -12,7 +12,7 @@
 import crypto from 'node:crypto';
 import { aiEnabled, aiModel, askClaude } from './claude.js';
 import { openStore } from './store.js';
-import { cookie, sign, tooManyAttempts, unsign } from '../shared/session.js';
+import { cookie, registerFailure, sign, tooManyFailures, unsign } from '../shared/session.js';
 import { cookies, html, readForm, readJson, routesOf, serve } from '../shared/web.js';
 
 const PORT = Number(process.env.PORT ?? 3003);
@@ -59,10 +59,14 @@ function status({ req }) {
 }
 
 async function login({ req }) {
-  if (tooManyAttempts(req)) return json(429, { error: 'Te veel pogingen. Wacht een kwartier en probeer het opnieuw.' });
+  // Generous: a whole group behind one office IP may mistype codes now and then.
+  if (tooManyFailures(req, 'code', 50)) return json(429, { error: 'Te veel mislukte pogingen. Wacht een kwartier en probeer het opnieuw.' });
   const { code } = await readJson(req, 2_000);
   const p = typeof code === 'string' && code.trim() ? store.login(code) : null;
-  if (!p) return json(401, { error: 'Deze code klopt niet, of de training is afgelopen.' });
+  if (!p) {
+    registerFailure(req, 'code');
+    return json(401, { error: 'Deze code klopt niet, of de training is afgelopen.' });
+  }
   const expires = Date.now() + DAY * 1000;
   return json(200, { label: p.label, training: p.training_name }, {
     'Set-Cookie': cookie(PARTICIPANT_COOKIE, sign(`${p.participant_id}:${expires}`), DAY),
@@ -173,12 +177,16 @@ function trainerLoginPage(message = '') {
 }
 
 async function trainerLogin({ req }) {
-  if (tooManyAttempts(req)) return { status: 429, ...trainerLoginPage('Te veel pogingen. Wacht een kwartier.') };
+  // Strict: only the trainer logs in here.
+  if (tooManyFailures(req, 'trainer', 10)) return { status: 429, ...trainerLoginPage('Te veel mislukte pogingen. Wacht een kwartier.') };
   const form = await readForm(req, 2_000);
   const given = Buffer.from(form.get('wachtwoord') ?? '');
   const expected = Buffer.from(TRAINER_PASSWORD);
   const ok = TRAINER_PASSWORD && given.length === expected.length && crypto.timingSafeEqual(given, expected);
-  if (!ok) return { status: 401, ...trainerLoginPage('Dat wachtwoord klopt niet.') };
+  if (!ok) {
+    registerFailure(req, 'trainer');
+    return { status: 401, ...trainerLoginPage('Dat wachtwoord klopt niet.') };
+  }
   return redirect('/trainer/', { 'Set-Cookie': cookie(TRAINER_COOKIE, sign(String(Date.now() + 12 * 3600 * 1000)), 12 * 3600) });
 }
 

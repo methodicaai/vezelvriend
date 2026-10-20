@@ -10,7 +10,7 @@
 // in the Klantbeeld, in customer language. It only reads.
 import { openDatabase } from '../shared/db.js';
 import { formatAddress, getCustomer, getModemCheck } from '../shared/queries.js';
-import { cookie, newSession, sessionId, tooManyAttempts } from '../shared/session.js';
+import { cookie, newSession, registerFailure, sessionId, tooManyFailures } from '../shared/session.js';
 import { formatEuro, formatStamp, world } from '../shared/world.js';
 import { cookies, readJson, routesOf, serve } from '../shared/web.js';
 
@@ -29,10 +29,11 @@ function customerFrom(req) {
 }
 
 async function login({ req }) {
-  if (tooManyAttempts(req)) return json(429, { error: 'Te veel pogingen. Wacht een kwartier en probeer het opnieuw.' });
+  if (tooManyFailures(req, 'klant', 50)) return json(429, { error: 'Te veel mislukte pogingen. Wacht een kwartier en probeer het opnieuw.' });
   const body = await readJson(req, 2_000);
   const c = getCustomer(db, normalise(body.klantnummer));
   if (!c || c.status !== 'actief' || normalise(c.postcode) !== normalise(body.postcode)) {
+    registerFailure(req, 'klant');
     return json(401, { error: 'Deze combinatie van klantnummer en postcode kennen we niet.' });
   }
   return json(200, { naam: c.name }, { 'Set-Cookie': cookie(COOKIE, newSession(c.customer_id, DAY), DAY) });

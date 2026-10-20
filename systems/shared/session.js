@@ -36,14 +36,29 @@ export function sessionId(signed) {
   return id && Number(expires) > Date.now() ? id : null;
 }
 
-// Brake on guessing (codes, passwords, customer logins), per visitor, in memory.
-// nginx has its own limit in front of this.
-const attempts = new Map();
-export function tooManyAttempts(req, max = 20, windowMs = 15 * 60 * 1000) {
-  const ip = String(req.headers['x-forwarded-for'] ?? req.socket.remoteAddress).split(',')[0].trim();
+// Brake on guessing (codes, passwords, customer logins), in memory.
+//
+// Only FAILED attempts count, per IP address and per kind of login. Why: a
+// whole training group often shares one IP address (the office network), so
+// counting every login would lock out the group; counting failures still stops
+// someone from guessing. nginx has its own, coarser limit in front of this.
+const failures = new Map();
+const WINDOW_MS = 15 * 60 * 1000;
+const ipOf = (req) => String(req.headers['x-forwarded-for'] ?? req.socket.remoteAddress).split(',')[0].trim();
+
+function recent(key) {
   const now = Date.now();
-  const recent = (attempts.get(ip) ?? []).filter((t) => now - t < windowMs);
-  recent.push(now);
-  attempts.set(ip, recent);
-  return recent.length > max;
+  const list = (failures.get(key) ?? []).filter((t) => now - t < WINDOW_MS);
+  failures.set(key, list);
+  return list;
+}
+
+/** True when this IP had `max` or more failed attempts of this kind in the last 15 minutes. */
+export function tooManyFailures(req, kind, max) {
+  return recent(`${kind}:${ipOf(req)}`).length >= max;
+}
+
+/** Records one failed attempt of this kind for this IP. */
+export function registerFailure(req, kind) {
+  recent(`${kind}:${ipOf(req)}`).push(Date.now());
 }
