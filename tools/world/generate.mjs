@@ -27,6 +27,9 @@ const args = process.argv.slice(2);
 const TOTAL = Number(args[args.indexOf('--customers') + 1] || 2000) || 2000;
 
 const bag = read('data', 'generated', 'bag.json');
+// Some BAG addresses have no postcode (for example berths and some
+// sub-addresses). A customer needs a postcode to log in, so skip those.
+bag.addresses = bag.addresses.filter((a) => a.street && a.house_number && a.postcode);
 const world = read('config', 'world.json');
 const T = Object.fromEntries(['addresses', 'customers', 'contracts', 'modems', 'modem_measurements', 'remote_restarts',
   'area_status', 'tickets', 'contacts', 'network_map', 'support_log'].map((t) => [t, read('data', 'seed', `${t}.json`)]));
