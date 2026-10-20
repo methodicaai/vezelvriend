@@ -69,6 +69,12 @@ async function login({ req }) {
   });
 }
 
+// Used by nginx (auth_request) to guard the exercise pages: 204 when the
+// visitor is logged in as a participant or as the trainer, 401 otherwise.
+function check({ req }) {
+  return participantFrom(req) || isTrainer(req) ? { status: 204, body: '' } : { status: 401, body: '' };
+}
+
 function logout() {
   return json(200, { ok: true }, { 'Set-Cookie': cookie(PARTICIPANT_COOKIE, '', 0) });
 }
@@ -336,6 +342,7 @@ serve({
     'GET /api/ai/status': status,
     'POST /api/ai/login': login,
     'POST /api/ai/logout': logout,
+    'GET /api/ai/check': check,
     'POST /api/ai/ask': ask,
     'POST /api/ai/inleveren': handIn,
     'GET /trainer/': trainerOnly(trainingList),

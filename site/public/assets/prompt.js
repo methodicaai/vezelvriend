@@ -300,7 +300,8 @@
         out.type = 'button';
         out.addEventListener('click', async () => {
           await fetch('/api/ai/logout', { method: 'POST' });
-          render({ loggedIn: false });
+          // The exercises are only for logged-in participants: back to the login page.
+          location.href = '/training/inloggen/';
         });
         bar.append(out);
       } else {

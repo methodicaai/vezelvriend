@@ -1,0 +1,23 @@
+---
+// Login page for participants. The exercise pages are only shown after
+// logging in with a participant code (nginx checks this, see gateway/nginx.conf).
+// The logic is in /assets/inloggen.js: no inline scripts (CSP).
+import Base from '../../layouts/TrainingLayout.astro';
+---
+<Base title="Inloggen" description="Log in met je deelnemerscode om de oefeningen te zien.">
+  <section class="sectie">
+    <div class="wrap smal">
+      <h1 class="inlog-kop">Inloggen voor de oefeningen</h1>
+      <p class="intro">De oefeningen zijn voor deelnemers van de training. Log in met de code die je van je trainer kreeg, bijvoorbeeld <code>VV-ABCD-EFGH</code>.</p>
+      <form id="inlog-form" class="inlog-form">
+        <label for="code">Je deelnemerscode</label>
+        <input id="code" name="code" autocomplete="off" autocapitalize="characters" placeholder="VV-XXXX-XXXX" required>
+        <button type="submit" class="knop knop--vol">Inloggen</button>
+        <p id="inlog-melding" class="inlog-melding" role="alert"></p>
+      </form>
+      <p class="intro">Wat je inlevert, wordt bewaard zodat de trainer het met je kan bespreken. Plak in de oefeningen geen echte persoonsgegevens of werkgegevens.</p>
+      <p>Geen code? Vraag je trainer, of lees eerst over <a href="/training/">de training</a>.</p>
+    </div>
+  </section>
+  <script is:inline src="/assets/inloggen.js" defer></script>
+</Base>

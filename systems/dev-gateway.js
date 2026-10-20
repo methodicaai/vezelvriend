@@ -19,7 +19,21 @@ const ROUTES = [
 ];
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.txt': 'text/plain', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
 
-http.createServer((req, res) => {
+// Same guard as nginx's auth_request: exercise pages only for logged-in visitors.
+function checkLogin(req) {
+  return new Promise((resolve) => {
+    const check = http.request({ host: '127.0.0.1', port: 3003, path: '/api/ai/check', headers: { cookie: req.headers.cookie ?? '' } },
+      (r) => { r.resume(); resolve(r.statusCode === 204); });
+    check.on('error', () => resolve(false));
+    check.end();
+  });
+}
+
+http.createServer(async (req, res) => {
+  if (req.url.startsWith('/training/oefeningen/') && !(await checkLogin(req))) {
+    res.writeHead(302, { Location: `/training/inloggen/?terug=${new URL(req.url, 'http://x').pathname}` });
+    return res.end();
+  }
   const route = ROUTES.find(([prefix]) => req.url.startsWith(prefix));
   if (route) {
     const upstream = http.request({ host: '127.0.0.1', port: route[1], path: req.url, method: req.method, headers: req.headers }, (up) => {
