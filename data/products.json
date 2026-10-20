@@ -1,0 +1,28 @@
+{
+  "_comment": "Products and rules of the fictional Vezelvriend B.V., used by the package builder on the website (/pakket/). Prices of the speeds match the contracts in data/seed/contracts.json. All names, prices and rules are made up.",
+  "speeds": [
+    { "id": "vezel-100", "product": "Vezel 100", "download_mbps": 100, "upload_mbps": 100, "monthly_fee_eur": 39.5, "description": "Genoeg voor mailen, streamen en videobellen met een of twee personen." },
+    { "id": "vezel-500", "product": "Vezel 500", "download_mbps": 500, "upload_mbps": 500, "monthly_fee_eur": 49.5, "description": "Voor een gezin dat tegelijk streamt, gamet en thuiswerkt.", "popular": true },
+    { "id": "vezel-1000", "product": "Vezel 1000", "download_mbps": 1000, "upload_mbps": 1000, "monthly_fee_eur": 59.5, "description": "Voor grote huishoudens en wie veel en grote bestanden verstuurt." }
+  ],
+  "extras": [
+    { "id": "wifi-punt", "name": "Extra wifi-punt", "monthly_fee_eur": 4.5, "max": 3, "description": "Sterke wifi op een andere verdieping of in de tuin. Maximaal 3." },
+    { "id": "vast-ip", "name": "Vast IP-adres", "monthly_fee_eur": 5.0, "max": 1, "only_with": ["vezel-500", "vezel-1000"], "description": "Voor wie thuis een eigen server of camera bereikbaar wil maken. Alleen bij Vezel 500 en Vezel 1000." },
+    { "id": "zorgeloos", "name": "Zorgeloos-service", "monthly_fee_eur": 3.0, "max": 1, "description": "Bij een storing in je woning komt de monteur zonder voorrijkosten." }
+  ],
+  "installation": [
+    { "id": "zelf", "name": "Zelf installeren", "one_off_eur": 0, "description": "Je krijgt de Vezelbox thuisgestuurd met een handleiding." },
+    { "id": "monteur", "name": "Installatie door een monteur", "one_off_eur": 49, "description": "Een monteur sluit alles aan en zet de wifi goed." }
+  ],
+  "terms": [
+    { "id": "1-jaar", "name": "1 jaar", "months": 12, "discount_months": 3, "discount_percent": 50, "connection_fee_eur": 25 },
+    { "id": "2-jaar", "name": "2 jaar", "months": 24, "discount_months": 6, "discount_percent": 50, "connection_fee_eur": 0 }
+  ],
+  "conditions": [
+    "De actiekorting geldt alleen voor de internetsnelheid, niet voor extra's.",
+    "Alleen voor nieuwe klanten op een adres in ons verzorgingsgebied.",
+    "Na de actieperiode betaal je de normale maandprijs. Prijzen worden elk jaar per 1 januari aangepast aan de inflatie.",
+    "Opzeggen kan na de looptijd per maand.",
+    "Alle bedragen zijn inclusief btw."
+  ]
+}

@@ -1,6 +1,8 @@
 # Data
 
-Alle data in deze map is **verzonnen** voor de training. Vezelvriend B.V. bestaat niet. Namen, telefoonnummers (06-0000...), e-mailadressen (@example.com), MAC-adressen (02:56:46:...) en IBAN's zijn verzonnen of bekende voorbeeldnummers. Adressen zijn voorlopig bedachte straatnamen met nep-postcodes (0000 ..), die later worden vervangen door echte BAG-adressen.
+Alle data in deze map is **verzonnen** voor de training. Vezelvriend B.V. bestaat niet. Namen, telefoonnummers (06-0000...), e-mailadressen (@example.com), MAC-adressen (02:56:46:...) en IBAN's zijn verzonnen of bekende voorbeeldnummers. De adressen in deze map zijn bedachte straatnamen met nep-postcodes (0000 ..): een kleine **sjabloonwereld**.
+
+**Echte adressen (BAG).** Op de server wordt met `tools/world/` een grotere wereld gemaakt: echte BAG-adressen uit het centrum van de trainingsstad, met 2000 verzonnen klanten. Die gegenereerde wereld staat in `data/generated/` en komt bewust **niet** in deze openbare repository: op die echte adressen wonen in werkelijkheid andere mensen. Zie `docs/change-city.md`.
 
 | Map of bestand | Wat | Gebruikt door |
 |---|---|---|

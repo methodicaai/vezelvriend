@@ -7,9 +7,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { openDatabase } from '../shared/db.js';
-import { formatAddress, getAddressHistory, getCustomer, getModemCheck, getNetworkMapEntry, searchCustomers } from '../shared/queries.js';
+import { formatAddress, getAddressHistory, getCustomer, getModemCheck, getNetworkMapEntry, isScenarioCustomer, searchCustomers } from '../shared/queries.js';
 import { ROOT, formatEuro, formatStamp, world } from '../shared/world.js';
-import { html, page, routesOf, serve } from '../shared/web.js';
+import { html, page, paginate, routesOf, serve } from '../shared/web.js';
 
 const PORT = Number(process.env.PORT ?? 3002);
 const BASE = process.env.BASE_PATH ?? '';
@@ -36,6 +36,7 @@ const render = (title, body) => ({ body: page({ base: BASE, system: SYSTEM, titl
 function chooseCustomer({ url }) {
   const q = url.searchParams.get('q') ?? '';
   const rows = searchCustomers(db, q);
+  const { slice, nav } = paginate(rows, url);
   return render('Klant kiezen', html`
     <h1>Welke klant heb je aan de lijn?</h1>
     <form class="zoek" method="get" action="${BASE}/" role="search">
@@ -45,11 +46,12 @@ function chooseCustomer({ url }) {
     </form>
     <div class="tabel-vak"><table>
       <thead><tr><th>Klantnr.</th><th>Naam</th><th>Adres</th><th>Status</th></tr></thead>
-      <tbody>${rows.map((r) => html`<tr>
+      <tbody>${slice.map((r) => html`<tr>
         <td class="mono"><a href="${BASE}/klant/${r.customer_id}">${r.customer_id}</a></td>
         <td><a href="${BASE}/klant/${r.customer_id}">${r.name}</a></td>
         <td>${formatAddress(r)}</td><td>${r.status}</td></tr>`)}</tbody>
-    </table></div>`);
+    </table></div>
+    ${nav}`);
 }
 
 function customerView({ url, params }) {
@@ -229,7 +231,8 @@ const DECISION_TREE = fs.readFileSync(path.join(ROOT, 'docs', 'decision-tree.md'
 const json = (data, status = 200) => ({ status, type: 'application/json; charset=utf-8', body: JSON.stringify(data) });
 
 function apiCustomers() {
-  const rows = searchCustomers(db, '').filter((r) => r.status === 'actief');
+  // Only the scenario customers: a list of thousands is no use in an exercise.
+  const rows = searchCustomers(db, '').filter((r) => r.status === 'actief' && isScenarioCustomer(r.customer_id));
   const withModem = new Set(db.prepare('SELECT customer_id FROM modems').all().map((r) => r.customer_id));
   return json(rows.filter((r) => withModem.has(r.customer_id))
     .map((r) => ({ customer_id: r.customer_id, name: r.name, address: formatAddress(r) })));

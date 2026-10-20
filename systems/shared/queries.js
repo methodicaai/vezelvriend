@@ -10,6 +10,10 @@ const CUSTOMER_SELECT = `
   JOIN addresses a ON a.address_id = c.address_id
   LEFT JOIN contracts k ON k.customer_id = c.customer_id`;
 
+// The training scenarios use the customer numbers K-1001 ... K-1012 (see the
+// trainer material). Lists for exercises show only these, not the whole base.
+export const isScenarioCustomer = (customerId) => /^K-10\d\d$/.test(customerId);
+
 export function formatAddress(row) {
   return `${row.street} ${row.house_number}${row.house_number_suffix ?? ''}, ${row.postcode} ${row.city}`;
 }

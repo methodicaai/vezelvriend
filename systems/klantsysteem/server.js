@@ -6,7 +6,7 @@ import path from 'node:path';
 import { openDatabase } from '../shared/db.js';
 import { formatAddress, searchCustomers } from '../shared/queries.js';
 import { ROOT, formatEuro, formatStamp } from '../shared/world.js';
-import { html, page, raw, readForm, routesOf, serve } from '../shared/web.js';
+import { html, page, paginate, raw, readForm, routesOf, serve } from '../shared/web.js';
 import { MAX_ROWS, runQuery } from './sql-runner.js';
 
 const PORT = Number(process.env.PORT ?? 3001);
@@ -30,6 +30,7 @@ function statusLabel(status) {
 function customerList({ url }) {
   const q = url.searchParams.get('q') ?? '';
   const rows = searchCustomers(db, q);
+  const { slice, from, nav } = paginate(rows, url);
   const body = html`
     <h1>Klanten</h1>
     <form class="zoek" method="get" action="${BASE}/" role="search">
@@ -38,12 +39,13 @@ function customerList({ url }) {
       <button type="submit">Zoeken</button>
       ${q ? html`<a class="knop knop--licht" href="${BASE}/">Wis zoekopdracht</a>` : ''}
     </form>
-    <p class="uitleg">${rows.length} ${rows.length === 1 ? 'klant' : 'klanten'} gevonden${q ? html` voor "${q}"` : ''}.</p>
+    <p class="uitleg">${rows.length} ${rows.length === 1 ? 'klant' : 'klanten'} gevonden${q ? html` voor "${q}"` : ''}${rows.length > slice.length ? ` (${from + 1} tot ${from + slice.length} getoond)` : ''}.</p>
+    ${nav}
     <div class="tabel-vak">
       <table>
         <thead><tr><th>Klantnr.</th><th>Naam</th><th>Type</th><th>Adres</th><th>Contract</th><th>Klant sinds</th><th>Status</th><th>Open bedrag</th><th></th></tr></thead>
         <tbody>
-          ${rows.map((r) => html`<tr>
+          ${slice.map((r) => html`<tr>
             <td class="mono">${r.customer_id}</td>
             <td>${r.name}</td>
             <td>${r.customer_type}</td>
@@ -56,7 +58,8 @@ function customerList({ url }) {
           </tr>`)}
         </tbody>
       </table>
-    </div>`;
+    </div>
+    ${nav}`;
   return { body: page({ base: BASE, system: SYSTEM, title: 'Klanten', body, links }) };
 }
 

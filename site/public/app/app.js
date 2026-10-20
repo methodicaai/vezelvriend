@@ -134,12 +134,24 @@
     } catch (err) { $('login-melding').textContent = err.message; }
   });
 
-  document.querySelectorAll('[data-demo]').forEach((b) => b.addEventListener('click', () => {
-    const [number, postcode] = b.dataset.demo.split('|');
-    $('klantnummer').value = number;
-    $('postcode').value = postcode;
-    $('login-form').requestSubmit();
-  }));
+  // Demo customers come from the server: their postcode depends on the city
+  // the training world is set to.
+  api('demo').then((list) => {
+    const ul = $('demo-lijst');
+    ul.replaceChildren();
+    list.forEach((c) => {
+      const li = el('li');
+      const b = el('button', '', c.naam);
+      b.type = 'button';
+      b.addEventListener('click', () => {
+        $('klantnummer').value = c.klantnummer;
+        $('postcode').value = c.postcode;
+        $('login-form').requestSubmit();
+      });
+      li.append(b);
+      ul.append(li);
+    });
+  }).catch(() => { $('demo-lijst').replaceChildren(el('li', 'app-zacht', 'Demoklanten konden niet worden geladen.')); });
 
   document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => show(b.dataset.tab)));
 

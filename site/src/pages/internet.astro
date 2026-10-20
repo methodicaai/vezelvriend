@@ -27,9 +27,9 @@ const popular = 'Vezel 500';
             <ul>
               <li>{p.download} Mbit/s down, {p.upload} Mbit/s up</li>
               <li>Vezelbox-modem met wifi</li>
-              <li>Geen eenmalige kosten</li>
+              <li>Geen aansluitkosten bij een contract van 2 jaar</li>
             </ul>
-            <a class="vv-knop vv-knop--vol" href="/bestellen/">Bestellen</a>
+            <a class="vv-knop vv-knop--vol" href={`/pakket/?snelheid=${p.product.toLowerCase().replace(' ', '-')}`}>Kies dit pakket</a>
           </div>
         ))}
       </div>

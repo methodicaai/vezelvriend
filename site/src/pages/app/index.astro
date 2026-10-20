@@ -41,7 +41,7 @@ import world from '../../../../config/world.json';
         <label for="klantnummer">Klantnummer</label>
         <input id="klantnummer" name="klantnummer" placeholder="K-1001" autocapitalize="characters" required>
         <label for="postcode">Postcode</label>
-        <input id="postcode" name="postcode" placeholder="0000 KA" autocapitalize="characters" required>
+        <input id="postcode" name="postcode" placeholder="1234 AB" autocapitalize="characters" required>
         <button type="submit" class="app-knop">Inloggen</button>
         <p id="login-melding" class="app-melding" role="alert"></p>
       </form>
@@ -49,13 +49,7 @@ import world from '../../../../config/world.json';
         <p><strong>Dit is een oefen-app.</strong> {world.company} bestaat niet. Vul hier nooit echte gegevens in.</p>
         <details>
           <summary>Inloggen met een demoklant</summary>
-          <ul class="app-demo">
-            <li><button type="button" data-demo="K-1001|0000 KA">Familie De Wit</button></li>
-            <li><button type="button" data-demo="K-1002|0000 GL">Mevrouw J. Jansen</button></li>
-            <li><button type="button" data-demo="K-1003|0000 LS">De heer Y. El Amrani</button></li>
-            <li><button type="button" data-demo="K-1004|0000 RP">Familie Bakker</button></li>
-            <li><button type="button" data-demo="K-1005|0000 MH">Bloemenhuis Lente</button></li>
-          </ul>
+          <ul class="app-demo" id="demo-lijst"><li class="app-zacht">Laden...</li></ul>
         </details>
       </div>
       <div id="installeer" class="app-kaart" hidden>

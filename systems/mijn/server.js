@@ -8,10 +8,12 @@
 //
 // The app shows the customer's own view of the same data the employees see
 // in the Klantbeeld, in customer language. It only reads.
+import fs from 'node:fs';
+import path from 'node:path';
 import { openDatabase } from '../shared/db.js';
-import { formatAddress, getCustomer, getModemCheck } from '../shared/queries.js';
+import { formatAddress, getCustomer, getModemCheck, isScenarioCustomer, searchCustomers } from '../shared/queries.js';
 import { cookie, newSession, registerFailure, sessionId, tooManyFailures } from '../shared/session.js';
-import { formatEuro, formatStamp, world } from '../shared/world.js';
+import { ROOT, formatEuro, formatStamp, world } from '../shared/world.js';
 import { cookies, readJson, routesOf, serve } from '../shared/web.js';
 
 const PORT = Number(process.env.PORT ?? 3004);
@@ -37,6 +39,52 @@ async function login({ req }) {
     return json(401, { error: 'Deze combinatie van klantnummer en postcode kennen we niet.' });
   }
   return json(200, { naam: c.name }, { 'Set-Cookie': cookie(COOKIE, newSession(c.customer_id, DAY), DAY) });
+}
+
+// Demo customers for the login screen: the scenario customers, with the
+// postcode of wherever the current world puts them.
+function demo() {
+  const rows = searchCustomers(db, '').filter((c) => c.status === 'actief' && isScenarioCustomer(c.customer_id) && c.customer_id <= 'K-1005');
+  return json(200, rows.map((c) => ({ klantnummer: c.customer_id, postcode: c.postcode, naam: c.name })));
+}
+
+// ---------------------------------------------------------------- address check (package builder)
+//
+// "Valt mijn adres in jullie gebied?" for the package builder on the website.
+// Uses the BAG snapshot of the training district when the server has one
+// (data/generated/bag.json, made by tools/world/), otherwise the addresses of
+// the small template world. Nothing is stored, and the answer never says
+// whether someone at that address is a customer.
+const ADDRESSES = (() => {
+  const bagFile = path.join(ROOT, 'data', 'generated', 'bag.json');
+  const list = fs.existsSync(bagFile)
+    ? JSON.parse(fs.readFileSync(bagFile, 'utf8')).addresses.map((a) => ({
+      postcode: a.postcode, number: a.house_number, addition: `${a.house_letter ?? ''}${a.house_suffix ? `-${a.house_suffix}` : ''}`, street: a.street, city: a.city }))
+    : db.prepare('SELECT postcode, house_number AS number, house_number_suffix AS addition, street, city FROM addresses').all()
+      .map((a) => ({ ...a, postcode: a.postcode.replace(/\s/g, ''), addition: a.addition ?? '' }));
+  const index = new Map();
+  for (const a of list) {
+    const key = `${a.postcode}|${a.number}`;
+    if (!index.has(key)) index.set(key, []);
+    index.get(key).push(a);
+  }
+  return index;
+})();
+
+function addressCheck({ url }) {
+  const postcode = normalise(url.searchParams.get('postcode'));
+  const number = Number(url.searchParams.get('huisnummer'));
+  const addition = normalise(url.searchParams.get('toevoeging')).replace(/^-/, '');
+  if (!/^\d{4}[A-Z]{2}$/.test(postcode) || !Number.isInteger(number) || number < 1) {
+    return json(400, { error: 'Vul een geldige postcode (1234 AB) en een huisnummer in.' });
+  }
+  const found = ADDRESSES.get(`${postcode}|${number}`) ?? [];
+  const label = (a) => `${a.street} ${a.number}${a.addition ? (/^[A-Z]/i.test(a.addition) ? a.addition : ` ${a.addition}`) : ''}, ${a.postcode.slice(0, 4)} ${a.postcode.slice(4)} ${a.city}`;
+  const exact = found.find((a) => normalise(a.addition).replace(/-/g, '') === addition.replace(/-/g, ''));
+  if (exact) return json(200, { inGebied: true, adres: label(exact) });
+  // Several flats or units at this number: ask which one, like real providers do.
+  if (found.length > 0 && !addition) return json(200, { inGebied: null, keuze: found.map((a) => ({ toevoeging: a.addition, adres: label(a) })) });
+  return json(200, { inGebied: false });
 }
 
 const logout = () => json(200, { ok: true }, { 'Set-Cookie': cookie(COOKIE, '', 0) });
@@ -97,6 +145,8 @@ serve({
   base: '',
   routes: routesOf({
     'POST /api/mijn/login': login,
+    'GET /api/mijn/demo': demo,
+    'GET /api/mijn/adrescheck': addressCheck,
     'POST /api/mijn/logout': logout,
     'GET /api/mijn/overzicht': overview,
     'POST /api/mijn/herstart': restart,

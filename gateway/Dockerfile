@@ -9,6 +9,9 @@ COPY config ./config
 COPY exercises ./exercises
 COPY docs ./docs
 COPY data ./data
+# Use the generated world (real BAG addresses, 2000 customers) when it exists on
+# this machine: it is made by tools/world/ and never committed to git.
+RUN if [ -d data/generated/seed ]; then cp data/generated/seed/*.json data/seed/ &&       if [ -f data/generated/accounting/open-items.csv ]; then cp data/generated/accounting/open-items.csv data/accounting/; fi; fi
 COPY site/package.json site/package-lock.json ./site/
 RUN npm ci --prefix site --no-audit --no-fund
 COPY site ./site

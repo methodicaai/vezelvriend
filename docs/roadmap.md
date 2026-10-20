@@ -10,7 +10,7 @@ De omgeving groeit stap voor stap: eerst wat in elke oefening nodig is, later de
 | 3 | **Servicedesk**: tickets bekijken en bijwerken, met de logregels uit oefening 5 | Gepland |
 | 4 | **Backlog**: user stories en acceptatiecriteria, voor de oefeningen van businessanalisten | Gepland |
 | 5 | **De rest**: boekhouding, marketing, planning van monteurs, dashboard | Later |
-| 6 | **Echte adressen** uit de BAG via PDOK, in plaats van de bedachte straatnamen | Later |
+| 6 | **Echte adressen** uit de BAG via PDOK, per stad en wijk in te stellen | Klaar |
 | 7 | **MCP-servers**: de systemen koppelen aan een AI-assistent, zodat deelnemers het verschil zien tussen zelf context geven en de AI zelf laten ophalen | Later |
 
 ## Bewust nog niet

@@ -1,0 +1,120 @@
+---
+// Package builder of the fictional company: address check, speed, extras,
+// installation and contract term, with a basket that keeps the total up to
+// date. Products and rules come from data/products.json (one source); the
+// calculation lives in /vv/pakket.js (no inline scripts: CSP).
+//
+// Nothing can be ordered and nothing is stored: the last step explains that
+// Vezelvriend is a training company. Useful for exercises: testers derive
+// test cases from the rules, analysts write stories for it.
+import Layout from '../layouts/CompanyLayout.astro';
+import products from '../../../data/products.json';
+import { euro } from '../world';
+---
+<Layout title="Stel je pakket samen">
+  <section class="vv-hero vv-hero--klein">
+    <div class="wrap">
+      <h1>Stel je pakket samen</h1>
+      <p>Kies je snelheid, de extra's die je wilt en hoe lang je klant wordt. Je ziet meteen wat je per maand betaalt.</p>
+    </div>
+  </section>
+
+  <section class="vv-sectie">
+    <div class="wrap pk">
+      <form id="pakket" class="pk-stappen" novalidate>
+        <fieldset class="pk-stap">
+          <legend><span class="pk-nr">1</span> Je adres</legend>
+          <p class="pk-uitleg">Kijk of glasvezel van Vezelvriend op je adres beschikbaar is. We slaan je adres niet op.</p>
+          <div class="pk-adres">
+            <label>Postcode<input name="postcode" autocomplete="off" placeholder="1234 AB" maxlength="7"></label>
+            <label>Huisnummer<input name="huisnummer" inputmode="numeric" autocomplete="off" placeholder="12" maxlength="5"></label>
+            <label>Toevoeging<input name="toevoeging" autocomplete="off" placeholder="A" maxlength="6"></label>
+            <button type="button" class="vv-knop vv-knop--vol" id="adrescheck">Check adres</button>
+          </div>
+          <div id="adres-uitkomst" class="pk-melding" role="status" aria-live="polite"></div>
+        </fieldset>
+
+        <fieldset class="pk-stap">
+          <legend><span class="pk-nr">2</span> Je snelheid</legend>
+          <div class="pk-keuzes">
+            {products.speeds.map((s, i) => (
+              <label class="pk-keuze">
+                <input type="radio" name="snelheid" value={s.id} data-price={s.monthly_fee_eur} data-name={s.product} checked={s.popular}>
+                <span class="pk-keuze-kop">{s.product}{s.popular && <span class="pk-label">Meest gekozen</span>}</span>
+                <span class="pk-keuze-prijs">{euro(s.monthly_fee_eur)} <small>per maand</small></span>
+                <span class="pk-keuze-tekst">{s.download_mbps} Mbit/s down en up. {s.description}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset class="pk-stap">
+          <legend><span class="pk-nr">3</span> Extra's</legend>
+          {products.extras.map((x) => (
+            <div class="pk-extra" data-only-with={(x.only_with ?? []).join(' ')}>
+              <label>
+                {x.max > 1
+                  ? <input type="number" name={x.id} min="0" max={x.max} value="0" data-price={x.monthly_fee_eur} data-name={x.name}>
+                  : <input type="checkbox" name={x.id} data-price={x.monthly_fee_eur} data-name={x.name}>}
+                <span><strong>{x.name}</strong> · {euro(x.monthly_fee_eur)} per maand{x.max > 1 ? ' per stuk' : ''}<br><small>{x.description}</small></span>
+              </label>
+              <p class="pk-niet-mogelijk" hidden>Niet mogelijk bij deze snelheid.</p>
+            </div>
+          ))}
+        </fieldset>
+
+        <fieldset class="pk-stap">
+          <legend><span class="pk-nr">4</span> Installatie</legend>
+          <div class="pk-keuzes pk-keuzes--twee">
+            {products.installation.map((x, i) => (
+              <label class="pk-keuze">
+                <input type="radio" name="installatie" value={x.id} data-once={x.one_off_eur} data-name={x.name} checked={i === 0}>
+                <span class="pk-keuze-kop">{x.name}</span>
+                <span class="pk-keuze-prijs">{x.one_off_eur === 0 ? 'Gratis' : `${euro(x.one_off_eur)} eenmalig`}</span>
+                <span class="pk-keuze-tekst">{x.description}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset class="pk-stap">
+          <legend><span class="pk-nr">5</span> Looptijd</legend>
+          <div class="pk-keuzes pk-keuzes--twee">
+            {products.terms.map((t, i) => (
+              <label class="pk-keuze">
+                <input type="radio" name="looptijd" value={t.id} data-months={t.months} data-discount-months={t.discount_months}
+                  data-discount-percent={t.discount_percent} data-connection={t.connection_fee_eur} data-name={t.name} checked={i === products.terms.length - 1}>
+                <span class="pk-keuze-kop">{t.name}</span>
+                <span class="pk-keuze-prijs">{t.discount_months} maanden {t.discount_percent}% korting</span>
+                <span class="pk-keuze-tekst">Op je internetsnelheid. Aansluitkosten: {t.connection_fee_eur === 0 ? 'gratis' : euro(t.connection_fee_eur)}.</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      </form>
+
+      <aside class="pk-mandje" aria-labelledby="mandje-kop">
+        <h2 id="mandje-kop">Je pakket</h2>
+        <ul id="mandje-regels" class="pk-regels"></ul>
+        <div class="pk-totaal">
+          <p><span id="actie-label">Eerste maanden</span><strong id="actie-prijs">-</strong></p>
+          <p><span>Daarna per maand</span><strong id="maand-prijs">-</strong></p>
+          <p><span>Eenmalig</span><strong id="eenmalig">-</strong></p>
+        </div>
+        <a class="vv-knop vv-knop--accent pk-bestel" id="bestellen" href="/bestellen/" aria-disabled="true">Bestellen</a>
+        <p class="pk-klein" id="bestel-uitleg">Check eerst je adres.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="vv-sectie vv-sectie--zacht">
+    <div class="wrap vv-tekst">
+      <h2>Voorwaarden</h2>
+      <ul>
+        {products.conditions.map((c) => <li>{c}</li>)}
+      </ul>
+      <p>Lees ook onze <a href="/service/voorwaarden/">servicevoorwaarden</a>.</p>
+    </div>
+  </section>
+  <script is:inline src="/vv/pakket.js" defer></script>
+</Layout>

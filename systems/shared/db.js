@@ -10,6 +10,9 @@ import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { ROOT, world } from './world.js';
 
+// SEED_DIR lets tests build a database from a generated world (data/generated/seed).
+const SEED_DIR = process.env.SEED_DIR ?? path.join(ROOT, 'data', 'seed');
+
 // Insert order follows the foreign keys.
 const TABLES = [
   'addresses', 'customers', 'contracts', 'modems', 'modem_measurements',
@@ -24,11 +27,11 @@ export function buildDatabase(file) {
 
   db.exec('BEGIN');
   for (const table of TABLES) {
-    const rows = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'seed', `${table}.json`), 'utf8'));
+    const rows = JSON.parse(fs.readFileSync(path.join(SEED_DIR, `${table}.json`), 'utf8'));
     for (const row of rows) {
-      // The city is a single setting for the whole world (config/world.json),
-      // so it is not repeated in every seed row.
-      if (table === 'addresses') row.city = world.city;
+      // The hand-made template has no city in its rows: it comes from the single
+      // setting in config/world.json. A generated world has real BAG cities.
+      if (table === 'addresses') row.city ??= world.city;
       const columns = Object.keys(row);
       const sql = `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${columns.map(() => '?').join(', ')})`;
       db.prepare(sql).run(...columns.map((c) => row[c]));

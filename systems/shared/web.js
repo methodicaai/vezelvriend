@@ -139,3 +139,21 @@ function findPatternRoute(routes, method, pathname) {
 
 // Wrap plain route functions so serve() can treat them uniformly.
 export const routesOf = (map) => Object.fromEntries(Object.entries(map).map(([k, fn]) => [k, { fn }]));
+
+/**
+ * Splits a long list into pages of PAGE_SIZE and renders simple prev/next links.
+ * A customer base of thousands is too big for one HTML page.
+ */
+export const PAGE_SIZE = 100;
+export function paginate(rows, url) {
+  const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const page = Math.min(pages, Math.max(1, Number(url.searchParams.get('pagina')) || 1));
+  const from = (page - 1) * PAGE_SIZE;
+  const link = (p, label) => {
+    const u = new URL(url); u.searchParams.set('pagina', String(p));
+    return html`<a class="knop knop--licht" href="${u.pathname}${u.search}">${label}</a>`;
+  };
+  const nav = pages === 1 ? '' : html`<p class="zoek">${page > 1 ? link(page - 1, 'Vorige') : ''}
+    <span class="uitleg">Pagina ${page} van ${pages}</span>${page < pages ? link(page + 1, 'Volgende') : ''}</p>`;
+  return { slice: rows.slice(from, from + PAGE_SIZE), from, page, pages, nav };
+}
