@@ -74,6 +74,8 @@
         addressOk = true;
         out.className = 'pk-melding pk-melding--goed';
         out.textContent = `Goed nieuws: glasvezel van Vezelvriend is beschikbaar op ${d.adres}.`;
+        // Shows the address on the map (kaart.js), when the page has one.
+        document.dispatchEvent(new CustomEvent('vv:adres', { detail: { lat: d.lat, lon: d.lon, adres: d.adres } }));
       } else if (d.inGebied === null) {
         addressOk = false;
         out.textContent = 'Op dit huisnummer zijn meerdere adressen. Kies het jouwe:';

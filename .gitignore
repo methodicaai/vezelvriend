@@ -18,6 +18,8 @@ trainer-private/
 node_modules/
 site/dist/
 site/.astro/
+# Copied from node_modules at build time (site/scripts/copy-vendor.mjs)
+site/public/vendor/
 .DS_Store
 Thumbs.db
 

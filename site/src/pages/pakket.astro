@@ -13,7 +13,7 @@ import Layout from '../layouts/CompanyLayout.astro';
 import products from '../../../data/products.json';
 import { euro } from '../world';
 ---
-<Layout title="Stel je pakket samen">
+<Layout title="Stel je pakket samen" kaart>
   <section class="vv-hero vv-hero--klein">
     <div class="wrap">
       <h1>Stel je pakket samen</h1>
@@ -34,6 +34,8 @@ import { euro } from '../world';
             <button type="button" class="vv-knop vv-knop--vol" id="adrescheck">Check adres</button>
           </div>
           <div id="adres-uitkomst" class="pk-melding" role="status" aria-live="polite"></div>
+          <div class="vv-kaart vv-kaart--klein" data-kaart="pakket" role="img" aria-label="Kaart van ons gebied, met je adres na de adrescheck"></div>
+          <p class="vv-kaart-uitleg">De groene lijn is <a href="/gebied/">ons gebied</a>. Na de adrescheck zie je je adres op de kaart.</p>
         </fieldset>
 
         <fieldset class="pk-stap">

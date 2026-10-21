@@ -64,7 +64,7 @@ const ADDRESSES = (() => {
   const bagFile = path.join(ROOT, 'data', 'generated', 'bag.json');
   const list = fs.existsSync(bagFile)
     ? JSON.parse(fs.readFileSync(bagFile, 'utf8')).addresses.map((a) => ({
-      postcode: a.postcode, number: a.house_number, addition: `${a.house_letter ?? ''}${a.house_suffix ? `-${a.house_suffix}` : ''}`, street: a.street, city: a.city }))
+      postcode: a.postcode, number: a.house_number, addition: `${a.house_letter ?? ''}${a.house_suffix ? `-${a.house_suffix}` : ''}`, street: a.street, city: a.city, lat: a.lat, lon: a.lon }))
     : db.prepare('SELECT postcode, house_number AS number, house_number_suffix AS addition, street, city FROM addresses').all()
       .map((a) => ({ ...a, postcode: a.postcode.replace(/\s/g, ''), addition: a.addition ?? '' }));
   const index = new Map();
@@ -94,7 +94,8 @@ function findAddress(postcodeIn, numberIn, additionIn) {
 function addressCheck({ url }) {
   const { error, exact, found, addition } = findAddress(url.searchParams.get('postcode'), url.searchParams.get('huisnummer'), url.searchParams.get('toevoeging'));
   if (error) return json(400, { error });
-  if (exact) return json(200, { inGebied: true, adres: addressLabel(exact) });
+  // The coordinates put the address on the map of the package builder (public BAG data).
+  if (exact) return json(200, { inGebied: true, adres: addressLabel(exact), lat: exact.lat ?? null, lon: exact.lon ?? null });
   // Several flats or units at this number: ask which one, like real providers do.
   if (found.length > 0 && !addition) return json(200, { inGebied: null, keuze: found.map((a) => ({ toevoeging: a.addition, adres: addressLabel(a) })) });
   return json(200, { inGebied: false });

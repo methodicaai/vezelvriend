@@ -1,0 +1,37 @@
+---
+// "Ons gebied": the service area on a map, with its neighbourhoods. The
+// area follows the training city (tools/world/), so this page changes with it.
+import Layout from '../layouts/CompanyLayout.astro';
+import Vlak from '../components/Vlak.astro';
+import { world } from '../world';
+
+const areaFiles = import.meta.glob('../../../data/generated/area.json', { eager: true, import: 'default' }) as Record<string, any>;
+const area = Object.values(areaFiles)[0];
+const buurten: string[] = area ? area.buurten.map((b: any) => b.naam).sort((a: string, b: string) => a.localeCompare(b, 'nl')) : [];
+---
+<Layout title="Ons gebied" kaart>
+  <section class="vv-hero vv-hero--klein">
+    <div class="wrap">
+      <h1>Ons gebied</h1>
+      <p>Vezelvriend legt glasvezel in {world.city} {world.district}. Hier zie je waar je glasvezel van ons kunt krijgen.</p>
+    </div>
+  </section>
+
+  <section class="vv-sectie">
+    <div class="wrap">
+      <div class="vv-kaart vv-kaart--groot" data-kaart="gebied" role="img" aria-label={`Kaart van ons gebied in ${world.city} ${world.district}`}></div>
+      <p class="vv-kaart-uitleg">De groene lijn is ons gebied; de stippellijnen zijn de buurten. Kaart van PDOK (Kadaster), grenzen van het CBS.</p>
+      {buurten.length > 0 && <p>Buurten: {buurten.join(', ')}.</p>}
+    </div>
+  </section>
+
+  <section class="vv-sectie vv-sectie--zacht">
+    <div class="wrap">
+      <Vlak columns={3} items={[
+        { label: 'Adrescheck', title: 'Woon je in ons gebied?', text: 'Vul je postcode en huisnummer in. Je ziet meteen of glasvezel van Vezelvriend op jouw adres kan.', href: '/pakket/', linkLabel: 'Pakket samenstellen' },
+        { label: 'Storingen', title: 'Is er een storing?', text: 'Op de kaart zie je in welke straat er een storing is.', href: '/storingen/', linkLabel: 'Bekijk de storingen' },
+        { label: 'Buiten ons gebied', title: 'Woon je ergens anders?', text: 'Vezelvriend is een oefenbedrijf en zit alleen in dit gebied. Voor echt glasvezel kijk je bij een echte aanbieder.', href: '/bestellen/', linkLabel: 'Lees meer' },
+      ]} />
+    </div>
+  </section>
+</Layout>

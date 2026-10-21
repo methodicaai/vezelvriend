@@ -3,7 +3,7 @@ import Layout from '../layouts/CompanyLayout.astro';
 import { world, getOutages, timeOf } from '../world';
 const outages = getOutages();
 ---
-<Layout title="Storingen">
+<Layout title="Storingen" kaart>
   <section class="vv-hero vv-hero--klein">
     <div class="wrap">
       <h1>Storingen</h1>
@@ -28,6 +28,9 @@ const outages = getOutages();
           ))}
         </ul>
       )}
+      {/* The red dots are the addresses in the street of the outage; the line is our service area. */}
+      <div class="vv-kaart" data-kaart="storing" role="img" aria-label={`Kaart van ons gebied in ${world.city} met de storing`}></div>
+      <p class="vv-kaart-uitleg">Rood: adressen in de straat met de storing. De groene lijn is <a href="/gebied/">ons gebied</a>.</p>
     </div>
   </section>
 

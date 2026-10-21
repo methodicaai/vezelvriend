@@ -3,11 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prebuild": "node scripts/copy-vendor.mjs",
+    "predev": "node scripts/copy-vendor.mjs",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview"
   },
   "dependencies": {
-    "astro": "7.4.0"
+    "astro": "7.4.0",
+    "leaflet": "1.9.4"
   }
 }

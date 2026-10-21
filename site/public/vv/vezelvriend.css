@@ -223,3 +223,12 @@ p{margin:0 0 1rem}
 .pk-bevestiging-lijst{display:grid;grid-template-columns:max-content 1fr;gap:.35rem 1rem;margin:1rem 0}
 .pk-bevestiging-lijst dt{color:var(--vv-muted)}
 .pk-bevestiging-lijst dd{margin:0;font-weight:800;font-family:ui-monospace,Consolas,monospace}
+
+/* Maps (Leaflet + PDOK background, see /vv/kaart.js) */
+.vv-kaart{height:22rem;margin:1.5rem 0 .5rem;border:1px solid var(--vv-line);border-radius:var(--vv-radius);overflow:hidden;background:var(--vv-soft);z-index:0}
+.vv-kaart--klein{height:16rem;margin-top:1rem}
+.vv-kaart--groot{height:min(32rem,70vh)}
+.vv-kaart--leeg{display:grid;place-items:center;color:var(--vv-muted);height:6rem}
+.vv-kaart-uitleg{font-size:.88rem;color:var(--vv-muted);margin:.25rem 0 1rem}
+.vv-kaart .leaflet-tooltip.vv-kaart-label{background:none;border:0;box-shadow:none;font-weight:800;color:#0f4f4a;text-shadow:0 0 3px #fff,0 0 3px #fff}
+.vv-kaart .leaflet-tooltip.vv-kaart-label::before{display:none}

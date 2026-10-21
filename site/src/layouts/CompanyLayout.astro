@@ -5,8 +5,9 @@
 // provider on a real domain must never be mistaken for a real one.
 import { world, getOutages, timeOf } from '../world';
 
-interface Props { title: string; description?: string; }
-const { title, description = `${world.company} is een fictief glasvezelbedrijf, bedacht voor de AI-training van Methodica.` } = Astro.props;
+interface Props { title: string; description?: string; kaart?: boolean; }
+// kaart: the page has a map (loads Leaflet and /vv/kaart.js).
+const { title, kaart = false, description = `${world.company} is een fictief glasvezelbedrijf, bedacht voor de AI-training van Methodica.` } = Astro.props;
 
 const nav = [
   { href: '/internet/', label: 'Internet' },
@@ -29,12 +30,13 @@ const outages = getOutages();
       for people searching for a real internet outage. */}
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="/vv/logo.svg" type="image/svg+xml">
+  {kaart && <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">}
   <link rel="stylesheet" href="/vv/vezelvriend.css">
 </head>
 <body>
   <a class="skip" href="#inhoud">Naar de inhoud</a>
   <div class="fictief" role="note">
-    <p><strong>Let op: {world.company} is een fictief bedrijf</strong>, bedacht voor de AI-training van Methodica. Geen echte internetaanbieder; alle namen, nummers en adressen zijn verzonnen. <a href="/training/">Naar de training</a></p>
+    <p><strong>Let op: {world.company} is een fictief bedrijf</strong>, bedacht voor de AI-training van Methodica. Geen echte internetaanbieder. De adressen bestaan echt, maar de klanten, namen en nummers zijn verzonnen. <a href="/training/">Naar de training</a></p>
   </div>
   <header class="vv-header">
     <div class="wrap vv-bar">
@@ -72,6 +74,7 @@ const outages = getOutages();
             <li><a href="/internet/">Abonnementen</a></li>
             <li><a href="/internet/#zakelijk">Zakelijk</a></li>
             <li><a href="/pakket/">Pakket samenstellen</a></li>
+            <li><a href="/gebied/">Ons gebied</a></li>
           </ul>
         </div>
         <div>
@@ -98,5 +101,7 @@ const outages = getOutages();
       </div>
     </div>
   </footer>
+  {kaart && <script is:inline src="/vendor/leaflet/leaflet.js"></script>}
+  {kaart && <script is:inline src="/vv/kaart.js" defer></script>}
 </body>
 </html>
