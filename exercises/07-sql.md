@@ -11,6 +11,8 @@ summary: Laat de AI SQL schrijven voor vragen over de klantdata. Met en zonder h
 
 Je ervaart dat een AI pas bruikbare SQL schrijft als hij de tabellen en kolommen kent, en dat je de uitkomst zelf moet controleren.
 
+**Tijd:** ± 45 minuten. Nog nooit SQL gezien? Dan is dit juist een goede oefening: de AI schrijft, jij controleert of de uitkomst klopt.
+
 ## Opdracht
 
 Open in het **Klantsysteem** het scherm **SQL**. Daar zie je ook het schema: alle tabellen en kolommen.

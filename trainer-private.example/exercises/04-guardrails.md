@@ -1,4 +1,4 @@
-# Oefening 04-data-pitfall (trainerversie)
+# Oefening 04-guardrails (trainerversie)
 
 ## Wat je wilt zien
 ## Antwoorden

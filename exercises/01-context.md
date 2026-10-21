@@ -11,17 +11,17 @@ summary: Dezelfde klantvraag, eerst kaal en daarna met de gegevens uit het Klant
 
 Je ervaart dat een AI-antwoord zo goed is als de context die je meegeeft. Je leert welke gegevens het verschil maken.
 
-Lees eerst [de contexttrap](/training/oefeningen/contexttrap/): daar zie je per trede een zwak en een sterk voorbeeld.
+**Tijd:** ± 30 minuten. Lees eerst [trede 0 en 1 van de contexttrap](/training/oefeningen/contexttrap/#trede-0): daar zie je een zwak en een sterk voorbeeld.
 
 ## Opdracht
 
 Een klant belt: **"Mijn modem doet het niet."**
 
-1. Kies een klant uit de lijst hieronder (of krijg er een van de trainer).
+1. Kies een klant uit de lijst hieronder, of krijg er een van de trainer. Weet je het niet? Begin met **Mevrouw Jansen**, en doe daarna **Familie Bakker** als je tijd over hebt.
 2. Stel je AI-assistent de vraag zonder context (prompt A). Bewaar het antwoord.
 3. Open de klant in het **Klantbeeld**. Kijk op het tabblad **Techniek** en klik op **Modem controleren**. Kijk ook naar **Klanthistorie op adres**.
-4. Stel de vraag opnieuw, nu met context (prompt B). Neem alleen over wat je nodig vindt.
-5. Probeer daarna prompt C. Daar kies je alleen de klant: alle context wordt automatisch uit het Klantbeeld opgehaald en ingevuld. Lees wat er is ingevuld voordat je het verstuurt.
+4. Stel de vraag opnieuw, nu met context (prompt B). Neem alleen over wat je nodig vindt. De werkwijze van Vezelvriend is de beslisboom: [download hem als tekst](/training/oefeningen/beslisboom.txt) en plak hem bij "Onze werkwijze".
+5. Probeer daarna prompt C. Daar kies je alleen de klant: alle context wordt automatisch uit het Klantbeeld opgehaald en ingevuld. Dat is al een stap hoger op de trap: een systeem kiest de context voor je. Lees wat er is ingevuld voordat je het verstuurt.
 6. Leg de antwoorden van A, B en C naast elkaar.
 
 Klanten om mee te oefenen: Familie De Wit, Mevrouw Jansen, De heer El Amrani, Familie Bakker, Bloemenhuis Lente.
@@ -46,7 +46,7 @@ Modemgegevens uit ons systeem:
 Relevante klanthistorie op dit adres:
 {{plak hier alleen wat over deze klant en dit probleem gaat}}
 
-Onze werkwijze: {{plak hier de beslisboom uit de documentatie}}
+Onze werkwijze: {{plak hier de beslisboom (download hem via de link in stap 4)}}
 
 Wat is de volgende stap, en wat zeg ik tegen de klant? Leg kort uit waarom.
 ```

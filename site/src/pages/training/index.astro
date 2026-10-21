@@ -5,9 +5,9 @@ import Vlak from '../../components/Vlak.astro';
 <Base title="Start">
   <section class="hero">
     <div class="hero-inner">
-      <p class="eyebrow">AI-training voor businessanalisten en testers</p>
+      <p class="eyebrow">AI op je werk, met verdieping voor analisten en testers</p>
       <h1>AI is zo goed als de <em>context</em> die je meegeeft.</h1>
-      <p class="lead">Dit is de oefenomgeving van Methodica. Je werkt een ochtend bij het (verzonnen) glasvezelbedrijf Vezelvriend en ontdekt hoe je AI goed inzet: context meegeven, grenzen stellen en valkuilen in data herkennen.</p>
+      <p class="lead">Dit is de oefenomgeving van Methodica. Je ontdekt eerst waarvoor jij AI kunt gebruiken. Daarna werk je bij het (verzonnen) glasvezelbedrijf Vezelvriend en oefen je hoe je AI goed inzet: context meegeven, grenzen stellen en valkuilen in data herkennen. Je sluit af met een echte taak uit je eigen werk.</p>
       <div class="knoppen">
         <a class="knop knop--vol" href="/training/oefeningen/">Naar de oefeningen</a>
         <a class="knop knop--rand" href="/training/bedrijf/">Maak kennis met Vezelvriend</a>
@@ -20,8 +20,8 @@ import Vlak from '../../components/Vlak.astro';
       <h2>Wat je hier leert</h2>
       <Vlak columns={3} items={[
         { label: 'Context', title: 'Geef de AI wat jij ziet', text: 'Een AI weet niets van jouw klant, jouw systemen of het tijdstip. Je oefent met wat je wel en niet meegeeft, en ziet wat dat doet met het antwoord.', href: '/training/oefeningen/01-context/', linkLabel: 'Naar oefening 1' },
-        { label: 'Guardrails', title: 'Spreek af wat niet mag', text: 'Je schrijft regels voor wat de AI wel en niet mag adviseren, zodat een goed klinkend antwoord geen verkeerde beslissing wordt.', href: '/training/oefeningen/03-guardrails/', linkLabel: 'Naar oefening 3' },
-        { label: 'Valkuilen', title: 'Vertrouw de data niet blind', text: 'Ook in nepdata zitten de fouten van echte systemen. Je leert ze herkennen voordat je ze aan een AI voert.', href: '/training/oefeningen/04-data-pitfall/', linkLabel: 'Naar oefening 4' },
+        { label: 'Guardrails', title: 'Spreek af wat niet mag', text: 'Je schrijft regels voor wat de AI wel en niet mag adviseren, zodat een goed klinkend antwoord geen verkeerde beslissing wordt.', href: '/training/oefeningen/04-guardrails/', linkLabel: 'Naar oefening 4' },
+        { label: 'Valkuilen', title: 'Vertrouw de data niet blind', text: 'Ook in nepdata zitten de fouten van echte systemen. Je leert ze herkennen voordat je ze aan een AI voert.', href: '/training/oefeningen/02-data-pitfall/', linkLabel: 'Naar oefening 2' },
       ]} />
     </div>
   </section>
@@ -30,11 +30,11 @@ import Vlak from '../../components/Vlak.astro';
     <div class="wrap smal">
       <h2>Zo begin je</h2>
       <ol class="stappen">
-        <li><h3>Lees wie Vezelvriend is</h3><p>Een regionaal glasvezelbedrijf met zo'n 25 medewerkers. Jij zit vandaag aan de telefoon.</p></li>
-        <li><h3>Bekijk de systemen</h3><p>Het Klantsysteem en het Klantbeeld zijn nep, maar gedragen zich als echte bedrijfssoftware.</p></li>
-        <li><h3>Kies een oefening</h3><p>Elke oefening heeft een doel, een opdracht, voorbeeldprompts en een reflectievraag.</p></li>
-        <li><h3>Werk met je eigen AI-assistent</h3><p>De systemen praten niet met een AI. Jij beslist wat je overneemt in je prompt. Dat is precies de vaardigheid die je oefent.</p></li>
-        <li><h3>Bespreek wat je zag</h3><p>De trainer bespreekt met de groep wat er goed ging en waar het misliep.</p></li>
+        <li><h3>Begin bij jezelf</h3><p>Op <a href="/training/oefeningen/wat-kan-ai/">Wat kan AI voor jou?</a> kies je een taak uit je eigen werk en zoek je uit welke AI je hebt.</p></li>
+        <li><h3>Lees wie Vezelvriend is</h3><p>Een regionaal glasvezelbedrijf met zo'n 25 medewerkers. In de oefeningen zit je aan de telefoon bij de klantenservice. Het Klantsysteem en het Klantbeeld zijn nep, maar gedragen zich als echte bedrijfssoftware.</p></li>
+        <li><h3>Volg de route</h3><p>De <a href="/training/oefeningen/">oefeningen</a> staan op volgorde, van zelf context kiezen tot een AI die zelf zoekt. Bij elke stap staat hoe lang hij ongeveer duurt.</p></li>
+        <li><h3>Werk met je eigen AI, of met Claude</h3><p>Meestal kies jij wat je overneemt in je prompt: dat is de vaardigheid die je oefent. Naast elke oefening staat een chat met Claude. In oefening 3 zoekt Claude zelf in de systemen, en zie je wat dat oplevert en wat er ongevraagd meekomt.</p></li>
+        <li><h3>Bespreek wat je zag</h3><p>De trainer bespreekt met je wat er goed ging en waar het misliep. Werk je alleen? Kijk dan bij elke oefening naar de reflectievragen.</p></li>
       </ol>
     </div>
   </section>

@@ -1,25 +1,27 @@
 ---
-number: 3
+number: 4
 title: Guardrails schrijven
 role: Iedereen
 summary: Schrijf regels voor wat de AI wel en niet mag adviseren, en test ze op de vijf klanten.
 ---
 
-# Oefening 3: Guardrails schrijven
+# Oefening 4: Guardrails schrijven
 
 ## Doel
 
-Je leert grenzen stellen aan een AI-assistent, zodat een goed klinkend antwoord geen verkeerde beslissing wordt.
+Je leert grenzen stellen aan een AI-assistent, zodat een goed klinkend antwoord geen verkeerde beslissing wordt. In oefening 3 zag je een AI die zelf een monteur wilde aanvragen; hier bepaal jij de regels.
+
+**Tijd:** ± 30 minuten. Dit hoort bij [trede 4 van de contexttrap](/training/oefeningen/contexttrap/#trede-4).
 
 ## Opdracht
 
-1. Lees de beslisboom bij **De systemen** op de site (of `docs/decision-tree.md`).
+1. Lees de beslisboom bij [De systemen](/training/systemen/), of [download hem als tekst](/training/oefeningen/beslisboom.txt).
 2. Schrijf een set regels (guardrails) voor een AI-assistent die de klantenservice helpt. Denk aan:
    - wat de AI **nooit** mag adviseren of beloven;
    - wanneer de AI moet zeggen dat hij het niet weet;
    - welke gegevens de AI eerst moet hebben voordat hij een advies geeft;
    - wanneer de AI moet doorverwijzen naar een mens.
-3. Zet je regels bovenaan een prompt en test ze op minstens drie van de vijf klanten uit oefening 1.
+3. Zet je regels bovenaan de prompt hieronder en test ze in de chat naast deze oefening, op twee klanten uit oefening 1: **Mevrouw Jansen** en **Familie Bakker**. Plak per klant de gegevens van "Modem controleren" uit het [Klantbeeld](/klantbeeld/).
 4. Probeer je eigen regels te breken: schrijf een prompt waarin de klant aandringt ("Ik wil gewoon een monteur!").
 
 Een voorbeeld van één regel: *"Plan nooit een monteur in zonder een gecontroleerde meting van de afgelopen 15 minuten."*

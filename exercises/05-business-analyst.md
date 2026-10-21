@@ -11,15 +11,17 @@ summary: Maak met AI een user story met acceptatiecriteria uit een klantverhaal,
 
 Je gebruikt AI om sneller een goede user story te schrijven, en je leert de bronnen te controleren in plaats van de AI blind te volgen.
 
+**Tijd:** ± 45 minuten.
+
 ## Opdracht
 
-Lees deze bestanden in de map `data/` van de repository:
+Lees deze documenten. Ze staan ook in de [documentenmap](/training/oefeningen/documenten/):
 
-- `documents/customer-story-de-wit.md`: het verhaal van Familie De Wit;
-- `documents/call-guide.json`: de gespreksleidraad van de klantenservice;
-- `documents/service-document.md`: de servicevoorwaarden (ook te lezen op de website, onder Service);
-- `backlog/US-014-outage-repair-time.md`: de user story zoals die nu in de backlog staat;
-- `mail/2026-10-14-sanne-us-014.md`: een mail van de product owner.
+- [Klantverhaal Familie De Wit](/training/oefeningen/documenten/klantverhaal-de-wit.txt): het verhaal van de klant;
+- [Gespreksleidraad](/training/oefeningen/documenten/gespreksleidraad.txt): hoe de klantenservice een gesprek voert;
+- [Servicevoorwaarden](/training/oefeningen/documenten/servicevoorwaarden.txt): ook te lezen op de website, onder Service;
+- [User story US-014](/training/oefeningen/documenten/us-014.txt): de user story zoals die nu in de backlog staat;
+- [Mail van Sanne over US-014](/training/oefeningen/documenten/mail-sanne-us-014.txt): een mail van de product owner.
 
 Doe dan het volgende:
 

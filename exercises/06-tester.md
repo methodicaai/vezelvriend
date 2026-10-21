@@ -11,9 +11,11 @@ summary: Leid met AI testcases af uit de beslisboom, inclusief randgevallen, en 
 
 Je gebruikt AI om testcases te bedenken en leert dat de AI vooral de voor de hand liggende gevallen vindt. De randgevallen moet je zelf bewaken.
 
+**Tijd:** ± 45 minuten.
+
 ## Opdracht
 
-1. Lees de beslisboom bij **De systemen** op de site (of `docs/decision-tree.md`).
+1. Lees de beslisboom bij [De systemen](/training/systemen/), of [download hem als tekst](/training/oefeningen/beslisboom.txt).
 2. Laat de AI testcases maken, eerst kaal (prompt A), dan met de beslisboom en de definities erbij (prompt B).
 3. Vul de lijst zelf aan met randgevallen. Denk in elk geval aan:
    - een meting die **precies 15 minuten** oud is;

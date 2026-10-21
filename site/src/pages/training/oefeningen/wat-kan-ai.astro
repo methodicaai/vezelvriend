@@ -1,0 +1,79 @@
+---
+// First step of the route: before learning HOW to use AI well, participants
+// find out WHAT they could use it for, and which AI they have (their step on
+// the context ladder). Written for people who want to do something with AI at
+// work but do not know where to start. Nothing here uses Vezelvriend data.
+import Base from '../../../layouts/TrainingLayout.astro';
+import Vlak from '../../../components/Vlak.astro';
+
+const tasks = [
+  { label: 'Mail en berichten', title: 'Lezen en schrijven', text: 'Een lange mailwisseling samenvatten tot de afspraken. Een lastige mail herschrijven: korter, vriendelijker of duidelijker. Een eerste versie van een antwoord maken.' },
+  { label: 'Overleg', title: 'Voorbereiden en vastleggen', text: 'Een agenda opstellen. Aantekeningen omzetten in besluiten en actiepunten met een eigenaar. Vragen bedenken die je in een overleg wilt stellen.' },
+  { label: 'Documenten', title: 'Bronnen doorzoeken', text: 'Uit een beleidsstuk of handleiding halen wat voor jouw vraag geldt, met de paragraaf erbij. Twee versies van een document vergelijken.' },
+  { label: 'Analisten', title: 'Eisen en user stories', text: 'Eisen uit mails en verslagen halen. Een user story met acceptatiecriteria opzetten. Gaten en tegenstrijdigheden zoeken in wat er al ligt.' },
+  { label: 'Testers', title: 'Testgevallen en randgevallen', text: 'Testgevallen afleiden uit een beschrijving of regel. Randgevallen bedenken. Een bevinding helder opschrijven: verwacht, werkelijk, stappen.' },
+  { label: 'Uitleggen', title: 'Begrijpelijk maken', text: 'Een technisch stuk uitleggen in gewone taal. Een tekst schrijven voor een andere doelgroep. Een SQL-vraag of foutmelding laten uitleggen.' },
+];
+---
+<Base title="Wat kan AI voor jou?" description="Ontdek welke taken in je werk geschikt zijn voor AI, en welke AI jij mag gebruiken.">
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Stap 1 van de route · ± 20 minuten</p>
+      <h1>Wat kan AI voor jou?</h1>
+      <p class="lead">Voordat je leert hoe je AI goed gebruikt, kijk je eerst waarvoor. Welke taken in jouw werk lenen zich ervoor, en welke AI mag jij gebruiken? Met die twee antwoorden maak je de rest van de oefeningen, en aan het eind doe je een echte taak van jezelf.</p>
+    </div>
+  </section>
+
+  <section class="sectie">
+    <div class="wrap">
+      <h2>Taken die zich goed lenen</h2>
+      <p class="prose">AI is sterk in werk met tekst: lezen, samenvatten, ordenen, herschrijven, ideeën bedenken. Hieronder staan voorbeelden. Streep in gedachten aan wat je vaak doet.</p>
+      <Vlak columns={3} items={tasks} />
+    </div>
+  </section>
+
+  <section class="sectie sectie--vlak">
+    <div class="wrap prose">
+      <h2>Zo kies je je eerste taak</h2>
+      <p>Een goede eerste taak voldoet aan vier dingen:</p>
+      <ol>
+        <li><strong>Je doet hem vaak,</strong> minstens elke week. Dan levert het iets op, en oefen je vanzelf.</li>
+        <li><strong>Het is werk met tekst,</strong> geen beslissing. De AI maakt een eerste versie, jij beslist.</li>
+        <li><strong>Je kunt de uitkomst zelf controleren.</strong> Je weet genoeg van het onderwerp om een fout te zien.</li>
+        <li><strong>Er zit niets in dat niet naar de AI mag,</strong> zoals persoonsgegevens of vertrouwelijke stukken, tenzij je werkgever dat uitdrukkelijk toestaat.</li>
+      </ol>
+      <p><strong>Liever niet voor een eerste taak:</strong> beslissingen over mensen, feiten die je niet kunt nakijken, rekenwerk waar geld van afhangt, en alles waarvan je niet weet of het naar de AI mag.</p>
+      <p>Schrijf je taak op. Je gebruikt hem aan het eind, bij de <a href="/training/oefeningen/werkbladen/">werkbladen</a>.</p>
+    </div>
+  </section>
+
+  <section class="sectie">
+    <div class="wrap">
+      <h2>Welke AI heb jij, en wat kan die?</h2>
+      <p class="prose">Plak deze vragen in de AI die je op je werk gebruikt. Ze testen niets en zoeken niets op: de AI vertelt alleen wat hij kan. Twijfel je of je dit mag vragen? Kijk dan in het menu van je AI, of vraag het je IT-afdeling.</p>
+      <pre class="prompt-alleen-kopieren"><code class="language-prompt">Ik ga binnenkort een training volgen over het gebruik van AI. Ik wil weten wat ik met jou kan doen. Beantwoord de vragen hieronder over je eigen mogelijkheden. Zoek daarvoor niets op en laat niets zien uit mijn mail, documenten of andere bestanden: vertel alleen wat je kunt. Weet je iets niet zeker, zeg dat dan.
+
+1. Kun je op internet zoeken?
+2. Kan ik een bestand toevoegen aan dit gesprek?
+3. Kan ik documenten en instructies bewaren op een vaste plek, zodat ik ze later weer kan gebruiken (bijvoorbeeld een project of notebook)?
+4. Kun je zelf in mijn documenten of mail zoeken, of moet ik je de informatie zelf geven?
+5. Onthoud je iets van mij tussen gesprekken?
+
+Antwoord per vraag met ja, nee of weet ik niet, en één zin uitleg.</code></pre>
+      <div class="tabel-vak">
+        <table class="tabel">
+          <thead><tr><th>Jouw antwoorden</th><th>Jouw trede op de contexttrap</th></tr></thead>
+          <tbody>
+            <tr><td>Alleen 1 en/of 2 is ja</td><td>Trede 1: zelf plakken en bestanden toevoegen</td></tr>
+            <tr><td>Ook 3 is ja</td><td>Trede 2: jij kiest de documenten</td></tr>
+            <tr><td>4 is ja</td><td>Trede 3: de AI zoekt zelf</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="prose">Wat de treden zijn, lees je in de volgende stap: <a href="/training/oefeningen/contexttrap/">de contexttrap</a>. Koppelingen en agents (trede 4) stellen beheerders in. Of die er zijn, weet je IT-afdeling het best.</p>
+      <p class="prose">Mag je de AI van je werk niet gebruiken voor deze training? Gebruik dan de chat met Claude die naast elke oefening staat. Daar gaat alleen verzonnen data in.</p>
+      <p><a class="knop knop--vol" href="/training/oefeningen/contexttrap/">Naar de contexttrap</a></p>
+    </div>
+  </section>
+  <script is:inline src="/assets/prompt.js" defer></script>
+</Base>

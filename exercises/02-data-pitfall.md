@@ -1,23 +1,23 @@
 ---
-number: 4
+number: 2
 title: Wat mag er naar de AI?
 role: Iedereen
 summary: Vijftig logregels van de servicedesk. Wat geef je aan de AI, wat vervang je, en wat meld je aan het bronteam?
 ---
 
-# Oefening 4: Wat mag er naar de AI?
+# Oefening 2: Wat mag er naar de AI?
 
 ## Doel
 
 Je leert data bekijken voordat je hem aan een AI geeft. Ook data die "gewoon logregels" lijken, kunnen gegevens bevatten die daar niet horen.
 
+**Tijd:** ± 30 minuten. Dit hoort bij [trede 1 van de contexttrap](/training/oefeningen/contexttrap/#trede-1): heb ik de juiste gegevens, en niet te veel? Wat er volgens Vezelvriend wel en niet naar een AI mag, staat in het [AI-beleid](/training/oefeningen/documenten/ai-beleid.txt).
+
 ## Opdracht
 
 Het team wil met AI een overzicht maken van waar klanten gisteren over belden. Daarvoor zijn er 50 notities van de servicedesk (vrijdag 16-10-2026).
 
-1. Haal de notities op. Dat kan op twee manieren:
-   - in het **Klantsysteem**, scherm **SQL**: `SELECT * FROM support_log ORDER BY logged_at;`
-   - of in de repository: `data/seed/support_log.json`.
+1. [Download de 50 notities](/training/oefeningen/servicedesk-notities.txt) en open ze. Kun je SQL? Dan kan het ook in het **Klantsysteem**, scherm **SQL**: `SELECT * FROM support_log ORDER BY logged_at;`
 2. Bekijk de regels **voordat** je ze aan een AI geeft. Wat valt je op?
 3. Bepaal per soort gegeven:
    - wat er gewoon naar de AI mag;
