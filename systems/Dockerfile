@@ -13,7 +13,7 @@ COPY site/public/favicon.svg ./site/public/favicon.svg
 # this machine: it is made by tools/world/ and never committed to git.
 RUN if [ -d data/generated/seed ]; then cp data/generated/seed/*.json data/seed/ &&       if [ -f data/generated/accounting/open-items.csv ]; then cp data/generated/accounting/open-items.csv data/accounting/; fi; fi
 # Folder for the shared orders volume, owned by the app user so it can write there.
-RUN mkdir -p /orders && chown node:node /orders
+RUN mkdir -p /orders /koppeling && chown node:node /orders /koppeling
 USER node
 ENV NODE_ENV=production PORT=3000
 EXPOSE 3000

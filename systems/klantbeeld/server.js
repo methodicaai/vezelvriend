@@ -9,11 +9,13 @@ import path from 'node:path';
 import { openDatabase } from '../shared/db.js';
 import { formatAddress, getAddressHistory, getCustomer, getModemCheck, getNetworkMapEntry, isScenarioCustomer, searchCustomers } from '../shared/queries.js';
 import { ROOT, formatEuro, formatStamp, world } from '../shared/world.js';
-import { html, page, paginate, routesOf, serve } from '../shared/web.js';
+import { html, page, paginate, readForm, routesOf, serve } from '../shared/web.js';
 
 const PORT = Number(process.env.PORT ?? 3002);
 const BASE = process.env.BASE_PATH ?? '';
 const KLANTSYSTEEM_URL = process.env.KLANTSYSTEEM_URL ?? 'http://localhost:3001';
+// The AI connection (systems/koppeling) keeps the technician requests an AI made.
+const KOPPELING_URL = process.env.KOPPELING_URL ?? 'http://localhost:3006';
 const SYSTEM = 'Klantbeeld';
 
 const { db, refresh } = openDatabase('klantbeeld');
@@ -54,7 +56,7 @@ function chooseCustomer({ url }) {
     ${nav}`);
 }
 
-function customerView({ url, params }) {
+async function customerView({ url, params }) {
   const customer = getCustomer(db, params.id);
   if (!customer) return { status: 404, ...render('Niet gevonden', html`<h1>Klant ${params.id} niet gevonden</h1><p><a href="${BASE}/">Kies een andere klant</a></p>`) };
   const tab = TABS.some(([key]) => key === url.searchParams.get('tab')) ? url.searchParams.get('tab') : 'leidraad';
@@ -66,6 +68,7 @@ function customerView({ url, params }) {
     historie: () => historyTab(customer),
     techniek: () => technicalTab(customer, url.searchParams.get('actie')),
   }[tab]();
+  const requests = tab === 'techniek' ? await technicianRequests(customer) : '';
 
   return render(customer.name, html`
     <div class="kop-klant">
@@ -77,7 +80,43 @@ function customerView({ url, params }) {
     <nav class="tabs" aria-label="Tabbladen">
       ${TABS.map(([key, label]) => html`<a href="${tabUrl(key)}" aria-current="${key === tab ? 'page' : 'false'}">${label}</a>`)}
     </nav>
-    ${content}`);
+    ${content}
+    ${requests}`);
+}
+
+// Technician requests an AI made through the connection. The AI may only
+// propose: an employee approves or rejects here (or in the chat).
+async function technicianRequests(c) {
+  let list = [];
+  try {
+    const res = await fetch(`${KOPPELING_URL}/internal/verzoeken?klant=${encodeURIComponent(c.customer_id)}`, { signal: AbortSignal.timeout(2000) });
+    if (res.ok) list = await res.json();
+  } catch { /* connection not running: nothing to show */ }
+  if (list.length === 0) return '';
+  const who = (r) => (r.source?.kind === 'chat' ? `AI in de chat (${r.source.label ?? 'deelnemer'})` : 'AI via de koppeling');
+  return html`<section class="paneel">
+    <h2>Monteursverzoeken van de AI</h2>
+    <p class="uitleg">Een AI mag een monteur alleen voorstellen. Controleer het verzoek met "Modem controleren" en de beslisboom voordat je het goedkeurt.</p>
+    <div class="tabel-vak"><table>
+      <thead><tr><th>Verzoek</th><th>Aangevraagd door</th><th>Reden</th><th>Voorgestelde tijd</th><th>Status</th></tr></thead>
+      <tbody>${list.slice().reverse().map((r) => html`<tr>
+        <td class="mono">${r.id}</td><td>${who(r)}</td><td>${r.reason}</td><td>${formatStamp(r.slot)}</td>
+        <td>${r.status === 'wacht op goedkeuring' ? html`<form method="post" action="${BASE}/klant/${c.customer_id}/verzoek/${r.id}">
+          <button type="submit" name="besluit" value="goedkeuren">Goedkeuren</button>
+          <button type="submit" name="besluit" value="afwijzen" class="knop--licht">Afwijzen</button></form>` : html`${r.status}${r.decidedBy ? ` (door ${r.decidedBy})` : ''}`}</td></tr>`)}</tbody>
+    </table></div>
+  </section>`;
+}
+
+async function decideRequest({ req, params }) {
+  const form = await readForm(req, 1_000);
+  try {
+    await fetch(`${KOPPELING_URL}/internal/verzoeken/${encodeURIComponent(params.rid)}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(3000),
+      body: JSON.stringify({ besluit: form.get('besluit') === 'goedkeuren' ? 'goedkeuren' : 'afwijzen', door: 'medewerker in het Klantbeeld' }),
+    });
+  } catch { /* shown as still pending */ }
+  return { status: 303, headers: { Location: `${BASE}/klant/${encodeURIComponent(params.id)}?tab=techniek` }, body: '' };
 }
 
 function callGuideTab() {
@@ -175,7 +214,7 @@ function technicalTab(c, action) {
   </section>
   ${modem ? html`<section class="paneel">
     <h2>Modem controleren</h2>
-    <p class="uitleg">Je AI-assistent kan dit scherm niet zien. Wil je hulp van de AI, neem dan zelf over wat nodig is.</p>
+    <p class="uitleg">Zonder koppeling kan je AI-assistent dit scherm niet zien. Wil je hulp van de AI, neem dan zelf over wat nodig is.</p>
     <p>
       <a class="knop" href="${actionUrl('controle')}">Modem controleren</a>
       <a class="knop knop--licht" href="${actionUrl('meting')}">Nieuwe meting aanvragen</a>
@@ -288,6 +327,7 @@ serve({
   routes: routesOf({
     'GET /': chooseCustomer,
     'GET /klant/:id': customerView,
+    'POST /klant/:id/verzoek/:rid': decideRequest,
     'GET /api/klanten': apiCustomers,
     'GET /api/context/:id': apiContext,
   }),

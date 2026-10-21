@@ -9,7 +9,7 @@ services:
     build: { context: ., dockerfile: gateway/Dockerfile }
     ports:
       - "127.0.0.1:${VEZELVRIEND_PORT:-8080}:80"
-    depends_on: [klantsysteem, klantbeeld, ai, mijn]
+    depends_on: [klantsysteem, klantbeeld, ai, mijn, koppeling]
     restart: unless-stopped
     mem_limit: 128m
     read_only: true          # nginx only needs a few writable temp folders
@@ -40,6 +40,7 @@ services:
     environment:
       BASE_PATH: /klantbeeld
       KLANTSYSTEEM_URL: /klantsysteem
+      KOPPELING_URL: http://koppeling:3000
       ORDERS_FILE: /orders/orders.json
     restart: unless-stopped
     mem_limit: 256m
@@ -66,6 +67,26 @@ services:
     volumes:
       - orders:/orders
 
+  # The AI connection: tools an AI may use to look things up in the systems
+  # (for the Vezelvriend chat, and over MCP for an AI app of the participant).
+  # Has the data but no secrets; checks connection keys with the AI box.
+  koppeling:
+    build: { context: ., dockerfile: systems/Dockerfile }
+    command: ["node", "systems/koppeling/server.js"]
+    environment:
+      AI_URL: http://ai:3000
+      ORDERS_FILE: /orders/orders.json
+      KOPPELING_DATA: /koppeling
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    restart: unless-stopped
+    mem_limit: 256m
+    read_only: true
+    tmpfs: [/tmp]
+    volumes:
+      - orders:/orders:ro
+      - koppeling-data:/koppeling   # technician requests and the log of what the AI looked up
+
   # AI box for the exercises: participant codes, Claude calls, stored conversations.
   # Secrets (API key, trainer password) come from .env on the server only.
   ai:
@@ -81,6 +102,7 @@ services:
     tmpfs: [/tmp]
     environment:
       ORDERS_FILE: /orders/orders.json
+      KOPPELING_URL: http://koppeling:3000
     volumes:
       - ai-data:/data      # the conversations database survives restarts and updates
       - orders:/orders     # the trainer wipes the website orders from the trainer screen
@@ -88,3 +110,4 @@ services:
 volumes:
   ai-data:
   orders:
+  koppeling-data:

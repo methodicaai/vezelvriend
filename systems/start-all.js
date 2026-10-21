@@ -16,15 +16,17 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 // Fixed ports so the parts never fight over an inherited PORT variable.
 const APPS = {
   'klantsysteem/server.js': { PORT: '3001', BASE_PATH: '/klantsysteem', KLANTBEELD_URL: '/klantbeeld' },
-  'klantbeeld/server.js': { PORT: '3002', BASE_PATH: '/klantbeeld', KLANTSYSTEEM_URL: '/klantsysteem' },
+  'klantbeeld/server.js': { PORT: '3002', BASE_PATH: '/klantbeeld', KLANTSYSTEEM_URL: '/klantsysteem', KOPPELING_URL: 'http://localhost:3006' },
   'ai/server.js': {
     PORT: '3003',
     AI_DB_FILE: process.env.AI_DB_FILE ?? path.join(os.tmpdir(), 'vezelvriend-ai-dev.db'),
     AI_FAKE: process.env.ANTHROPIC_API_KEY ? '0' : '1',
     TRAINER_PASSWORD: process.env.TRAINER_PASSWORD ?? 'test',
     COOKIE_SECURE: '0', // plain http on localhost
+    KOPPELING_URL: 'http://localhost:3006',
   },
   'mijn/server.js': { PORT: '3005', COOKIE_SECURE: '0' },
+  'koppeling/server.js': { PORT: '3006', AI_URL: 'http://localhost:3003' },
   'dev-gateway.js': { PORT: '8080' },
 };
 

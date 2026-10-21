@@ -16,6 +16,7 @@ const ROUTES = [
   ['/api/ai/', 3003],
   ['/api/mijn/', 3005],
   ['/trainer/', 3003],
+  ['/mcp/', 3006],
 ];
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.txt': 'text/plain', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
 

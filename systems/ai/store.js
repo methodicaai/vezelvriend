@@ -62,6 +62,15 @@ CREATE TABLE IF NOT EXISTS submissions (
 );
 
 CREATE INDEX IF NOT EXISTS submissions_by_participant ON submissions(participant_id, submitted_at);
+
+-- One key per training for the AI connection (systems/koppeling): participants
+-- add https://<site>/mcp/<key> to an AI app of their own. Stored as a hash,
+-- shown once; it works only while the training is active.
+CREATE TABLE IF NOT EXISTS connection_keys (
+  training_id INTEGER PRIMARY KEY REFERENCES trainings(training_id) ON DELETE CASCADE,
+  key_hash    TEXT NOT NULL UNIQUE,
+  created_at  TEXT NOT NULL
+);
 `;
 
 // No 0/O, 1/I/L: codes are read aloud and typed over from paper.
@@ -202,6 +211,24 @@ export function openStore(file) {
 
     setActive(trainingId, active) {
       db.prepare('UPDATE trainings SET active = ? WHERE training_id = ?').run(active ? 1 : 0, trainingId);
+    },
+
+    /** Makes (or replaces) the connection key of a training and returns it. Only the hash is kept. */
+    newConnectionKey(trainingId) {
+      const pick = () => ALPHABET[crypto.randomInt(ALPHABET.length)];
+      const key = `VVK-${Array.from({ length: 4 }, () => Array.from({ length: 4 }, pick).join('')).join('-')}`;
+      db.prepare('INSERT OR REPLACE INTO connection_keys (training_id, key_hash, created_at) VALUES (?, ?, ?)').run(trainingId, hashCode(key), nowIso());
+      return key;
+    },
+
+    connectionKeyOf(trainingId) {
+      return db.prepare('SELECT created_at FROM connection_keys WHERE training_id = ?').get(trainingId) ?? null;
+    },
+
+    /** The training a connection key belongs to, only while that training is active. */
+    trainingForConnectionKey(key) {
+      return db.prepare(`SELECT t.training_id, t.name FROM connection_keys k JOIN trainings t ON t.training_id = k.training_id
+        WHERE k.key_hash = ? AND t.active = 1`).get(hashCode(String(key))) ?? null;
     },
 
     deleteTraining(trainingId) {

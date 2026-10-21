@@ -1,0 +1,12 @@
+{
+  "_comment": "The company documents shown on the documents page (/training/oefeningen/documenten/) and readable through the AI connection (systems/koppeling). One list, so both always offer the same documents. Descriptions are neutral on purpose: they never hint at what is wrong in a document.",
+  "documents": [
+    { "slug": "gespreksleidraad", "kind": "Klantenservice", "title": "Gespreksleidraad", "about": "De stappen voor een gesprek met een klant die een probleem met internet meldt.", "file": "documents/call-guide.json" },
+    { "slug": "servicevoorwaarden", "kind": "Voorwaarden", "title": "Servicevoorwaarden", "about": "Hersteltijden, monteursbezoek en vergoedingen.", "file": "documents/service-document.md" },
+    { "slug": "tarieven", "kind": "Verkoop", "title": "Tarievenoverzicht internet voor thuis", "about": "Abonnementen, extra's en eenmalige kosten.", "file": "documents/rates-2025.md" },
+    { "slug": "ai-beleid", "kind": "Beleid", "title": "AI-beleid", "about": "Welke AI je mag gebruiken, welke gegevens je meegeeft en wat je met de uitkomst doet.", "file": "documents/ai-policy.md" },
+    { "slug": "us-014", "kind": "Backlog", "title": "User story US-014", "about": "Hersteltijd noemen bij een storing in de straat.", "file": "backlog/US-014-outage-repair-time.md" },
+    { "slug": "mail-sanne-us-014", "kind": "Mail", "title": "Mail van Sanne over US-014", "about": "Mail van de product owner aan het productteam, 14 oktober.", "file": "mail/2026-10-14-sanne-us-014.md" },
+    { "slug": "klantverhaal-de-wit", "kind": "Klant", "title": "Klantverhaal Familie De Wit", "about": "Wat de klant vertelt over het gesprek met de klantenservice.", "file": "documents/customer-story-de-wit.md" }
+  ]
+}

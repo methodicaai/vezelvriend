@@ -296,6 +296,8 @@ function trainingDetail({ params, url }) {
         <td><form method="post" action="/trainer/deelnemer/${p.participant_id}/nieuwe-code"><input type="hidden" name="training" value="${t.training_id}"><button class="knop--licht">Nieuwe code</button></form></td></tr>`)}</tbody>
     </table></div>
 
+    ${connectionPanel(t)}
+
     <h2>Ingeleverd${filter ? html` door ${who} · ${allLink}` : ''}</h2>
     <p class="uitleg">Wat deelnemers zelf hebben ingeleverd uit hun eigen AI (bijvoorbeeld Copilot op het werk).</p>
     ${submissions.length === 0 ? html`<p class="leeg">Nog niets ingeleverd.</p>` : submissions.map((m) => html`
@@ -341,6 +343,53 @@ async function newCode({ req, params }) {
   return { body: codesPage(p.training_id, `${p.label} (nieuwe code)`, [{ label: p.label, code }]) };
 }
 
+// ---------------------------------------------------------------- AI connection (systems/koppeling)
+
+// The public address of this site, for the connection URLs the trainer hands out.
+const siteUrl = (req) => process.env.PUBLIC_URL || `${process.env.COOKIE_SECURE === '0' ? 'http' : 'https'}://${req.headers.host}`;
+
+function connectionPanel(t) {
+  const key = store.connectionKeyOf(t.training_id);
+  return html`<h2>Koppeling voor een eigen AI</h2>
+    <p class="uitleg">Met een koppelingssleutel kunnen deelnemers Vezelvriend koppelen aan hun eigen AI-app (Claude Desktop, claude.ai, Claude Code of Copilot Studio). De AI kan dan zelf klanten, modems, documenten en de database raadplegen, en een monteur aanvragen die iemand moet goedkeuren. De sleutel werkt alleen zolang de codes van deze training aan staan.</p>
+    <form method="post" action="/trainer/training/${t.training_id}/koppeling" class="zoek">
+      <span>${key ? html`<span class="status status--ok">Sleutel gemaakt op ${time(key.created_at)}</span>` : html`<span class="status status--uit">Nog geen sleutel</span>`}</span>
+      <button type="submit" class="knop--licht">${key ? 'Nieuwe sleutel maken (de oude stopt)' : 'Sleutel maken'}</button>
+    </form>`;
+}
+
+function newConnectionKey({ req, params }) {
+  const t = store.training(Number(params.id));
+  if (!t) return { status: 404, body: trainerPage('Niet gevonden', html`<h1>Training niet gevonden</h1>`) };
+  const key = store.newConnectionKey(t.training_id);
+  const base = `${siteUrl(req)}/mcp/${key}`;
+  return { body: trainerPage('Koppelingssleutel', html`
+    <h1>Koppeling voor ${t.name}</h1>
+    <div class="melding"><strong>Je ziet deze adressen maar één keer.</strong> Kopieer ze nu. Ben je ze kwijt, maak dan een nieuwe sleutel.</div>
+    <div class="tabel-vak"><table>
+      <thead><tr><th>Stand</th><th>Adres voor de AI-app</th></tr></thead>
+      <tbody>
+        <tr><td>Zuinig: alleen wat nodig is</td><td class="mono">${base}</td></tr>
+        <tr><td>Breed: alles, ook persoonsgegevens en SQL</td><td class="mono">${base}/breed</td></tr>
+      </tbody>
+    </table></div>
+    <h2>Zo koppel je het</h2>
+    <ul>
+      <li><strong>claude.ai:</strong> Instellingen, Connectors, "Aangepaste connector toevoegen". Plak het adres. (Hangt af van het abonnement.)</li>
+      <li><strong>Claude Code:</strong> <span class="mono">claude mcp add --transport http vezelvriend ${base}</span></li>
+      <li><strong>Claude Desktop:</strong> Instellingen, Connectors, "Aangepaste connector toevoegen", en plak het adres.</li>
+      <li><strong>Copilot Studio:</strong> een agent, Hulpprogramma's, "Model Context Protocol" toevoegen, en plak het adres.</li>
+    </ul>
+    <p class="uitleg">Alle klanten zijn verzonnen, maar staan op echte adressen. Geef het adres alleen aan deelnemers van deze training, en zet de codes uit als de training voorbij is.</p>
+    <p><a class="knop" href="/trainer/training/${t.training_id}">Naar de training</a></p>`) };
+}
+
+/** For the connection service only (not forwarded by the gateway): which active training owns this key? */
+function connectionKeyCheck({ url }) {
+  const t = store.trainingForConnectionKey(url.searchParams.get('sleutel') ?? '');
+  return t ? json(200, { training: t.training_id, label: t.name }) : json(404, { error: 'onbekend' });
+}
+
 async function deleteTraining({ req, params }) {
   const form = await readForm(req);
   if (form.get('zeker') === 'ja') store.deleteTraining(Number(params.id));
@@ -381,6 +430,8 @@ serve({
     'GET /trainer/training/:id': trainerOnly(trainingDetail),
     'POST /trainer/training/:id/actief': trainerOnly(setActive),
     'POST /trainer/training/:id/verwijderen': trainerOnly(deleteTraining),
+    'POST /trainer/training/:id/koppeling': trainerOnly(newConnectionKey),
+    'GET /internal/koppeling-sleutel': connectionKeyCheck,
     'GET /trainer/training/:id/export.csv': trainerOnly(exportCsv),
     'POST /trainer/deelnemer/:id/nieuwe-code': trainerOnly(newCode),
   }),
