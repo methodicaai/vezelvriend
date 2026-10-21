@@ -314,6 +314,8 @@ h3{margin:0 0 .5rem;line-height:1.3}
 @media print{.pad-spoor{display:none}.pad-stap{display:block}}
 
 /* Reflection questions of an exercise: closed until the participant is done. */
-.markdown details.reflectie{margin:1.5rem 0;border:1px solid var(--kleur-lijn);border-radius:var(--radius-klein);padding:.75rem 1.1rem;background:var(--kleur-vlak)}
-.markdown details.reflectie summary{cursor:pointer;font-weight:700;color:var(--kleur-accent-tekst)}
-.markdown details.reflectie[open] summary{margin-bottom:.5rem}
+details.reflectie{margin:1.5rem 0;border:1px solid var(--kleur-lijn);border-radius:var(--radius-klein);padding:.75rem 1.1rem;background:var(--kleur-vlak)}
+details.reflectie summary{cursor:pointer;font-weight:700;color:var(--kleur-accent-tekst)}
+details.reflectie[open] summary{margin-bottom:.5rem}
+.kort-uitslag{margin-top:1.5rem;padding:1.1rem 1.25rem;border-left:4px solid var(--kleur-accent);background:var(--kleur-vlak);border-radius:var(--radius-klein)}
+.kort-uitslag h2{margin-bottom:.5rem}

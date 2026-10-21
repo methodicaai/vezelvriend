@@ -1,11 +1,11 @@
 ---
-stap: "4"
+stap: "4a"
 title: Wat mag er naar de AI?
 role: Iedereen
 summary: Vijftig logregels van de servicedesk. Wat geef je aan de AI, wat vervang je, en wat meld je aan het bronteam?
 ---
 
-# Stap 4: Wat mag er naar de AI?
+# Stap 4a: Wat mag er naar de AI?
 
 ## Doel
 

@@ -1,4 +1,4 @@
-// The servicedesk notes of step 4 as a plain text file, so participants
+// The servicedesk notes of step 4a as a plain text file, so participants
 // do not need SQL to get them. Built from the same seed as the Klantsysteem
 // (the generated world when it exists), one note per line.
 import notes from '../../../../../data/seed/support_log.json';
