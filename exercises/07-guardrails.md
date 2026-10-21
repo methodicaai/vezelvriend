@@ -2,6 +2,7 @@
 stap: "7"
 title: Guardrails schrijven
 role: Iedereen
+trede: [4]
 summary: Schrijf regels voor wat de AI wel en niet mag adviseren, en test ze op vier lastige situaties. Houdt de AI zich eraan, en is dat dan ook goed?
 ---
 
@@ -13,7 +14,7 @@ Je leert grenzen stellen aan een AI-assistent, zodat een goed klinkend antwoord 
 
 Je ontdekt twee dingen: een AI die zich aan je regels houdt, is nog geen goede AI. En dat het deze keer goed ging, zegt weinig over de volgende keer.
 
-**Tijd:** ± 30 minuten. Dit hoort bij [trede 4 van de contexttrap](/training/oefeningen/contexttrap/#trede-4).
+**Tijd:** ± 30 minuten. Hierboven staat de uitleg van [trede 4 van de contexttrap](#trede-4).
 
 ## Opdracht
 

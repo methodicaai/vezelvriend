@@ -2,6 +2,7 @@
 stap: "3"
 title: Context maakt het verschil
 role: Iedereen
+trede: [0, 1]
 summary: Dezelfde klantvraag, eerst kaal en daarna met de gegevens uit het Klantbeeld. Wat verandert er aan het antwoord van de AI?
 ---
 
@@ -11,7 +12,7 @@ summary: Dezelfde klantvraag, eerst kaal en daarna met de gegevens uit het Klant
 
 Je ervaart dat een AI-antwoord zo goed is als de context die je meegeeft. Je leert welke gegevens het verschil maken.
 
-**Tijd:** ± 30 minuten. Lees eerst [trede 0 en 1 van de contexttrap](/training/oefeningen/contexttrap/#trede-0): daar zie je een zwak en een sterk voorbeeld.
+**Tijd:** ± 30 minuten. Hierboven staat de uitleg van [trede 0 en 1 van de contexttrap](#trede-0), met een zwak en een sterk voorbeeld.
 
 ## Opdracht
 

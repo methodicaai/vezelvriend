@@ -2,6 +2,7 @@
 stap: "6"
 title: Claude zoekt zelf
 role: Iedereen
+trede: [3]
 summary: Dezelfde klantvraag als in stap 3, maar nu haalt Claude alles zelf op via een koppeling met de systemen. Wat wint je, en wat komt er ongevraagd mee?
 koppeling: aan
 ---
@@ -10,7 +11,7 @@ koppeling: aan
 
 ## Doel
 
-Je ervaart [trede 3 en 4 van de contexttrap](/training/oefeningen/contexttrap/#trede-3): de AI haalt zelf de context op. Je ziet wat dat oplevert, wat er ongevraagd meekomt, en waarom een mens moet goedkeuren voordat een AI iets doet.
+Je ervaart [trede 3 van de contexttrap](#trede-3): de AI haalt zelf de context op. Je ziet wat dat oplevert, wat er ongevraagd meekomt, en waarom een mens moet goedkeuren voordat een AI iets doet. Dat laatste is al een stukje trede 4: daarover meer in stap 7.
 
 **Tijd:** ± 25 minuten.
 

@@ -1,8 +1,9 @@
 ---
 // First step of the route: before learning HOW to use AI well, participants
-// find out WHAT they could use it for, and which AI they have (their step on
-// the context ladder). Written for people who want to do something with AI at
-// work but do not know where to start. Nothing here uses Vezelvriend data.
+// find out WHAT they could use it for, and what their AI can do. Written for
+// people who want to do something with AI at work but do not know where to
+// start. We do not tell participants which step of the context ladder they are
+// on: the site cannot know that. Nothing here uses Vezelvriend data.
 import Base from '../../../layouts/TrainingLayout.astro';
 import Vlak from '../../../components/Vlak.astro';
 
@@ -62,17 +63,8 @@ const tasks = [
 5. Onthoud je iets van mij tussen gesprekken?
 
 Antwoord per vraag met ja, nee of weet ik niet, en één zin uitleg.</code></pre>
-      <div class="tabel-vak">
-        <table class="tabel">
-          <thead><tr><th>Jouw antwoorden</th><th>Jouw trede op de contexttrap</th></tr></thead>
-          <tbody>
-            <tr><td>Alleen 1 en/of 2 is ja</td><td>Trede 1: zelf plakken en bestanden toevoegen</td></tr>
-            <tr><td>Ook 3 is ja</td><td>Trede 2: jij kiest de documenten</td></tr>
-            <tr><td>4 is ja</td><td>Trede 3: de AI zoekt zelf</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="prose">Wat de treden zijn, lees je in de volgende stap: <a href="/training/oefeningen/contexttrap/">de contexttrap</a>. Koppelingen en agents (trede 4) stellen beheerders in. Of die er zijn, weet je IT-afdeling het best.</p>
+      <p class="prose">Schrijf de antwoorden op. Ze vertellen je welke manieren om context te geven jouw AI kent. Wat dat betekent, zie je in de volgende stappen. Koppelingen met andere systemen en agents stellen beheerders in; of die er zijn, weet je IT-afdeling het best.</p>
+      <p class="prose">Zei je AI ja op vraag 5? Dan gaat wat hij over jou onthoudt ongezien mee in elk gesprek. Dat is ook context. Kijk in de instellingen wat hij onthoudt, en haal weg wat er niet hoort.</p>
       <p class="prose">Mag je de AI van je werk niet gebruiken voor deze training? Gebruik dan de chat met Claude die naast elke oefening staat. Daar gaat alleen verzonnen data in.</p>
       <p><a class="knop knop--vol" href="/training/oefeningen/contexttrap/">Naar de contexttrap</a></p>
     </div>

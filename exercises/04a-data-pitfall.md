@@ -11,7 +11,7 @@ summary: Vijftig logregels van de servicedesk. Wat geef je aan de AI, wat vervan
 
 Je leert data bekijken voordat je hem aan een AI geeft. Ook data die "gewoon logregels" lijken, kunnen gegevens bevatten die daar niet horen.
 
-**Tijd:** ± 30 minuten. Dit hoort bij [trede 1 van de contexttrap](/training/oefeningen/contexttrap/#trede-1): heb ik de juiste gegevens, en niet te veel? Wat er volgens Vezelvriend wel en niet naar een AI mag, staat in het [AI-beleid](/training/oefeningen/documenten/ai-beleid.txt).
+**Tijd:** ± 30 minuten. Dit hoort bij [trede 1 van de contexttrap](/training/oefeningen/03-context/#trede-1) (uitgelegd bij stap 3): heb ik de juiste gegevens, en niet te veel? Wat er volgens Vezelvriend wel en niet naar een AI mag, staat in het [AI-beleid](/training/oefeningen/documenten/ai-beleid.txt).
 
 ## Opdracht
 

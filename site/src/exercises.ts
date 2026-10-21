@@ -14,6 +14,8 @@ export function getExercises() {
       summary: mod.frontmatter.summary,
       // 'aan': the chat next to the exercise has the AI connection (Claude looks things up itself).
       connection: mod.frontmatter.koppeling === 'aan',
+      // Steps of the context ladder explained above the exercise (frontmatter "trede: [0, 1]").
+      ladder: (mod.frontmatter.trede ?? []) as number[],
       Content: mod.Content,
     }))
     .sort((a, b) => a.step.localeCompare(b.step, 'nl', { numeric: true }));

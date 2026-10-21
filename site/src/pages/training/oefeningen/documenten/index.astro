@@ -5,6 +5,7 @@
 // use at work, if their employer allows it.
 import Base from '../../../../layouts/TrainingLayout.astro';
 import Vlak from '../../../../components/Vlak.astro';
+import Trede from '../../../../components/Trede.astro';
 import { getDocuments } from '../../../../documents';
 
 const docs = getDocuments();
@@ -15,12 +16,15 @@ const href = (slug: string) => `/training/oefeningen/documenten/${slug}.txt`;
     <div class="hero-inner">
       <p class="eyebrow">Stap 5 · trede 2: jij kiest de documenten · ± 25 minuten</p>
       <h1>Documenten van Vezelvriend</h1>
-      <p class="lead">Dit zijn de documenten van het oefenbedrijf: van de klantenservice, verkoop, het productteam en de directie. Zet ze in je AI en stel er vragen over. Zo oefen je trede 2 in de AI die je zelf gebruikt, zonder echte werkgegevens. Lees eerst <a href="/training/oefeningen/contexttrap/#trede-2">trede 2 van de contexttrap</a>.</p>
+      <p class="lead">Dit zijn de documenten van het oefenbedrijf: van de klantenservice, verkoop, het productteam en de directie. Zet ze in je AI en stel er vragen over. Zo oefen je trede 2 in de AI die je zelf gebruikt, zonder echte werkgegevens. Eerst de uitleg van <a href="#trede-2">trede 2</a>, daarna <a href="#zelf-doen">doe je het zelf</a>.</p>
     </div>
   </section>
 
-  <section class="sectie">
+  <Trede nr={2} tinted />
+
+  <section class="sectie" id="zelf-doen">
     <div class="wrap">
+      <h2>Nu zelf doen: de documenten</h2>
       <Vlak columns={3} items={docs.map((d) => ({ label: d.kind, title: d.title, text: d.about, href: href(d.slug), linkLabel: 'Bekijk of download' }))} />
     </div>
   </section>
@@ -49,7 +53,6 @@ const href = (slug: string) => `/training/oefeningen/documenten/${slug}.txt`;
         <li>Was elk document nog actueel? Hoe kon je dat zien?</li>
         <li>Wat betekent dit voor de documenten die jij op je werk aan een AI geeft?</li>
       </ul>
-      <p><a href="/training/oefeningen/contexttrap/#trede-2">Terug naar trede 2 van de contexttrap</a></p>
     </div>
   </section>
 </Base>

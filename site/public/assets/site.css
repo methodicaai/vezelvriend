@@ -319,3 +319,6 @@ details.reflectie summary{cursor:pointer;font-weight:700;color:var(--kleur-accen
 details.reflectie[open] summary{margin-bottom:.5rem}
 .kort-uitslag{margin-top:1.5rem;padding:1.1rem 1.25rem;border-left:4px solid var(--kleur-accent);background:var(--kleur-vlak);border-radius:var(--radius-klein)}
 .kort-uitslag h2{margin-bottom:.5rem}
+
+/* Exercise with the ladder explanation above it: the hero carries the title. */
+.markdown--zonder-titel > h1:first-child { display: none; }
