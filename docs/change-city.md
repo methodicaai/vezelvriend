@@ -15,7 +15,12 @@ De oefenwereld speelt in het centrum van de stad waar je de training geeft, met 
    docker run --rm -v "$PWD":/w -w /w node:24-alpine node tools/world/generate.mjs --customers 2000
    ```
    Dezelfde wijk geeft altijd precies dezelfde wereld. `data/generated/world-facts.md` laat zien in welke straten de vijf scenario's liggen.
-4. Bouw en start opnieuw: `docker compose up -d --build`.
+4. Haal de grenzen van de wijk en de buurten op, voor de kaarten op de website (Ons gebied, Storingen, Pakket samenstellen):
+   ```bash
+   docker run --rm -v "$PWD":/w -w /w node:24-alpine node tools/world/fetch-area.mjs
+   ```
+   Zonder deze stap zeggen de kaarten dat ze niet beschikbaar zijn; de rest werkt gewoon.
+5. Bouw en start opnieuw: `docker compose up -d --build`.
 
 ## Wat er verandert
 
