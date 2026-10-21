@@ -1,0 +1,92 @@
+/* The Vezelvriend chat (/assets/chat.js): full page and panel next to an exercise. */
+.vc,.vc *{box-sizing:border-box}
+.vc{
+  --vc-bg:#F6FAF9;--vc-panel:#FFFFFF;--vc-ink:#10282B;--vc-muted:#5B7173;--vc-line:#D7E6E3;--vc-soft:#E4F2EF;
+  --vc-accent:#0F766E;--vc-accent-ink:#FFFFFF;--vc-warn:#C2410C;--vc-warn-soft:#FFF1E8;--vc-ok:#2E7D4F;
+  display:grid;grid-template-columns:minmax(0,1fr);background:var(--vc-bg);color:var(--vc-ink);font-family:var(--font-tekst,system-ui,sans-serif);min-height:0
+}
+@media (prefers-color-scheme:dark){.vc{--vc-bg:#0E1C1E;--vc-panel:#132628;--vc-ink:#E3EFED;--vc-muted:#9DB3B1;--vc-line:#26403F;--vc-soft:#173235;--vc-accent:#2DB3A5;--vc-accent-ink:#06201D;--vc-warn:#FB923C;--vc-warn-soft:#3A2418;--vc-ok:#7FD3A0}}
+.vc[data-vorm="volledig"]{grid-template-columns:260px minmax(0,1fr);flex:1;min-height:0}
+.vc[data-vorm="paneel"]{border:1px solid var(--vc-line);border-radius:18px;height:min(80vh,760px);overflow:hidden}
+
+/* sidebar */
+.vc-zij{border-right:1px solid var(--vc-line);background:var(--vc-panel);padding:1rem;overflow-y:auto;display:flex;flex-direction:column;gap:.5rem}
+.vc-nieuw{font:inherit;font-weight:700;padding:.65rem .9rem;border-radius:12px;border:1px solid var(--vc-line);background:var(--vc-soft);color:var(--vc-ink);cursor:pointer;text-align:left}
+.vc-zij-kop{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--vc-muted);margin:.75rem 0 .25rem;font-weight:700}
+.vc-lijst{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.vc-lijst li{display:flex;align-items:center;border-radius:10px}
+.vc-lijst li.vc-actief,.vc-lijst li:hover{background:var(--vc-soft)}
+.vc-lijst-titel{flex:1;min-width:0;font:inherit;font-size:.92rem;text-align:left;background:none;border:0;color:var(--vc-ink);padding:.5rem .6rem;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vc-wis{font:inherit;background:none;border:0;color:var(--vc-muted);cursor:pointer;padding:.3rem .5rem;font-size:1.1rem;visibility:hidden}
+.vc-lijst li:hover .vc-wis,.vc-lijst li.vc-actief .vc-wis{visibility:visible}
+
+/* narrow screens: the list of conversations becomes a short strip above the chat */
+@media (max-width:760px){
+  .vc[data-vorm="volledig"]{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+  .vc-zij{border-right:0;border-bottom:1px solid var(--vc-line);max-height:7.5rem;padding:.6rem .9rem}
+  .vc-zij-kop{display:none}
+}
+
+/* main */
+.vc-hoofd{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;min-height:0;min-width:0}
+.vc-balk{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1rem;padding:.75rem 1.25rem;border-bottom:1px solid var(--vc-line);background:var(--vc-panel)}
+.vc-titel{font-size:1.05rem;margin:0;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.vc-knoppen{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .9rem;font-size:.88rem}
+.vc-stand{display:inline-flex;border:1px solid var(--vc-line);border-radius:999px;padding:2px;background:var(--vc-bg)}
+.vc-stand-knop{font:inherit;font-weight:700;border:0;background:none;color:var(--vc-muted);padding:.3rem .8rem;border-radius:999px;cursor:pointer}
+.vc-stand-knop[aria-checked="true"]{background:var(--vc-accent);color:var(--vc-accent-ink)}
+.vc--breed .vc-stand-knop[aria-checked="true"]{background:var(--vc-warn);color:#fff}
+.vc-toon{display:inline-flex;align-items:center;gap:.35rem;cursor:pointer}
+.vc-toon input{accent-color:var(--vc-accent)}
+.vc-over summary{cursor:pointer;color:var(--vc-accent);font-weight:600}
+.vc-over-tekst{position:absolute;z-index:5;right:1rem;max-width:min(32rem,90vw);background:var(--vc-panel);border:1px solid var(--vc-line);border-radius:12px;padding:.75rem 1rem;box-shadow:0 8px 30px rgba(0,0,0,.15);font-size:.88rem}
+.vc-over-tekst pre{white-space:pre-wrap;font:.82rem/1.5 Consolas,'Cascadia Mono',monospace;background:var(--vc-bg);padding:.6rem;border-radius:8px}
+.vc-klein{font:inherit;font-size:.85rem;background:none;border:1px solid var(--vc-line);border-radius:999px;padding:.25rem .7rem;color:var(--vc-ink);cursor:pointer;text-decoration:none}
+
+/* conversation */
+.vc-gesprek{overflow-y:auto;overflow-x:hidden;padding:1.25rem clamp(1rem,4vw,3rem);display:flex;flex-direction:column;gap:.9rem}
+.vc-gesprek>*{max-width:46rem;width:100%;margin:0 auto}
+.vc-label{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--vc-muted);margin-bottom:.25rem}
+.vc-vraag{background:var(--vc-soft);border-radius:16px;padding:.75rem 1rem}
+.vc-vraag p{margin:0;white-space:pre-wrap}
+.vc-antwoord{padding:.25rem .25rem}
+.vc-tekst p{margin:.35rem 0}
+.vc-tekst ul,.vc-tekst ol{margin:.35rem 0;padding-left:1.3rem}
+.vc-tekst code{font-family:Consolas,'Cascadia Mono',monospace;font-size:.9em;background:var(--vc-soft);padding:0 .25rem;border-radius:4px}
+.vc-kop{font-weight:800;margin-top:.75rem!important}
+.vc-opvraging{display:none;border:1px dashed var(--vc-line);border-radius:10px;padding:.4rem .75rem;font-size:.85rem;color:var(--vc-muted);background:var(--vc-panel)}
+.vc--toon .vc-opvraging{display:block}
+.vc-opvraging summary{cursor:pointer}
+.vc-opvraging--fout summary{color:var(--vc-warn)}
+.vc-opvraging pre{white-space:pre-wrap;word-break:break-word;max-height:18rem;overflow:auto;font:.78rem/1.45 Consolas,'Cascadia Mono',monospace;color:var(--vc-ink);margin:.5rem 0 .2rem}
+.vc-kaart{border:2px solid var(--vc-warn);background:var(--vc-warn-soft);border-radius:14px;padding:.85rem 1.1rem}
+.vc-kaart--klaar{border-color:var(--vc-line);background:var(--vc-panel)}
+.vc-kaart-kop{font-weight:800;margin:0 0 .4rem}
+.vc-kaart dl{display:grid;grid-template-columns:max-content 1fr;gap:.2rem .9rem;margin:0 0 .6rem;font-size:.92rem}
+.vc-kaart dt{color:var(--vc-muted)}
+.vc-kaart dd{margin:0}
+.vc-kaart-knoppen{display:flex;gap:.5rem}
+.vc-ja,.vc-nee{font:inherit;font-weight:700;border-radius:999px;padding:.45rem 1.1rem;cursor:pointer;border:1px solid var(--vc-line)}
+.vc-ja{background:var(--vc-ok);color:#fff;border-color:var(--vc-ok)}
+.vc-nee{background:var(--vc-panel);color:var(--vc-ink)}
+.vc-kaart-status{margin:.5rem 0 0;font-size:.88rem}
+.vc-melding{color:var(--vc-warn);font-weight:600}
+.vc-leeg{margin:auto;text-align:center;color:var(--vc-muted);max-width:30rem}
+.vc-leeg-kop{font-size:1.4rem;font-weight:800;color:var(--vc-ink)}
+
+/* input */
+.vc-invoer{display:flex;gap:.5rem;align-items:flex-end;padding:.75rem clamp(1rem,4vw,3rem) .25rem;max-width:46rem;width:100%;margin:0 auto;box-sizing:border-box}
+.vc-invoer textarea{flex:1;font:inherit;padding:.75rem .9rem;border:1px solid var(--vc-line);border-radius:14px;background:var(--vc-panel);color:var(--vc-ink);resize:vertical;min-height:3rem;max-height:40vh}
+.vc-stuur{font:inherit;font-weight:700;background:var(--vc-accent);color:var(--vc-accent-ink);border:0;border-radius:12px;padding:.75rem 1.1rem;cursor:pointer}
+.vc-stuur:disabled{opacity:.5;cursor:wait}
+.vc-status{min-height:1.3em;margin:0 auto .6rem;padding:0 clamp(1rem,4vw,3rem);max-width:46rem;width:100%;box-sizing:border-box;font-size:.88rem;color:var(--vc-muted)}
+.vc--bezig .vc-status::before{content:"";display:inline-block;width:.8em;height:.8em;margin-right:.4em;border:2px solid var(--vc-accent);border-right-color:transparent;border-radius:50%;animation:vc-draai .8s linear infinite;vertical-align:-.1em}
+@keyframes vc-draai{to{transform:rotate(360deg)}}
+.vc-login{display:grid;gap:.6rem;max-width:24rem;margin:2.5rem auto;padding:0 1rem}
+.vc-login input{font:inherit;padding:.7rem .9rem;border:1px solid var(--vc-line);border-radius:12px;background:var(--vc-panel);color:var(--vc-ink);text-transform:uppercase}
+
+/* the own page */
+.vc-pagina{margin:0;background:#F6FAF9;height:100dvh;display:flex;flex-direction:column}
+@media (prefers-color-scheme:dark){.vc-pagina{background:#0E1C1E}}
+.vc-fictief{margin:0;padding:.45rem 1rem;font-size:.8rem;background:#10282B;color:#E3EFED;display:flex;flex-wrap:wrap;gap:.15rem 1rem;justify-content:space-between;align-items:center;flex:none}
+.vc-fictief a{color:#7FE0D3}

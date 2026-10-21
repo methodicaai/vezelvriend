@@ -11,6 +11,7 @@
 // context goes into the prompt. That stays the core of the training.
 import crypto from 'node:crypto';
 import { aiEnabled, aiModel, askClaude } from './claude.js';
+import { SYSTEM_PROMPT, chatModel, decideRequest, runTurn } from './agent.js';
 import { openStore } from './store.js';
 import { KEEP_DAYS, readOrders, writeOrders } from '../shared/orders.js';
 import { cookie, registerFailure, sign, tooManyFailures, unsign } from '../shared/session.js';
@@ -108,6 +109,97 @@ async function ask({ req }) {
   if (result.status === 'refusal') return json(200, { answer: result.answer ?? '', note: result.error });
   return json(200, { answer: result.answer });
 }
+
+// ---------------------------------------------------------------- the Vezelvriend chat (Claude with the AI connection)
+
+const CONTEXT = /^[a-z0-9-]{1,40}$/;
+const contextOf = (v) => (typeof v === 'string' && CONTEXT.test(v) ? v : 'chat');
+const titleOf = (question) => (question.length > 60 ? `${question.slice(0, 57).trim()}...` : question);
+
+function chatInfo({ req }) {
+  const p = participantFrom(req);
+  return json(200, { enabled: aiEnabled(), loggedIn: Boolean(p), participant: p ? { label: p.label, training: p.training_name } : null,
+    model: chatModel(), systemPrompt: SYSTEM_PROMPT, maxPerDay: MAX_PER_DAY, usedToday: p ? store.countToday(p.participant_id) : 0 });
+}
+
+function listChats({ req, url }) {
+  const p = participantFrom(req);
+  if (!p) return json(401, { error: 'Log eerst in met je deelnemerscode.' });
+  return json(200, store.chats(p.participant_id, url.searchParams.get('context') ? contextOf(url.searchParams.get('context')) : null));
+}
+
+async function newChat({ req }) {
+  const p = participantFrom(req);
+  if (!p) return json(401, { error: 'Log eerst in met je deelnemerscode.' });
+  const body = await readJson(req, 1_000).catch(() => ({}));
+  return json(200, { id: store.createChat(p.participant_id, contextOf(body.context)) });
+}
+
+function getChat({ req, params }) {
+  const p = participantFrom(req);
+  if (!p) return json(401, { error: 'Log eerst in met je deelnemerscode.' });
+  const c = store.chat(p.participant_id, Number(params.id));
+  if (!c) return json(404, { error: 'Gesprek niet gevonden.' });
+  return json(200, { id: c.chat_id, title: c.title, context: c.context, items: c.items });
+}
+
+async function chatMessage({ req, params }) {
+  if (!aiEnabled()) return json(503, { error: 'De AI staat uit.' });
+  const p = participantFrom(req);
+  if (!p) return json(401, { error: 'Log eerst in met je deelnemerscode.' });
+  const c = store.chat(p.participant_id, Number(params.id));
+  if (!c) return json(404, { error: 'Gesprek niet gevonden.' });
+  const body = await readJson(req, MAX_PROMPT_CHARS * 2);
+  const question = typeof body.tekst === 'string' ? body.tekst.trim() : '';
+  if (!question) return json(400, { error: 'Typ eerst een vraag.' });
+  if (question.length > MAX_PROMPT_CHARS) return json(400, { error: `De vraag is te lang (meer dan ${MAX_PROMPT_CHARS} tekens).` });
+  if (store.countToday(p.participant_id) >= MAX_PER_DAY) return json(429, { error: `Je hebt vandaag al ${MAX_PER_DAY} vragen gesteld. Dat is het maximum per dag.` });
+  const stand = body.stand === 'breed' ? 'breed' : 'zuinig';
+
+  // A decision on a technician request since the last question is passed on to Claude.
+  const forClaude = c.note ? `[Melding van het systeem: ${c.note}]
+
+${question}` : question;
+  const source = { kind: 'chat', training: trainingIdOf(p.participant_id), participant: p.participant_id, label: p.label, chat: c.chat_id };
+  const result = await runTurn({ apiMessages: c.api_messages, question: forClaude, stand, source });
+  store.saveMessage({ participantId: p.participant_id, exercise: c.context, promptBlock: `Chat, stand ${stand}`, prompt: question,
+    answer: result.answer, status: result.status, error: result.error, model: result.model, inputTokens: result.inputTokens, outputTokens: result.outputTokens, durationMs: result.durationMs });
+  if (result.status === 'error') return json(502, { error: result.participantMessage });
+
+  const newItems = [{ type: 'vraag', text: question, stand }, ...result.newItems];
+  const title = c.items.length === 0 ? titleOf(question) : c.title;
+  store.saveChat(c.chat_id, { title, apiMessages: result.apiMessages, items: [...c.items, ...newItems], note: null });
+  return json(200, { title, items: newItems });
+}
+
+async function chatDecision({ req, params }) {
+  const p = participantFrom(req);
+  if (!p) return json(401, { error: 'Log eerst in met je deelnemerscode.' });
+  const c = store.chat(p.participant_id, Number(params.id));
+  if (!c) return json(404, { error: 'Gesprek niet gevonden.' });
+  const body = await readJson(req, 1_000);
+  const card = c.items.find((i) => i.type === 'goedkeuring' && i.verzoek === body.verzoek);
+  if (!card) return json(404, { error: 'Verzoek niet gevonden in dit gesprek.' });
+  const besluit = body.besluit === 'goedkeuren' ? 'goedkeuren' : 'afwijzen';
+  try {
+    await decideRequest(card.verzoek, besluit, `${p.label} (in de chat)`);
+  } catch {
+    return json(409, { error: 'Dit verzoek is al beoordeeld, of de koppeling is niet bereikbaar.' });
+  }
+  card.status = besluit === 'goedkeuren' ? 'gepland' : 'afgewezen';
+  const note = `verzoek ${card.verzoek} is ${besluit === 'goedkeuren' ? 'goedgekeurd: de monteur is ingepland' : 'afgewezen door de medewerker'}.`;
+  store.saveChat(c.chat_id, { title: c.title, apiMessages: c.api_messages, items: c.items, note: [c.note, note].filter(Boolean).join(' ') });
+  return json(200, { status: card.status });
+}
+
+function deleteChat({ req, params }) {
+  const p = participantFrom(req);
+  if (!p) return json(401, { error: 'Log eerst in met je deelnemerscode.' });
+  store.deleteChat(p.participant_id, Number(params.id));
+  return json(200, { ok: true });
+}
+
+const trainingIdOf = (participantId) => store.db.prepare('SELECT training_id FROM participants WHERE participant_id = ?').get(participantId)?.training_id ?? null;
 
 // Participants who work in their own AI (e.g. Copilot at work) paste in the
 // prompt and answer they want the trainer to see. They choose what to share,
@@ -422,6 +514,13 @@ serve({
     'GET /api/ai/check': check,
     'POST /api/ai/ask': ask,
     'POST /api/ai/inleveren': handIn,
+    'GET /api/ai/chat': chatInfo,
+    'GET /api/ai/chats': listChats,
+    'POST /api/ai/chats': newChat,
+    'GET /api/ai/chats/:id': getChat,
+    'POST /api/ai/chats/:id/bericht': chatMessage,
+    'POST /api/ai/chats/:id/besluit': chatDecision,
+    'POST /api/ai/chats/:id/verwijderen': deleteChat,
     'GET /trainer/': trainerOnly(trainingList),
     'POST /trainer/login': trainerLogin,
     'POST /trainer/uitloggen': trainerLogout,

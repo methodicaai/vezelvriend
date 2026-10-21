@@ -1,0 +1,27 @@
+---
+// "Claude voor Vezelvriend": the chat in its own tab, like claude.ai. Claude
+// can look things up in the systems itself through the AI connection.
+// Behind the participant login (under /training/oefeningen/). Its own simple
+// page frame: a full-height app, with only the fictional-company notice above.
+import world from '../../../../../config/world.json';
+---
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claude voor Vezelvriend | Training</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/fonts.css">
+  <link rel="stylesheet" href="/assets/chat.css">
+</head>
+<body class="vc-pagina">
+  <p class="vc-fictief" role="note">
+    <span><strong>{world.company} is fictief.</strong> Alle klanten zijn verzonnen. Je gesprekken worden bewaard voor de nabespreking.</span>
+    <a href="/training/oefeningen/">Terug naar de oefeningen</a>
+  </p>
+  <div class="vc" data-vorm="volledig" data-context="chat"></div>
+  <script is:inline src="/assets/chat.js" defer></script>
+</body>
+</html>

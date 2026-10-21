@@ -63,6 +63,24 @@ CREATE TABLE IF NOT EXISTS submissions (
 
 CREATE INDEX IF NOT EXISTS submissions_by_participant ON submissions(participant_id, submitted_at);
 
+-- Conversations in the Vezelvriend chat, where Claude uses the AI connection.
+-- api_messages: the conversation as sent to Claude (incl. tool calls and results);
+-- items: what the participant sees (texts, look-ups, approval cards);
+-- note: a message for Claude added to the next question (e.g. a request was approved).
+CREATE TABLE IF NOT EXISTS chats (
+  chat_id        INTEGER PRIMARY KEY,
+  participant_id INTEGER NOT NULL REFERENCES participants(participant_id) ON DELETE CASCADE,
+  context        TEXT NOT NULL DEFAULT 'chat',   -- 'chat' (own tab) or the exercise it belongs to
+  title          TEXT NOT NULL DEFAULT 'Nieuw gesprek',
+  created_at     TEXT NOT NULL,
+  updated_at     TEXT NOT NULL,
+  api_messages   TEXT NOT NULL DEFAULT '[]',
+  items          TEXT NOT NULL DEFAULT '[]',
+  note           TEXT
+);
+
+CREATE INDEX IF NOT EXISTS chats_by_participant ON chats(participant_id, updated_at);
+
 -- One key per training for the AI connection (systems/koppeling): participants
 -- add https://<site>/mcp/<key> to an AI app of their own. Stored as a hash,
 -- shown once; it works only while the training is active.
@@ -211,6 +229,41 @@ export function openStore(file) {
 
     setActive(trainingId, active) {
       db.prepare('UPDATE trainings SET active = ? WHERE training_id = ?').run(active ? 1 : 0, trainingId);
+    },
+
+    createChat(participantId, context) {
+      const at = nowIso();
+      const { lastInsertRowid } = db.prepare('INSERT INTO chats (participant_id, context, created_at, updated_at) VALUES (?, ?, ?, ?)')
+        .run(participantId, context, at, at);
+      return Number(lastInsertRowid);
+    },
+
+    chats(participantId, context) {
+      return db.prepare(`SELECT chat_id, title, context, updated_at FROM chats
+        WHERE participant_id = ? AND (? IS NULL OR context = ?) ORDER BY updated_at DESC LIMIT 100`).all(participantId, context, context);
+    },
+
+    /** One chat, only for its own participant. */
+    chat(participantId, chatId) {
+      const c = db.prepare('SELECT * FROM chats WHERE chat_id = ? AND participant_id = ?').get(chatId, participantId);
+      return c ? { ...c, api_messages: JSON.parse(c.api_messages), items: JSON.parse(c.items) } : null;
+    },
+
+    saveChat(chatId, { title, apiMessages, items, note }) {
+      db.prepare('UPDATE chats SET title = ?, api_messages = ?, items = ?, note = ?, updated_at = ? WHERE chat_id = ?')
+        .run(title, JSON.stringify(apiMessages), JSON.stringify(items), note ?? null, nowIso(), chatId);
+    },
+
+    deleteChat(participantId, chatId) {
+      db.prepare('DELETE FROM chats WHERE chat_id = ? AND participant_id = ?').run(chatId, participantId);
+    },
+
+    /** All chats of a training, for the trainer screen. */
+    chatsOfTraining(trainingId, participantId = null) {
+      return db.prepare(`SELECT c.chat_id, c.title, c.context, c.updated_at, c.items, p.label FROM chats c
+        JOIN participants p ON p.participant_id = c.participant_id
+        WHERE p.training_id = ? AND (? IS NULL OR p.participant_id = ?) ORDER BY c.updated_at DESC`)
+        .all(trainingId, participantId, participantId).map((c) => ({ ...c, items: JSON.parse(c.items) }));
     },
 
     /** Makes (or replaces) the connection key of a training and returns it. Only the hash is kept. */
