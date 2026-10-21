@@ -94,13 +94,87 @@
       out.textContent = err.message;
     }
     $('bestellen').setAttribute('aria-disabled', String(!addressOk));
-    $('bestel-uitleg').textContent = addressOk ? 'Let op: dit is een oefenbedrijf. Bestellen kan niet echt.' : 'Check eerst je adres.';
+    $('bestel-uitleg').textContent = addressOk ? 'Vul bij stap 6 je (verzonnen) gegevens in en klik op Bestellen.' : 'Check eerst je adres.';
+  }
+
+  // A practice IBAN of the made-up "Vezelvriend Oefenbank" (VVBK) with a
+  // correct check number, so nobody needs to type in a real bank account.
+  function practiceIban() {
+    let account = '';
+    for (let i = 0; i < 10; i++) account += Math.floor(Math.random() * 10);
+    // Check number: 98 minus the remainder of (account + VVBK + NL00, letters as numbers) divided by 97.
+    const digits = `VVBK${account}NL00`.replace(/[A-Z]/g, (ch) => String(ch.charCodeAt(0) - 55));
+    let rest = 0;
+    for (const d of digits) rest = (rest * 10 + Number(d)) % 97;
+    const check = String(98 - rest).padStart(2, '0');
+    return `NL${check}VVBK${account}`.replace(/(.{4})/g, '$1 ').trim();
+  }
+
+  function showErrors(errors = {}) {
+    form.querySelectorAll('[data-fout]').forEach((el) => {
+      el.textContent = errors[el.dataset.fout] ?? '';
+      const input = form.elements[el.dataset.fout];
+      if (input && input.setAttribute) input.setAttribute('aria-invalid', String(Boolean(errors[el.dataset.fout])));
+    });
+  }
+
+  async function order(e) {
+    e.preventDefault();
+    if (!addressOk) {
+      $('adres-uitkomst').className = 'pk-melding pk-melding--fout';
+      $('adres-uitkomst').textContent = 'Check eerst of je adres in ons gebied valt.';
+      $('adres-uitkomst').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    const extras = {};
+    form.querySelectorAll('.pk-extra input').forEach((input) => {
+      extras[input.name] = input.type === 'checkbox' ? (input.checked ? 1 : 0) : Number(input.value) || 0;
+    });
+    const value = (name) => form.elements[name].value;
+    const body = {
+      adres: { postcode: value('postcode'), huisnummer: value('huisnummer'), toevoeging: value('toevoeging') },
+      pakket: { snelheid: value('snelheid'), extras, installatie: value('installatie'), looptijd: value('looptijd') },
+      klant: Object.fromEntries(['aanhef', 'voorletters', 'tussenvoegsel', 'achternaam', 'geboortedatum', 'email', 'telefoon', 'iban'].map((f) => [f, value(f)])),
+      akkoord: form.elements.akkoord.checked,
+    };
+    const button = $('bestellen');
+    button.disabled = true;
+    $('bestel-uitleg').textContent = 'Bezig met bestellen...';
+    try {
+      const r = await fetch('/api/mijn/bestelling', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const d = await r.json().catch(() => ({}));
+      if (r.status === 400 && d.errors) {
+        showErrors(d.errors);
+        $('bestel-uitleg').textContent = 'Niet alles is goed ingevuld. Kijk bij stap 6.';
+        form.querySelector('[aria-invalid="true"]')?.focus();
+        return;
+      }
+      if (!r.ok) throw new Error(d.error || 'Bestellen lukte niet. Probeer het opnieuw.');
+      showErrors();
+      $('b-bestelnummer').textContent = d.bestelnummer;
+      $('b-klantnummer').textContent = d.klantnummer;
+      $('b-postcode').textContent = d.postcode;
+      $('bevestiging-tekst').textContent = `${d.naam}, we hebben je bestelling voor ${d.adres} ontvangen. `
+        + (d.installatie === 'monteur' ? `De monteur komt op ${d.gepland}.` : `We bezorgen je Vezelbox op ${d.gepland}.`);
+      $('b-klantsysteem').href = `/klantsysteem/?q=${encodeURIComponent(d.klantnummer)}`;
+      $('b-klantbeeld').href = `/klantbeeld/klant/${encodeURIComponent(d.klantnummer)}`;
+      form.hidden = true;
+      $('bevestiging').hidden = false;
+      button.hidden = true;
+      $('bestel-uitleg').textContent = 'Besteld.';
+      $('bevestiging').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+      $('bestel-uitleg').textContent = err.message;
+    } finally {
+      button.disabled = false;
+    }
   }
 
   $('adrescheck').addEventListener('click', checkAddress);
+  $('maak-iban').addEventListener('click', () => { form.elements.iban.value = practiceIban(); });
   form.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.closest('.pk-adres')) { e.preventDefault(); checkAddress(); } });
   form.addEventListener('input', update);
   form.addEventListener('change', update);
-  $('bestellen').addEventListener('click', (e) => { if (!addressOk) { e.preventDefault(); $('adres-uitkomst').textContent = 'Check eerst of je adres in ons gebied valt.'; } });
+  form.addEventListener('submit', order);
   update();
 })();

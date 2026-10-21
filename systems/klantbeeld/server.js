@@ -16,7 +16,7 @@ const BASE = process.env.BASE_PATH ?? '';
 const KLANTSYSTEEM_URL = process.env.KLANTSYSTEEM_URL ?? 'http://localhost:3001';
 const SYSTEM = 'Klantbeeld';
 
-const { db } = openDatabase('klantbeeld');
+const { db, refresh } = openDatabase('klantbeeld');
 const CALL_GUIDE = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'documents', 'call-guide.json'), 'utf8'));
 
 const links = [
@@ -98,12 +98,33 @@ function detailsTab(c) {
       <dt>Adres</dt><dd>${formatAddress(c)}</dd>
       <dt>Telefoon</dt><dd>${c.phone}</dd>
       <dt>E-mail</dt><dd>${c.email}</dd>
+      ${c.birth_date ? html`<dt>Geboortedatum</dt><dd>${formatStamp(c.birth_date)}</dd>` : ''}
+      ${c.iban ? html`<dt>IBAN</dt><dd class="mono">${c.iban}</dd>` : ''}
       <dt>Klant sinds</dt><dd>${formatStamp(c.customer_since)}</dd>
       <dt>Status</dt><dd>${c.status}${c.end_date ? ` (tot ${formatStamp(c.end_date)})` : ''}</dd>
       <dt>Contract</dt><dd>${c.product ?? '-'}${c.product ? `, ${c.download_mbps}/${c.upload_mbps} Mbit/s, ${formatEuro(c.monthly_fee_eur)} per maand` : ''}</dd>
       <dt>Contract sinds</dt><dd>${formatStamp(c.contract_start)}</dd>
       <dt>Openstaand bedrag</dt><dd>${formatEuro(c.open_balance_eur)}</dd>
     </dl>
+  </section>${orderPanel(c)}`;
+}
+
+// Customers who ordered on the website: what they ordered and when it is connected.
+function orderPanel(c) {
+  const orders = db.prepare('SELECT * FROM orders WHERE customer_id = ? ORDER BY order_id').all(c.customer_id);
+  if (orders.length === 0) return '';
+  return html`<section class="paneel">
+    <h2>Bestelling via de website</h2>
+    ${orders.map((o) => html`<dl class="gegevens">
+      <dt>Bestelnummer</dt><dd class="mono">${o.order_id}</dd>
+      <dt>Besteld op</dt><dd>${formatStamp(o.ordered_at)}</dd>
+      <dt>Status</dt><dd>${o.status}</dd>
+      <dt>Pakket</dt><dd>${o.product}${o.extras ? `, ${o.extras}` : ''}</dd>
+      <dt>Installatie</dt><dd>${o.installation}</dd>
+      <dt>Looptijd</dt><dd>${o.contract_term}</dd>
+      <dt>Prijs</dt><dd>eerste ${o.first_months} maanden ${formatEuro(o.discount_price_eur)}, daarna ${formatEuro(o.monthly_price_eur)} per maand; eenmalig ${formatEuro(o.one_off_eur)}</dd>
+      <dt>Gepland op</dt><dd>${formatStamp(o.planned_date)}</dd>
+    </dl>`)}
   </section>`;
 }
 
@@ -263,6 +284,7 @@ function apiContext({ params }) {
 serve({
   port: PORT,
   base: BASE,
+  before: refresh,   // orders from the website become customers here too
   routes: routesOf({
     'GET /': chooseCustomer,
     'GET /klant/:id': customerView,

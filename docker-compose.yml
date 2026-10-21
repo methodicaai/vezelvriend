@@ -24,10 +24,13 @@ services:
     environment:
       BASE_PATH: /klantsysteem
       KLANTBEELD_URL: /klantbeeld
+      ORDERS_FILE: /orders/orders.json
     restart: unless-stopped
     mem_limit: 256m
     read_only: true          # the database is rebuilt in /tmp on every start
     tmpfs: [/tmp]
+    volumes:
+      - orders:/orders:ro    # orders from the website become customers here (read only)
 
   klantbeeld:
     build: { context: ., dockerfile: systems/Dockerfile }
@@ -37,24 +40,31 @@ services:
     environment:
       BASE_PATH: /klantbeeld
       KLANTSYSTEEM_URL: /klantsysteem
+      ORDERS_FILE: /orders/orders.json
     restart: unless-stopped
     mem_limit: 256m
     read_only: true
     tmpfs: [/tmp]
+    volumes:
+      - orders:/orders:ro
 
-  # "Mijn Vezelvriend": API of the customer app at /app/ (reads the fake data only).
+  # "Mijn Vezelvriend": API of the customer app at /app/ and of the order form
+  # on the website. The only system that writes orders (volume "orders").
   # Gets only the cookie secret from .env, not the AI key: least privilege.
   mijn:
     build: { context: ., dockerfile: systems/Dockerfile }
     command: ["node", "systems/mijn/server.js"]
     environment:
       SESSION_SECRET: ${SESSION_SECRET:-}
+      ORDERS_FILE: /orders/orders.json
     security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
     restart: unless-stopped
     mem_limit: 256m
     read_only: true
     tmpfs: [/tmp]
+    volumes:
+      - orders:/orders
 
   # AI box for the exercises: participant codes, Claude calls, stored conversations.
   # Secrets (API key, trainer password) come from .env on the server only.
@@ -69,8 +79,12 @@ services:
     mem_limit: 256m
     read_only: true
     tmpfs: [/tmp]
+    environment:
+      ORDERS_FILE: /orders/orders.json
     volumes:
       - ai-data:/data      # the conversations database survives restarts and updates
+      - orders:/orders     # the trainer wipes the website orders from the trainer screen
 
 volumes:
   ai-data:
+  orders:

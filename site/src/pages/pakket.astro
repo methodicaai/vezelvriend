@@ -4,9 +4,11 @@
 // date. Products and rules come from data/products.json (one source); the
 // calculation lives in /vv/pakket.js (no inline scripts: CSP).
 //
-// Nothing can be ordered and nothing is stored: the last step explains that
-// Vezelvriend is a training company. Useful for exercises: testers derive
-// test cases from the rules, analysts write stories for it.
+// Step 6 places a real (practice) order: POST /api/mijn/bestelling, which
+// checks everything again and turns the order into a customer in the
+// Klantsysteem. Made-up data only; the IBAN must be a practice IBAN.
+// Useful for exercises: testers derive test cases from the rules and check
+// the result in the systems, analysts write stories for it.
 import Layout from '../layouts/CompanyLayout.astro';
 import products from '../../../data/products.json';
 import { euro } from '../world';
@@ -91,7 +93,52 @@ import { euro } from '../world';
             ))}
           </div>
         </fieldset>
+
+        <fieldset class="pk-stap" id="gegevens">
+          <legend><span class="pk-nr">6</span> Je gegevens</legend>
+          <div class="pk-let-op">
+            <strong>Vul verzonnen gegevens in.</strong> Vezelvriend is een oefenbedrijf. Je bestelling wordt een klant in het
+            Klantsysteem, en iedereen in de training kan die zien. Gebruik nooit je echte rekeningnummer: we accepteren alleen
+            een oefen-IBAN van de (verzonnen) Vezelvriend Oefenbank.
+          </div>
+          <div class="pk-velden">
+            <div class="pk-veld pk-veld--breed" role="radiogroup" aria-labelledby="aanhef-kop">
+              <span id="aanhef-kop" class="pk-veld-kop">Aanhef</span>
+              <span class="pk-radio-rij">
+                <label><input type="radio" name="aanhef" value="dhr"> De heer</label>
+                <label><input type="radio" name="aanhef" value="mevr"> Mevrouw</label>
+                <label><input type="radio" name="aanhef" value="geen"> Geen aanhef</label>
+              </span>
+              <p class="pk-fout" data-fout="aanhef"></p>
+            </div>
+            <label class="pk-veld">Voorletters<input name="voorletters" autocomplete="off" placeholder="P.J." maxlength="20"><span class="pk-fout" data-fout="voorletters"></span></label>
+            <label class="pk-veld">Tussenvoegsel <small>(niet verplicht)</small><input name="tussenvoegsel" autocomplete="off" placeholder="de" maxlength="15"><span class="pk-fout" data-fout="tussenvoegsel"></span></label>
+            <label class="pk-veld">Achternaam<input name="achternaam" autocomplete="off" placeholder="Vries" maxlength="60"><span class="pk-fout" data-fout="achternaam"></span></label>
+            <label class="pk-veld">Geboortedatum<input name="geboortedatum" type="date" autocomplete="off"><span class="pk-fout" data-fout="geboortedatum"></span></label>
+            <label class="pk-veld">E-mailadres<input name="email" type="email" autocomplete="off" placeholder="naam@example.com" maxlength="100"><span class="pk-fout" data-fout="email"></span></label>
+            <label class="pk-veld">Telefoonnummer<input name="telefoon" type="tel" autocomplete="off" placeholder="06-12345678" maxlength="16"><span class="pk-fout" data-fout="telefoon"></span></label>
+            <div class="pk-veld pk-veld--breed">
+              <label for="iban">IBAN</label>
+              <span class="pk-iban"><input id="iban" name="iban" autocomplete="off" placeholder="NL00 VVBK 0000 0000 00" maxlength="34">
+                <button type="button" class="vv-knop vv-knop--rand" id="maak-iban">Maak een oefen-IBAN</button></span>
+              <span class="pk-fout" data-fout="iban"></span>
+            </div>
+            <label class="pk-veld pk-veld--breed pk-akkoord"><input type="checkbox" name="akkoord"> Ik ga akkoord met de voorwaarden hieronder.<span class="pk-fout" data-fout="akkoord"></span></label>
+          </div>
+        </fieldset>
       </form>
+
+      <section class="pk-bevestiging" id="bevestiging" hidden aria-live="polite">
+        <h2>Bedankt voor je bestelling!</h2>
+        <p id="bevestiging-tekst"></p>
+        <dl class="pk-bevestiging-lijst">
+          <dt>Bestelnummer</dt><dd id="b-bestelnummer"></dd>
+          <dt>Klantnummer</dt><dd id="b-klantnummer"></dd>
+          <dt>Postcode</dt><dd id="b-postcode"></dd>
+        </dl>
+        <p>Met je klantnummer en postcode log je in in de app <a href="/app/">Mijn Vezelvriend</a>.</p>
+        <p class="pk-klein">Voor de training: zoek je bestelling op in het <a id="b-klantsysteem" href="/klantsysteem/">Klantsysteem</a> of het <a id="b-klantbeeld" href="/klantbeeld/">Klantbeeld</a>, of met SQL in de tabel <code>orders</code>.</p>
+      </section>
 
       <aside class="pk-mandje" aria-labelledby="mandje-kop">
         <h2 id="mandje-kop">Je pakket</h2>
@@ -101,7 +148,7 @@ import { euro } from '../world';
           <p><span>Daarna per maand</span><strong id="maand-prijs">-</strong></p>
           <p><span>Eenmalig</span><strong id="eenmalig">-</strong></p>
         </div>
-        <a class="vv-knop vv-knop--accent pk-bestel" id="bestellen" href="/bestellen/" aria-disabled="true">Bestellen</a>
+        <button class="vv-knop vv-knop--accent pk-bestel" id="bestellen" type="submit" form="pakket" aria-disabled="true">Bestellen</button>
         <p class="pk-klein" id="bestel-uitleg">Check eerst je adres.</p>
       </aside>
     </div>

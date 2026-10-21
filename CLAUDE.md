@@ -15,7 +15,7 @@ Vezelvriend B.V. is a FICTIONAL fibre company: the practice environment of the D
 ## Site design
 - **Card grids always use `site/src/components/Vlak.astro`** (the methodica.nl "tweedeling" style: one surface split into cells with shared lines, first cell tinted, small label, large heading, text, link with an arrow). Never build new card grids with other markup.
 - Company website (`/`): `CompanyLayout.astro` + `/vv/vezelvriend.css` (own teal/coral house style). Training (`/training/`): `TrainingLayout.astro` + the methodica.nl theme in `/assets/`.
-- No inline scripts or styles (strict CSP; Markdown syntax highlighting is off for that reason), no forms that collect data, the fictional-company notice and `noindex` on every page.
+- No inline scripts or styles (strict CSP; Markdown syntax highlighting is off for that reason), the fictional-company notice and `noindex` on every page. The only form that stores data is the practice order on `/pakket/` (made-up data, practice IBAN `NL..VVBK..` only).
 - Exercise prompts are ```prompt blocks: `{{fill in by hand}}` and `{{auto:key|label}}` (filled from `/klantbeeld/api/context/:id`); `site/public/assets/prompt.js` turns them into fields with "Kopieer prompt" and "Stuur naar AI".
 
 ## Architecture (one Docker Compose project)
@@ -26,6 +26,7 @@ Vezelvriend B.V. is a FICTIONAL fibre company: the practice environment of the D
 - World clock fixed at Saturday 17-10-2026 10:15, city in `config/world.json`.
 - World on real addresses: `tools/world/fetch-bag.mjs --city X --district Y` (PDOK, no key, slow at times) writes `data/generated/bag.json`; `tools/world/generate.mjs --customers 2000` writes `data/generated/seed/`, the accounting CSV and `world-facts.md` (where the five scenarios live; trainer only). `data/generated/` is gitignored and exists only on the server; the Dockerfiles copy it over `data/seed/` at build time. Without it the template world in `data/seed/` is used. Steps: `docs/change-city.md`.
 - Scenario customers keep fixed IDs (K-1001 to K-1012, K-0871); `SEED_DIR=data/generated/seed` runs systems and the trainer test against the generated world.
+- Orders: `POST /api/mijn/bestelling` checks everything again (address in the BAG copy, rules, prices) and appends to `orders.json` on volume `orders` (`systems/shared/orders.js`). Klantsysteem, Klantbeeld and `mijn` copy the orders into their own database before each request (customers K-9..., table `orders`). Trainer wipes them at `/trainer/`; older than 30 days disappear by themselves.
 - Package builder `/pakket/`: products and rules in `data/products.json`, maths in `site/public/vv/pakket.js`, address check via `/api/mijn/adrescheck` on `data/generated/bag.json`.
 - Local without Docker: `npm run --prefix site build`, then `npm start` -> http://localhost:8080 (AI in test mode, trainer password `test`).
 

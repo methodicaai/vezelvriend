@@ -14,7 +14,7 @@ const BASE = process.env.BASE_PATH ?? '';
 const KLANTBEELD_URL = process.env.KLANTBEELD_URL ?? 'http://localhost:3002';
 const SYSTEM = 'Klantsysteem';
 
-const { db, file } = openDatabase('klantsysteem');
+const { db, file, refresh } = openDatabase('klantsysteem');
 const SCHEMA = fs.readFileSync(path.join(ROOT, 'data', 'schema.sql'), 'utf8');
 
 const links = [
@@ -120,6 +120,7 @@ function apiCustomers({ url }) {
 serve({
   port: PORT,
   base: BASE,
+  before: refresh,   // orders from the website become customers here too
   routes: routesOf({ 'GET /': customerList, 'GET /sql': sqlScreen, 'POST /sql': sqlScreen, 'GET /api/customers': apiCustomers }),
   notFound: () => page({ base: BASE, system: SYSTEM, title: 'Niet gevonden', body: html`<h1>Deze pagina bestaat niet</h1><p><a href="${BASE}/">Terug naar de klantenlijst</a></p>`, links }),
 });

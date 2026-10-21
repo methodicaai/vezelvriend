@@ -1,21 +1,24 @@
 ---
-// There is deliberately no order form: a fake internet provider on a real
-// domain must never collect personal or payment details.
+// A fake internet provider on a real domain must never look like it sells
+// real internet. Home packages can be "ordered" as a practice order on
+// /pakket/ (made-up data, practice IBAN only); business packages cannot.
 import Layout from '../layouts/CompanyLayout.astro';
 import { world } from '../world';
 ---
 <Layout title="Bestellen">
   <section class="vv-hero vv-hero--klein">
     <div class="wrap">
-      <h1>Bestellen kan hier niet</h1>
+      <h1>Bestellen is hier een oefening</h1>
       <p>{world.company} is een oefenbedrijf.</p>
     </div>
   </section>
   <section class="vv-sectie">
     <div class="wrap vv-tekst">
       <div class="vv-melding">
-        <p><strong>Je kunt bij {world.company} geen internet bestellen.</strong> Het bedrijf bestaat niet: het is bedacht voor de AI-training van <a href="https://methodica.nl/">Methodica</a>. Vul hier dus nergens je gegevens in; we vragen er ook nergens om.</p>
+        <p><strong>Je kunt bij {world.company} geen echt internet bestellen.</strong> Het bedrijf bestaat niet: het is bedacht voor de AI-training van <a href="https://methodica.nl/">Methodica</a>.</p>
       </div>
+      <p>Voor thuis kun je wel een <strong>oefenbestelling</strong> plaatsen via <a href="/pakket/">Pakket samenstellen</a>. Die komt als klant in het Klantsysteem van de training, zodat deelnemers hem daar kunnen terugvinden. Vul daar alleen verzonnen gegevens in en gebruik een oefen-IBAN.</p>
+      <p>Zakelijke pakketten kun je niet bestellen.</p>
       <p>Op zoek naar glasvezel bij jou thuis? Kijk dan bij een echte internetaanbieder.</p>
       <p>Ben je deelnemer aan de training? <a href="/training/">Ga naar de training en de opdrachten.</a></p>
     </div>

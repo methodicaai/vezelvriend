@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
+import { syncOrders } from './orders.js';
 import { ROOT, world } from './world.js';
 
 // SEED_DIR lets tests build a database from a generated world (data/generated/seed).
@@ -46,6 +47,8 @@ export function buildDatabase(file) {
  * Each running process gets its own file, so two apps (or two copies of one
  * app) never collide. The file is removed again when the process stops.
  * Read-only on purpose: nothing in these screens may change the data.
+ * The one exception is orders from the website: call `refresh()` before a
+ * request to copy new orders into the file (see orders.js).
  */
 export function openDatabase(appName) {
   const file = path.join(os.tmpdir(), `vezelvriend-${appName}-${process.pid}.db`);
@@ -54,5 +57,5 @@ export function openDatabase(appName) {
   const cleanUp = () => { try { db.close(); fs.rmSync(file, { force: true }); } catch { /* already gone */ } };
   process.once('exit', cleanUp);
   for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => process.exit(0));
-  return { db, file };
+  return { db, file, refresh: syncOrders(file) };
 }

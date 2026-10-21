@@ -200,3 +200,26 @@ p{margin:0 0 1rem}
 .pk-bestel{display:block;text-align:center;margin-top:1rem}
 .pk-bestel[aria-disabled="true"]{opacity:.55}
 .pk-klein{font-size:.85rem;color:var(--vv-muted);margin:.5rem 0 0}
+.pk-bestel{width:100%;font:inherit;cursor:pointer;border:0}
+.pk-let-op{border-left:4px solid var(--vv-accent);background:var(--vv-soft);border-radius:10px;padding:.75rem 1rem;margin:.25rem 0 1rem;font-size:.95rem}
+.pk-velden{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem 1rem}
+@media (max-width:640px){.pk-velden{grid-template-columns:minmax(0,1fr)}}
+.pk-veld{display:grid;gap:.25rem;font-weight:600;font-size:.9rem;align-content:start}
+.pk-veld--breed{grid-column:1/-1}
+.pk-veld small{font-weight:400;color:var(--vv-muted)}
+.pk-veld input:not([type=radio]):not([type=checkbox]){font:inherit;font-weight:400;padding:.65rem .8rem;border:1px solid var(--vv-line);border-radius:10px;background:var(--vv-bg);color:var(--vv-ink);min-width:0;width:100%;box-sizing:border-box}
+.pk-veld input[aria-invalid="true"]{border-color:var(--vv-accent-text)}
+.pk-veld-kop{font-weight:600}
+.pk-radio-rij{display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;font-weight:400}
+.pk-radio-rij input,.pk-akkoord input{accent-color:var(--vv-primary)}
+.pk-iban{display:flex;gap:.5rem;flex-wrap:wrap}
+.pk-iban input{flex:1 1 14rem;text-transform:uppercase}
+.pk-akkoord{display:block;font-weight:400}
+.pk-fout{display:block;margin:0;color:var(--vv-accent-text);font-weight:600;font-size:.85rem}
+.pk-fout:empty{display:none}
+.pk-bevestiging{border:2px solid var(--vv-primary);border-radius:var(--vv-radius);background:var(--vv-panel);padding:1.5rem}
+.pk-bevestiging[hidden]{display:none}
+.pk-bevestiging h2{margin-top:0}
+.pk-bevestiging-lijst{display:grid;grid-template-columns:max-content 1fr;gap:.35rem 1rem;margin:1rem 0}
+.pk-bevestiging-lijst dt{color:var(--vv-muted)}
+.pk-bevestiging-lijst dd{margin:0;font-weight:800;font-family:ui-monospace,Consolas,monospace}

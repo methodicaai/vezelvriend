@@ -8,7 +8,7 @@ COPY systems/shared ./systems/shared
 COPY systems/ai ./systems/ai
 COPY config ./config
 COPY site/public/favicon.svg ./site/public/favicon.svg
-RUN mkdir -p /data && chown node:node /data
+RUN mkdir -p /data /orders && chown node:node /data /orders
 USER node
 ENV NODE_ENV=production PORT=3000 AI_DB_FILE=/data/ai.db
 EXPOSE 3000

@@ -91,7 +91,7 @@ export function cookies(req) {
  * { status?, type?, body }. BASE_PATH lets the app live under a prefix
  * (e.g. /klantbeeld) behind the gateway, and at the root when run locally.
  */
-export function serve({ port, base, routes, notFound }) {
+export function serve({ port, base, routes, notFound, before }) {
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://localhost');
     let pathname = url.pathname;
@@ -112,6 +112,7 @@ export function serve({ port, base, routes, notFound }) {
       if (pathname === '/health') return send(200, 'text/plain', 'ok');
       const handler = routes[`${req.method} ${pathname}`] ?? findPatternRoute(routes, req.method, pathname);
       if (!handler) return send(404, 'text/html; charset=utf-8', notFound());
+      before?.();
       const result = await handler.fn({ req, url, params: handler.params ?? {} });
       send(result.status ?? 200, result.type ?? 'text/html; charset=utf-8', result.body ?? '', result.headers);
     } catch (err) {

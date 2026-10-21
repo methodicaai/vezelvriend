@@ -12,6 +12,7 @@
 import crypto from 'node:crypto';
 import { aiEnabled, aiModel, askClaude } from './claude.js';
 import { openStore } from './store.js';
+import { KEEP_DAYS, readOrders, writeOrders } from '../shared/orders.js';
 import { cookie, registerFailure, sign, tooManyFailures, unsign } from '../shared/session.js';
 import { cookies, html, readForm, readJson, routesOf, serve } from '../shared/web.js';
 
@@ -211,6 +212,7 @@ function trainingList() {
         <td>${time(t.created_at)}</td><td>${t.participants}</td><td>${t.messages}</td><td>${t.submissions}</td>
         <td>${t.active ? html`<span class="status status--ok">werken</span>` : html`<span class="status status--uit">uitgezet</span>`}</td></tr>`)}</tbody>
     </table></div>
+    ${ordersPanel()}
     <h2>Nieuwe training</h2>
     <form method="post" action="/trainer/training" class="paneel">
       <p><label for="naam"><strong>Naam van de training</strong></label><br>
@@ -222,6 +224,24 @@ function trainingList() {
       <p class="uitleg">De codes zie je één keer, direct na het aanmaken. Bewaar of print ze dan. Kwijt? Maak per deelnemer een nieuwe code.</p>
       <p><button type="submit">Training en codes aanmaken</button></p>
     </form>`) };
+}
+
+// Orders that visitors placed on the website (/pakket/). They are customers
+// K-9... in the Klantsysteem until they are wiped here (or after KEEP_DAYS days).
+function ordersPanel() {
+  const count = readOrders().length;
+  return html`<h2>Bestellingen op de website</h2>
+    <p class="uitleg">${count === 0 ? 'Er zijn geen oefenbestellingen.' : `${count} oefenbestelling${count === 1 ? '' : 'en'}. Ze staan als klant in het Klantsysteem (klantnummers K-9...).`} Wis ze na de training; na ${KEEP_DAYS} dagen verdwijnen ze vanzelf.</p>
+    ${count === 0 ? '' : html`<form method="post" action="/trainer/bestellingen/wissen" class="paneel">
+      <p><label><input type="checkbox" name="zeker" value="ja" required> Ja, wis alle ${count} bestellingen</label></p>
+      <p><button type="submit">Bestellingen wissen</button></p>
+    </form>`}`;
+}
+
+async function wipeOrders({ req }) {
+  const form = await readForm(req);
+  if (form.get('zeker') === 'ja') writeOrders([]);
+  return redirect('/trainer/');
 }
 
 async function createTraining({ req }) {
@@ -357,6 +377,7 @@ serve({
     'POST /trainer/login': trainerLogin,
     'POST /trainer/uitloggen': trainerLogout,
     'POST /trainer/training': trainerOnly(createTraining),
+    'POST /trainer/bestellingen/wissen': trainerOnly(wipeOrders),
     'GET /trainer/training/:id': trainerOnly(trainingDetail),
     'POST /trainer/training/:id/actief': trainerOnly(setActive),
     'POST /trainer/training/:id/verwijderen': trainerOnly(deleteTraining),

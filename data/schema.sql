@@ -26,6 +26,8 @@ CREATE TABLE customers (
   address_id       TEXT NOT NULL REFERENCES addresses(address_id),
   phone            TEXT,
   email            TEXT,
+  birth_date       TEXT,               -- only for customers who ordered on the website
+  iban             TEXT,               -- idem: a practice IBAN of the fictional VVBK bank
   status           TEXT NOT NULL CHECK (status IN ('actief', 'beëindigd')),
   customer_since   TEXT NOT NULL,
   end_date         TEXT,
@@ -117,4 +119,22 @@ CREATE TABLE support_log (
   customer_id TEXT REFERENCES customers(customer_id),
   category    TEXT NOT NULL,
   free_text   TEXT NOT NULL
+);
+
+-- Orders placed on the website (/pakket/). Empty in the seed: filled from the
+-- orders that visitors place during a training, until the trainer wipes them.
+CREATE TABLE orders (
+  order_id           TEXT PRIMARY KEY,
+  customer_id        TEXT NOT NULL REFERENCES customers(customer_id),
+  ordered_at         TEXT NOT NULL,
+  product            TEXT NOT NULL,
+  extras             TEXT,
+  installation       TEXT NOT NULL,
+  contract_term      TEXT NOT NULL,
+  first_months       INTEGER NOT NULL,   -- number of months with the discount price
+  discount_price_eur REAL NOT NULL,      -- per month during those months
+  monthly_price_eur  REAL NOT NULL,      -- per month afterwards
+  one_off_eur        REAL NOT NULL,
+  planned_date       TEXT NOT NULL,      -- connection or delivery date
+  status             TEXT NOT NULL CHECK (status IN ('nieuw', 'gepland', 'geannuleerd'))
 );
