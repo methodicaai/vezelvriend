@@ -57,7 +57,7 @@ export const requestsFor = (customerId) => read().filter((r) => !customerId || r
 export const requestById = (id) => read().find((r) => r.id === id) ?? null;
 export const wipeRequests = (trainingId) => write(trainingId ? read().filter((r) => r.source?.training !== trainingId) : []);
 
-/** Appends one line per tool call: who, which tool, which mode, which arguments. Not the result. */
+/** Appends one line per tool call: who, which tool, which arguments. Not the result. */
 export function logCall(entry) {
   try {
     if (fs.existsSync(LOG) && fs.statSync(LOG).size > MAX_LOG_BYTES) fs.renameSync(LOG, `${LOG}.oud`);

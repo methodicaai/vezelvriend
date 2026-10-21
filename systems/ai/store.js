@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS chats (
   chat_id        INTEGER PRIMARY KEY,
   participant_id INTEGER NOT NULL REFERENCES participants(participant_id) ON DELETE CASCADE,
   context        TEXT NOT NULL DEFAULT 'chat',   -- 'chat' (own tab) or the exercise it belongs to
+  assistant      TEXT NOT NULL DEFAULT 'zonder', -- 'zonder' (no connection) or 'koppeling' (Claude looks things up itself)
   title          TEXT NOT NULL DEFAULT 'Nieuw gesprek',
   created_at     TEXT NOT NULL,
   updated_at     TEXT NOT NULL,
@@ -110,6 +111,10 @@ export function openStore(file) {
   const db = new DatabaseSync(file);
   db.exec('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL;');
   db.exec(SCHEMA);
+  // Databases made before the two assistants existed get the column too.
+  if (!db.prepare('PRAGMA table_info(chats)').all().some((c) => c.name === 'assistant')) {
+    db.exec("ALTER TABLE chats ADD COLUMN assistant TEXT NOT NULL DEFAULT 'zonder'");
+  }
 
   const store = {
     db,
@@ -231,15 +236,15 @@ export function openStore(file) {
       db.prepare('UPDATE trainings SET active = ? WHERE training_id = ?').run(active ? 1 : 0, trainingId);
     },
 
-    createChat(participantId, context) {
+    createChat(participantId, context, assistant) {
       const at = nowIso();
-      const { lastInsertRowid } = db.prepare('INSERT INTO chats (participant_id, context, created_at, updated_at) VALUES (?, ?, ?, ?)')
-        .run(participantId, context, at, at);
+      const { lastInsertRowid } = db.prepare('INSERT INTO chats (participant_id, context, assistant, created_at, updated_at) VALUES (?, ?, ?, ?, ?)')
+        .run(participantId, context, assistant, at, at);
       return Number(lastInsertRowid);
     },
 
     chats(participantId, context) {
-      return db.prepare(`SELECT chat_id, title, context, updated_at FROM chats
+      return db.prepare(`SELECT chat_id, title, context, assistant, updated_at FROM chats
         WHERE participant_id = ? AND (? IS NULL OR context = ?) ORDER BY updated_at DESC LIMIT 100`).all(participantId, context, context);
     },
 
@@ -260,7 +265,7 @@ export function openStore(file) {
 
     /** All chats of a training, for the trainer screen. */
     chatsOfTraining(trainingId, participantId = null) {
-      return db.prepare(`SELECT c.chat_id, c.title, c.context, c.updated_at, c.items, p.label FROM chats c
+      return db.prepare(`SELECT c.chat_id, c.title, c.context, c.assistant, c.updated_at, c.items, p.label FROM chats c
         JOIN participants p ON p.participant_id = c.participant_id
         WHERE p.training_id = ? AND (? IS NULL OR p.participant_id = ?) ORDER BY c.updated_at DESC`)
         .all(trainingId, participantId, participantId).map((c) => ({ ...c, items: JSON.parse(c.items) }));

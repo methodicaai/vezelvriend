@@ -4,16 +4,16 @@
 // Two entrances to the same tools (tools.js):
 // - /internal/...: for the Vezelvriend chat (systems/ai). Only reachable
 //   inside the Docker network: the gateway does not forward /internal/.
-// - /mcp/<key>[/breed]: the Model Context Protocol, for an AI app of the
+// - /mcp/<key>: the Model Context Protocol, for an AI app of the
 //   participant's own (Claude Desktop, claude.ai, Claude Code, Copilot Studio).
 //   <key> is the connection key of a training, made in the trainer screen;
 //   it stops working when the trainer switches the training off.
 //
-// Every call is logged (who, which tool, which mode, which arguments), so the
+// Every call is logged (who, which tool, which arguments), so the
 // trainer can discuss what the AI looked up. Results are not logged.
 import { openDatabase } from '../shared/db.js';
 import { readJson, routesOf, serve } from '../shared/web.js';
-import { callTool, toolsFor } from './tools.js';
+import { TOOLS, callTool } from './tools.js';
 import { callsFor, decideRequest, logCall, requestsFor, wipeCalls, wipeRequests } from './requests.js';
 
 const PORT = Number(process.env.PORT ?? 3006);
@@ -21,19 +21,17 @@ const AI_URL = process.env.AI_URL ?? 'http://localhost:3003';
 const { db, file, refresh } = openDatabase('koppeling');
 
 const json = (status, data) => ({ status, type: 'application/json; charset=utf-8', body: JSON.stringify(data) });
-const standOf = (value) => (value === 'breed' ? 'breed' : 'zuinig');
 
 // ---------------------------------------------------------------- internal (chat, Klantbeeld, trainer)
 
-function listTools({ url }) {
-  return json(200, toolsFor(standOf(url.searchParams.get('stand'))).map(({ name, description, input_schema, approval }) => ({ name, description, input_schema, approval: Boolean(approval) })));
+function listTools() {
+  return json(200, TOOLS.map(({ name, description, input_schema, approval }) => ({ name, description, input_schema, approval: Boolean(approval) })));
 }
 
 async function internalCall({ req }) {
   const body = await readJson(req, 50_000);
-  const stand = standOf(body.stand);
-  const outcome = await callTool({ name: body.name, args: body.arguments, stand, db, dbFile: file, source: body.source });
-  logCall({ source: body.source ?? null, tool: body.name, stand, arguments: body.arguments ?? {}, ok: !outcome.error });
+  const outcome = await callTool({ name: body.name, args: body.arguments, db, dbFile: file, source: body.source });
+  logCall({ source: body.source ?? null, tool: body.name, arguments: body.arguments ?? {}, ok: !outcome.error });
   return json(200, outcome);
 }
 
@@ -83,7 +81,6 @@ const rpcError = (id, code, message) => json(200, { jsonrpc: '2.0', id, error: {
 async function mcp({ req, params }) {
   const access = await trainingForKey(params.key);
   if (!access) return json(404, { error: 'Onbekende of uitgezette sleutel.' });
-  const stand = standOf(params.stand);
   let msg;
   try { msg = await readJson(req, 100_000); } catch { return rpcError(null, -32700, 'Parse error'); }
   if (Array.isArray(msg)) return rpcError(null, -32600, 'Batches worden niet ondersteund.');
@@ -96,14 +93,14 @@ async function mcp({ req, params }) {
         protocolVersion: PROTOCOL_VERSIONS.includes(asked) ? asked : PROTOCOL_VERSIONS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: 'vezelvriend', title: 'Vezelvriend (fictief oefenbedrijf)', version: '1.0.0' },
-        instructions: `Koppeling met de systemen van Vezelvriend B.V., een fictief glasvezelbedrijf voor een AI-training. Alle klanten zijn verzonnen. In de oefenwereld is het nu zaterdag 17-10-2026 10:15. Stand: ${stand}.`,
+        instructions: `Koppeling met de systemen van Vezelvriend B.V., een fictief glasvezelbedrijf voor een AI-training. Alle klanten zijn verzonnen. In de oefenwereld is het nu zaterdag 17-10-2026 10:15.`,
       });
     }
     case 'ping':
       return rpc(msg.id, {});
     case 'tools/list':
       return rpc(msg.id, {
-        tools: toolsFor(stand).map((t) => ({
+        tools: TOOLS.map((t) => ({
           name: t.name, description: t.description, inputSchema: t.input_schema,
           annotations: { readOnlyHint: !t.approval, destructiveHint: false, openWorldHint: false },
         })),
@@ -111,8 +108,8 @@ async function mcp({ req, params }) {
     case 'tools/call': {
       const name = msg.params?.name;
       const source = { kind: 'mcp', training: access.training, label: access.label };
-      const outcome = await callTool({ name, args: msg.params?.arguments, stand, db, dbFile: file, source });
-      logCall({ source, tool: name, stand, arguments: msg.params?.arguments ?? {}, ok: !outcome.error });
+      const outcome = await callTool({ name, args: msg.params?.arguments, db, dbFile: file, source });
+      logCall({ source, tool: name, arguments: msg.params?.arguments ?? {}, ok: !outcome.error });
       return rpc(msg.id, {
         content: [{ type: 'text', text: outcome.error ?? JSON.stringify(outcome.result, null, 2) }],
         isError: Boolean(outcome.error),
@@ -138,9 +135,7 @@ serve({
     'GET /internal/opvragingen': listCalls,
     'POST /internal/wissen': wipe,
     'POST /mcp/:key': mcp,
-    'POST /mcp/:key/:stand': mcp,
     'GET /mcp/:key': noStream,
-    'GET /mcp/:key/:stand': noStream,
   }),
   notFound: () => JSON.stringify({ error: 'Niet gevonden' }),
 });

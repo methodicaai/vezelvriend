@@ -11,6 +11,8 @@ export function getExercises() {
       title: mod.frontmatter.title,
       role: mod.frontmatter.role,
       summary: mod.frontmatter.summary,
+      // 'aan': the chat next to the exercise has the AI connection (Claude looks things up itself).
+      connection: mod.frontmatter.koppeling === 'aan',
       Content: mod.Content,
     }))
     .sort((a, b) => a.number - b.number);

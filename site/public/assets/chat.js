@@ -63,17 +63,7 @@
   const bar = el('div', 'vc-balk');
   const title = el('h1', 'vc-titel', 'Claude voor Vezelvriend');
   const controls = el('div', 'vc-knoppen');
-  const standBox = el('div', 'vc-stand');
-  standBox.setAttribute('role', 'radiogroup');
-  standBox.setAttribute('aria-label', 'Stand van de koppeling');
-  const standButtons = ['zuinig', 'breed'].map((s) => {
-    const b = el('button', 'vc-stand-knop', s === 'zuinig' ? 'Zuinig' : 'Breed');
-    b.type = 'button'; b.dataset.stand = s; b.setAttribute('role', 'radio');
-    b.title = s === 'zuinig' ? 'Claude krijgt alleen wat nodig is' : 'Claude krijgt alles wat in de systemen staat, ook persoonsgegevens en SQL';
-    b.addEventListener('click', () => { prefs.stand = s; savePrefs(); renderStand(); });
-    standBox.append(b);
-    return b;
-  });
+  const badge = el('span', 'vc-badge');
   const showLabel = el('label', 'vc-toon');
   const showBox = el('input'); showBox.type = 'checkbox';
   showLabel.append(showBox, ' Laat zien wat Claude opvroeg');
@@ -82,7 +72,7 @@
   about.append(el('summary', '', 'Wat weet Claude vooraf?'));
   const aboutText = el('div', 'vc-over-tekst');
   about.append(aboutText);
-  controls.append(standBox, showLabel, about);
+  controls.append(badge, showLabel, about);
   bar.append(title, controls);
 
   const thread = el('div', 'vc-gesprek');
@@ -95,23 +85,57 @@
   form.append(input, send);
   main.append(bar, thread, form, status);
 
-  function renderStand() {
-    const stand = prefs.stand === 'breed' ? 'breed' : 'zuinig';
-    standButtons.forEach((b) => b.setAttribute('aria-checked', String(b.dataset.stand === stand)));
-    root.classList.toggle('vc--breed', stand === 'breed');
-  }
-  renderStand();
   showBox.checked = Boolean(prefs.toon);
   root.classList.toggle('vc--toon', showBox.checked);
 
   // ------------------------------------------------------------ state
   let chatId = null;
   let busy = false;
+  let info = null;                                  // from GET /api/ai/chat: names and descriptions of the assistants
+  const fixed = root.dataset.assistent || null;     // next to an exercise the assistant is fixed
+  let assistant = fixed;
+
+  /** Shows which assistant this conversation uses, and what it can see. */
+  function setAssistant(a) {
+    assistant = a;
+    const about = a && info ? info.assistants[a] : null;
+    badge.textContent = about ? about.name : '';
+    badge.hidden = !about;
+    root.classList.toggle('vc--koppeling', a === 'koppeling');
+    showLabel.hidden = a !== 'koppeling';
+    aboutText.replaceChildren();
+    if (!about) return;
+    aboutText.append(el('p', '', about.sees));
+    if (about.instruction) aboutText.append(el('p', '', 'Claude krijgt bij elk gesprek deze instructie mee:'), el('pre', '', about.instruction));
+    else aboutText.append(el('p', '', 'Claude krijgt geen instructie vooraf: alleen jouw vraag.'));
+    aboutText.append(el('p', '', `Model: ${info.model}. Je kunt ${info.maxPerDay} vragen per dag stellen. Je gesprekken worden bewaard, zodat de trainer ze kan nabespreken.`));
+  }
+
+  /** The two assistants as cards; a new conversation starts with a choice. */
+  function chooser() {
+    const box = el('div', 'vc-kies');
+    box.append(el('p', 'vc-leeg-kop', fixed ? 'Waar kan ik je mee helpen?' : 'Kies een assistent'));
+    const cards = el('div', 'vc-kies-kaarten');
+    for (const key of fixed ? [fixed] : ['zonder', 'koppeling']) {
+      const a = info.assistants[key];
+      const card = el(fixed ? 'div' : 'button', `vc-kies-kaart${assistant === key ? ' vc-gekozen' : ''}`);
+      if (!fixed) {
+        card.type = 'button';
+        card.setAttribute('aria-pressed', String(assistant === key));
+        card.addEventListener('click', () => { setAssistant(key); showItems([], true); input.focus(); });
+      }
+      card.append(el('span', 'vc-kies-naam', a.name), el('span', 'vc-kies-tekst', a.sees));
+      cards.append(card);
+    }
+    box.append(cards);
+    if (!fixed) box.append(el('p', 'vc-kies-uitleg', assistant ? 'Typ je vraag hieronder. De assistent blijft hetzelfde in dit gesprek.' : 'Je kunt in een gesprek niet wisselen. Wil je vergelijken? Stel dezelfde vraag in een nieuw gesprek met de andere assistent.'));
+    return box;
+  }
 
   function renderItem(item) {
     if (item.type === 'vraag') {
       const n = el('div', 'vc-vraag');
-      n.append(el('span', 'vc-label', `Jij · stand ${item.stand}`), el('p', '', item.text));
+      n.append(el('span', 'vc-label', 'Jij'), el('p', '', item.text));
       return n;
     }
     if (item.type === 'tekst') {
@@ -165,12 +189,7 @@
 
   function showItems(items, replace) {
     if (replace) thread.replaceChildren();
-    if (replace && items.length === 0) {
-      const empty = el('div', 'vc-leeg');
-      empty.append(el('p', 'vc-leeg-kop', 'Waar kan ik je mee helpen?'),
-        el('p', '', 'Claude kan zelf klanten, modems, storingen, documenten en (in de stand breed) de database raadplegen. Wat het opvroeg, zie je als je "Laat zien wat Claude opvroeg" aanzet.'));
-      thread.append(empty);
-    }
+    if (replace && items.length === 0) thread.append(chooser());
     for (const item of items) thread.append(renderItem(item));
     thread.scrollTop = thread.scrollHeight;
   }
@@ -209,14 +228,15 @@
   async function openChat(id) {
     chatId = id;
     status.textContent = '';
-    if (id === null) { title.textContent = 'Nieuw gesprek'; showItems([], true); refreshList(); input.focus(); return; }
+    if (id === null) { title.textContent = 'Nieuw gesprek'; setAssistant(fixed); showItems([], true); refreshList(); return; }
     try {
       const c = await api(`/chats/${id}`);
       title.textContent = c.title;
+      setAssistant(c.assistant);
       showItems(c.items, true);
     } catch (err) {
       // A remembered conversation may have been deleted: start a new one.
-      if (err.status === 404) { chatId = null; title.textContent = 'Nieuw gesprek'; showItems([], true); } else status.textContent = err.message;
+      if (err.status === 404) { chatId = null; title.textContent = 'Nieuw gesprek'; setAssistant(fixed); showItems([], true); } else status.textContent = err.message;
     }
     refreshList();
   }
@@ -225,13 +245,14 @@
     e.preventDefault();
     const text = input.value.trim();
     if (!text || busy) return;
+    if (!assistant) { status.textContent = 'Kies eerst een assistent.'; return; }
     busy = true; send.disabled = true;
-    status.textContent = 'Claude zoekt het uit...';
+    status.textContent = assistant === 'koppeling' ? 'Claude zoekt het uit in de systemen...' : 'Claude denkt na...';
     root.classList.add('vc--bezig');
     try {
-      if (chatId === null) chatId = (await api('/chats', { context })).id;
-      if (thread.querySelector('.vc-leeg')) thread.replaceChildren();
-      const r = await api(`/chats/${chatId}/bericht`, { tekst: text, stand: prefs.stand === 'breed' ? 'breed' : 'zuinig' });
+      if (chatId === null) chatId = (await api('/chats', { context, assistent: assistant })).id;
+      if (thread.querySelector('.vc-kies')) thread.replaceChildren();
+      const r = await api(`/chats/${chatId}/bericht`, { tekst: text });
       input.value = '';
       title.textContent = r.title;
       showItems(r.items, false);
@@ -264,11 +285,8 @@
   }
 
   (async () => {
-    let info;
     try { info = await api('/chat'); } catch { info = null; }
     if (!info) { main.replaceChildren(bar, el('p', 'vc-melding', 'De chat is nu niet bereikbaar.')); return; }
-    aboutText.replaceChildren(el('p', '', `Model: ${info.model}. Claude krijgt bij elk gesprek deze instructie mee:`), el('pre', '', info.systemPrompt),
-      el('p', '', `Je kunt ${info.maxPerDay} vragen per dag stellen. Je gesprekken worden bewaard, zodat de trainer ze kan nabespreken.`));
     if (!info.loggedIn) return loginForm('Log in met je deelnemerscode om met Claude te chatten. Je gesprekken worden bewaard, zodat de trainer ze kan nabespreken.');
     if (!info.enabled) { main.replaceChildren(bar, el('p', 'vc-melding', 'De AI staat uit. Vraag je trainer.')); return; }
     const remembered = shape === 'paneel' ? prefs[`chat-${context}`] : null;

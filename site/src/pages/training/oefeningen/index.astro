@@ -15,11 +15,13 @@ const exercises = getExercises();
   <section class="sectie">
     <div class="wrap">
       <h2>Eerst dit</h2>
-      <Vlak columns={2} items={[
+      <Vlak columns={3} items={[
         { label: 'Begin hier', title: 'De contexttrap', text: 'Vijf manieren waarop context bij een AI komt, met per trede een zwak en een sterk voorbeeld en de controlevraag.', href: '/training/oefeningen/contexttrap/', linkLabel: 'Naar de contexttrap' },
         { label: 'Proef', title: 'Vind de fout', text: 'Acht AI-antwoorden over klanten. Eerst schatten hoe zeker je bent, dan controleren in de bron.', href: '/training/oefeningen/vind-de-fout/', linkLabel: 'Naar de proef' },
         { label: 'Trede 2', title: 'Documenten van Vezelvriend', text: 'De bedrijfsdocumenten om in je eigen AI te zetten en er vragen over te stellen.', href: '/training/oefeningen/documenten/', linkLabel: 'Naar de documenten' },
         { label: 'Eigen werk', title: 'Werkbladen', text: 'Het promptkader voor je eigen taak, en je als-dan-kaart om mee af te sluiten.', href: '/training/oefeningen/werkbladen/', linkLabel: 'Naar de werkbladen' },
+        { label: 'Chat', title: 'Claude voor Vezelvriend', text: 'Chat met Claude in een eigen tabblad: zonder koppeling, of met een koppeling waarmee Claude zelf in de systemen zoekt.', href: '/training/oefeningen/claude/', linkLabel: 'Open de chat' },
+        { label: 'Code', title: 'De code van Vezelvriend', text: 'Lees hoe de website en de systemen echt werken. Wat belooft een pagina, en wat controleert de code?', href: '/training/oefeningen/code/', linkLabel: 'Naar de code' },
       ]} />
       <h2>Oefeningen</h2>
       {exercises.length === 0 && <p>De oefeningen komen binnenkort.</p>}

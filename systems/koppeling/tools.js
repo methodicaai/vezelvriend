@@ -1,11 +1,10 @@
 // The tools an AI may use to look things up in the Vezelvriend systems
 // (step 3 and 4 of the context ladder: the AI fetches context itself).
 //
-// Two modes, so participants can compare:
-// - "zuinig" (frugal): only what a decision needs. No names of other
-//   residents, no phone, e-mail or bank details, no SQL.
-// - "breed" (broad): everything the systems hold, the way many real
-//   connections are built. Participants should notice what comes along.
+// Full access on purpose: the tools return everything the systems hold
+// (names, phone, e-mail, bank details, earlier residents, the whole
+// database), the way many real connections are built. Participants should
+// notice what comes along that the question did not need.
 //
 // One action: requesting a technician. It never happens directly: it creates
 // a request that a person must approve (in the chat, or in the Klantbeeld).
@@ -36,24 +35,20 @@ export const TOOLS = [
     name: 'zoek_klanten',
     description: 'Zoek klanten op naam, klantnummer, straat of postcode. Geeft maximaal 20 klanten.',
     input_schema: schema({ zoekterm: { type: 'string', description: 'Naam, klantnummer, straat of postcode' } }),
-    run: ({ db, args, stand }) => searchCustomers(db, String(args.zoekterm ?? '')).slice(0, 20).map((c) => ({
-      klantnummer: c.customer_id, naam: c.name, adres: formatAddress(c), status: c.status,
-      ...(stand === 'breed' ? { telefoon: c.phone, email: c.email } : {}),
+    run: ({ db, args }) => searchCustomers(db, String(args.zoekterm ?? '')).slice(0, 20).map((c) => ({
+      klantnummer: c.customer_id, naam: c.name, adres: formatAddress(c), status: c.status, telefoon: c.phone, email: c.email,
     })),
   },
   {
     name: 'klantbeeld',
     description: 'De klantgegevens en het contract van één klant.',
     input_schema: schema(customerArg),
-    run: ({ db, args, stand }) => {
+    run: ({ db, args }) => {
       const c = customerOrFail(db, args.klantnummer);
-      const base = {
+      return {
         klantnummer: c.customer_id, soort_klant: c.customer_type, status: c.status, klant_sinds: c.customer_since,
         contract: c.product ? { product: c.product, snelheid_mbps: c.download_mbps, sinds: c.contract_start } : null,
-      };
-      if (stand !== 'breed') return base;
-      return {
-        ...base, naam: c.name, adres: formatAddress(c), telefoon: c.phone, email: c.email,
+        naam: c.name, adres: formatAddress(c), telefoon: c.phone, email: c.email,
         geboortedatum: c.birth_date ?? null, iban: c.iban ?? null, openstaand_bedrag_eur: c.open_balance_eur,
         einddatum: c.end_date, maandbedrag_eur: c.monthly_fee_eur,
       };
@@ -63,7 +58,7 @@ export const TOOLS = [
     name: 'modem_controleren',
     description: 'Controleer het modem van een klant: laatste meting, straatstatus, laatste herstart, firmware en of andere aansluitingen in de straat offline zijn. Zelfde gegevens als de knop "Modem controleren" in het Klantbeeld.',
     input_schema: schema(customerArg),
-    run: ({ db, args, stand }) => {
+    run: ({ db, args }) => {
       const c = customerOrFail(db, args.klantnummer);
       const check = getModemCheck(db, c.customer_id);
       if (!check) return { klantnummer: c.customer_id, modem: null, melding: 'Geen modem gekoppeld aan deze klant.' };
@@ -77,22 +72,20 @@ export const TOOLS = [
         andere_aansluitingen_offline: check.offlineNeighbours,
         laatste_herstart: check.restart ? { tijd: check.restart.requested_at, resultaat: check.restart.result } : null,
         firmware: { versie: check.modem.firmware, nieuwste: check.firmwareLatest },
-        ...(stand === 'breed' ? { modem: { model: check.modem.model, serienummer: check.modem.serial_number, mac_adres: check.modem.mac_address }, netwerksegment: c.network_segment } : {}),
+        modem: { model: check.modem.model, serienummer: check.modem.serial_number, mac_adres: check.modem.mac_address },
+        netwerksegment: c.network_segment,
       };
     },
   },
   {
     name: 'historie_op_adres',
-    description: 'Contactmomenten en tickets bij een klant, nieuwste eerst.',
+    description: 'Alle contactmomenten en tickets op het adres van een klant, nieuwste eerst.',
     input_schema: schema(customerArg),
-    run: ({ db, args, stand }) => {
+    // Everything at the address, also from earlier residents (as the Klantbeeld shows it).
+    run: ({ db, args }) => {
       const c = customerOrFail(db, args.klantnummer);
-      // Broad: everything at the address, also from earlier residents (as the Klantbeeld shows it).
-      // Frugal: only this customer's own history.
-      const items = getAddressHistory(db, c.address_id).filter((i) => stand === 'breed' || i.customer_id === c.customer_id);
-      return items.map((i) => ({
-        datum: i.at, kanaal: i.channel, richting: i.direction, onderwerp: i.subject, samenvatting: i.summary,
-        ...(stand === 'breed' ? { klant: `${i.customer_name} (${i.customer_id})` } : {}),
+      return getAddressHistory(db, c.address_id).map((i) => ({
+        datum: i.at, kanaal: i.channel, richting: i.direction, onderwerp: i.subject, samenvatting: i.summary, klant: `${i.customer_name} (${i.customer_id})`,
       }));
     },
   },
@@ -131,7 +124,6 @@ export const TOOLS = [
     name: 'sql',
     description: 'Stel een SQL-vraag (alleen SELECT) aan de database van het Klantsysteem. Tabellen: addresses, customers, contracts, modems, modem_measurements, remote_restarts, area_status, tickets, contacts, network_map, support_log, orders. Maximaal 100 rijen.',
     input_schema: schema({ query: { type: 'string', description: 'Eén SELECT-vraag' } }),
-    stands: ['breed'],
     run: async ({ dbFile, args }) => {
       const result = await runQuery(dbFile, String(args.query ?? ''));
       if (result.error) throw new ToolError(result.error);
@@ -154,14 +146,12 @@ export const TOOLS = [
   },
 ];
 
-export const toolsFor = (stand) => TOOLS.filter((t) => !t.stands || t.stands.includes(stand));
-
 /** Runs a tool. Returns { result } or { error } (a message the AI can act on). */
-export async function callTool({ name, args, stand, db, dbFile, source }) {
-  const tool = toolsFor(stand).find((t) => t.name === name);
-  if (!tool) return { error: `Het gereedschap ${name} bestaat niet${name === 'sql' ? ' in de stand "zuinig"' : ''}.` };
+export async function callTool({ name, args, db, dbFile, source }) {
+  const tool = TOOLS.find((t) => t.name === name);
+  if (!tool) return { error: `Het gereedschap ${name} bestaat niet.` };
   try {
-    return { result: await tool.run({ db, dbFile, args: args ?? {}, stand, source }) };
+    return { result: await tool.run({ db, dbFile, args: args ?? {}, source }) };
   } catch (err) {
     if (err instanceof ToolError) return { error: err.message };
     console.error(err);

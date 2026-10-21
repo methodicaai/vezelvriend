@@ -11,7 +11,7 @@
 // context goes into the prompt. That stays the core of the training.
 import crypto from 'node:crypto';
 import { aiEnabled, aiModel, askClaude } from './claude.js';
-import { SYSTEM_PROMPT, chatModel, decideRequest, runTurn } from './agent.js';
+import { ASSISTANTS, chatModel, decideRequest, runTurn } from './agent.js';
 import { openStore } from './store.js';
 import { KEEP_DAYS, readOrders, writeOrders } from '../shared/orders.js';
 import { cookie, registerFailure, sign, tooManyFailures, unsign } from '../shared/session.js';
@@ -114,12 +114,13 @@ async function ask({ req }) {
 
 const CONTEXT = /^[a-z0-9-]{1,40}$/;
 const contextOf = (v) => (typeof v === 'string' && CONTEXT.test(v) ? v : 'chat');
+const assistantOf = (v) => (v === 'koppeling' ? 'koppeling' : 'zonder');
 const titleOf = (question) => (question.length > 60 ? `${question.slice(0, 57).trim()}...` : question);
 
 function chatInfo({ req }) {
   const p = participantFrom(req);
   return json(200, { enabled: aiEnabled(), loggedIn: Boolean(p), participant: p ? { label: p.label, training: p.training_name } : null,
-    model: chatModel(), systemPrompt: SYSTEM_PROMPT, maxPerDay: MAX_PER_DAY, usedToday: p ? store.countToday(p.participant_id) : 0 });
+    model: chatModel(), assistants: ASSISTANTS, maxPerDay: MAX_PER_DAY, usedToday: p ? store.countToday(p.participant_id) : 0 });
 }
 
 function listChats({ req, url }) {
@@ -132,7 +133,7 @@ async function newChat({ req }) {
   const p = participantFrom(req);
   if (!p) return json(401, { error: 'Log eerst in met je deelnemerscode.' });
   const body = await readJson(req, 1_000).catch(() => ({}));
-  return json(200, { id: store.createChat(p.participant_id, contextOf(body.context)) });
+  return json(200, { id: store.createChat(p.participant_id, contextOf(body.context), assistantOf(body.assistent)) });
 }
 
 function getChat({ req, params }) {
@@ -140,7 +141,7 @@ function getChat({ req, params }) {
   if (!p) return json(401, { error: 'Log eerst in met je deelnemerscode.' });
   const c = store.chat(p.participant_id, Number(params.id));
   if (!c) return json(404, { error: 'Gesprek niet gevonden.' });
-  return json(200, { id: c.chat_id, title: c.title, context: c.context, items: c.items });
+  return json(200, { id: c.chat_id, title: c.title, context: c.context, assistant: c.assistant, items: c.items });
 }
 
 async function chatMessage({ req, params }) {
@@ -154,19 +155,17 @@ async function chatMessage({ req, params }) {
   if (!question) return json(400, { error: 'Typ eerst een vraag.' });
   if (question.length > MAX_PROMPT_CHARS) return json(400, { error: `De vraag is te lang (meer dan ${MAX_PROMPT_CHARS} tekens).` });
   if (store.countToday(p.participant_id) >= MAX_PER_DAY) return json(429, { error: `Je hebt vandaag al ${MAX_PER_DAY} vragen gesteld. Dat is het maximum per dag.` });
-  const stand = body.stand === 'breed' ? 'breed' : 'zuinig';
-
   // A decision on a technician request since the last question is passed on to Claude.
   const forClaude = c.note ? `[Melding van het systeem: ${c.note}]
 
 ${question}` : question;
   const source = { kind: 'chat', training: trainingIdOf(p.participant_id), participant: p.participant_id, label: p.label, chat: c.chat_id };
-  const result = await runTurn({ apiMessages: c.api_messages, question: forClaude, stand, source });
-  store.saveMessage({ participantId: p.participant_id, exercise: c.context, promptBlock: `Chat, stand ${stand}`, prompt: question,
+  const result = await runTurn({ apiMessages: c.api_messages, question: forClaude, assistant: c.assistant, source });
+  store.saveMessage({ participantId: p.participant_id, exercise: c.context, promptBlock: c.assistant === 'koppeling' ? 'Chat met koppeling' : 'Chat zonder koppeling', prompt: question,
     answer: result.answer, status: result.status, error: result.error, model: result.model, inputTokens: result.inputTokens, outputTokens: result.outputTokens, durationMs: result.durationMs });
   if (result.status === 'error') return json(502, { error: result.participantMessage });
 
-  const newItems = [{ type: 'vraag', text: question, stand }, ...result.newItems];
+  const newItems = [{ type: 'vraag', text: question }, ...result.newItems];
   const title = c.items.length === 0 ? titleOf(question) : c.title;
   store.saveChat(c.chat_id, { title, apiMessages: result.apiMessages, items: [...c.items, ...newItems], note: null });
   return json(200, { title, items: newItems });
@@ -360,7 +359,7 @@ function codesPage(trainingId, name, participants) {
     <p><a class="knop" href="/trainer/training/${trainingId}">Naar de training</a></p>`);
 }
 
-function trainingDetail({ params, url }) {
+async function trainingDetail({ params, url }) {
   const t = store.training(Number(params.id));
   if (!t) return { status: 404, body: trainerPage('Niet gevonden', html`<h1>Training niet gevonden</h1>`) };
   const participants = store.participants(t.training_id);
@@ -413,9 +412,12 @@ function trainingDetail({ params, url }) {
         </div>
       </section>`)}
 
+    ${chatsPanel(t, filter, who, allLink)}
+    ${await connectionCallsPanel(t)}
+
     <h2>Verwijderen</h2>
     <form method="post" action="/trainer/training/${t.training_id}/verwijderen" class="paneel">
-      <p>Verwijdert deze training met alle deelnemers, codes, gesprekken en inleveringen. Dit kan niet ongedaan worden gemaakt.</p>
+      <p>Verwijdert deze training met alle deelnemers, codes, gesprekken, inleveringen, de koppelingssleutel, de opvragingen via de koppeling en de monteursverzoeken. Dit kan niet ongedaan worden gemaakt.</p>
       <p><label><input type="checkbox" name="zeker" value="ja" required> Ik weet het zeker</label></p>
       <p><button type="submit">Training definitief verwijderen</button></p>
     </form>`) };
@@ -437,13 +439,50 @@ async function newCode({ req, params }) {
 
 // ---------------------------------------------------------------- AI connection (systems/koppeling)
 
+const KOPPELING_URL = process.env.KOPPELING_URL ?? 'http://localhost:3006';
+const TOOL_LABELS = { zoek_klanten: 'klanten gezocht', klantbeeld: 'klantbeeld', modem_controleren: 'modem gecontroleerd', historie_op_adres: 'historie op adres',
+  storingen: 'storingen', beslisboom: 'beslisboom', documenten: 'lijst met documenten', document_lezen: 'document gelezen', sql: 'SQL-vraag', monteur_inplannen: 'monteur aangevraagd' };
+const lookup = (tool, args) => `${TOOL_LABELS[tool] ?? tool}${Object.values(args ?? {}).filter((v) => typeof v === 'string').length ? ` (${Object.values(args).filter((v) => typeof v === 'string').join(', ').slice(0, 160)})` : ''}`;
+
+/** The chat conversations of a training, with what Claude looked up and what was decided. */
+function chatsPanel(t, filter, who, allLink) {
+  const chats = store.chatsOfTraining(t.training_id, filter);
+  return html`<h2>Chatgesprekken${filter ? html` van ${who} · ${allLink}` : ''}</h2>
+    <p class="uitleg">Gesprekken in "Claude voor Vezelvriend" en in de chat naast de oefeningen. Bij "met koppeling" zie je wat Claude zelf opvroeg.</p>
+    ${chats.length === 0 ? html`<p class="leeg">Nog geen chatgesprekken.</p>` : chats.map((c) => html`
+      <details class="paneel">
+        <summary><strong>${c.label}</strong> · ${c.assistant === 'koppeling' ? 'met koppeling' : 'zonder koppeling'} · ${c.context} · ${time(c.updated_at)} · ${c.title}</summary>
+        ${c.items.map((i) => i.type === 'vraag' ? html`<p><strong>Deelnemer:</strong> ${i.text}</p>`
+          : i.type === 'tekst' ? html`<pre class="schema">${i.text}</pre>`
+          : i.type === 'opvraging' ? html`<p class="uitleg">Claude vroeg op: ${lookup(i.tool, i.args)}${i.ok ? '' : ' (mislukt)'}</p>`
+          : i.type === 'goedkeuring' ? html`<p><strong>Monteursverzoek ${i.verzoek}</strong> (${i.klantnummer}): ${i.status}</p>`
+          : html`<p class="uitleg">${i.text ?? ''}</p>`)}
+      </details>`)}`;
+}
+
+/** What AI apps of participants (over MCP) looked up with this training's key. */
+async function connectionCallsPanel(t) {
+  let calls = [];
+  try {
+    const res = await fetch(`${KOPPELING_URL}/internal/opvragingen?training=${t.training_id}`, { signal: AbortSignal.timeout(3000) });
+    if (res.ok) calls = (await res.json()).filter((c) => c.source?.kind === 'mcp');
+  } catch { /* connection not running */ }
+  if (calls.length === 0) return '';
+  return html`<h2>Opvragingen via een eigen AI-app</h2>
+    <p class="uitleg">Wat AI-apps van deelnemers (via de koppelingssleutel) hebben opgevraagd. De koppeling bewaart niet wie het was, alleen de training.</p>
+    <div class="tabel-vak"><table>
+      <thead><tr><th>Tijd</th><th>Opvraging</th><th>Gelukt</th></tr></thead>
+      <tbody>${calls.slice(-300).reverse().map((c) => html`<tr><td>${time(c.at)}</td><td>${lookup(c.tool, c.arguments)}</td><td>${c.ok ? 'ja' : 'nee'}</td></tr>`)}</tbody>
+    </table></div>`;
+}
+
 // The public address of this site, for the connection URLs the trainer hands out.
 const siteUrl = (req) => process.env.PUBLIC_URL || `${process.env.COOKIE_SECURE === '0' ? 'http' : 'https'}://${req.headers.host}`;
 
 function connectionPanel(t) {
   const key = store.connectionKeyOf(t.training_id);
   return html`<h2>Koppeling voor een eigen AI</h2>
-    <p class="uitleg">Met een koppelingssleutel kunnen deelnemers Vezelvriend koppelen aan hun eigen AI-app (Claude Desktop, claude.ai, Claude Code of Copilot Studio). De AI kan dan zelf klanten, modems, documenten en de database raadplegen, en een monteur aanvragen die iemand moet goedkeuren. De sleutel werkt alleen zolang de codes van deze training aan staan.</p>
+    <p class="uitleg">Met een koppelingssleutel kunnen deelnemers Vezelvriend koppelen aan hun eigen AI-app (Claude Desktop, claude.ai, Claude Code of Copilot Studio). De AI krijgt dan volledige toegang: klanten met alle persoonsgegevens, modems, documenten en de database. Een monteur kan hij alleen aanvragen; iemand moet dat goedkeuren in het Klantbeeld. De sleutel werkt alleen zolang de codes van deze training aan staan.</p>
     <form method="post" action="/trainer/training/${t.training_id}/koppeling" class="zoek">
       <span>${key ? html`<span class="status status--ok">Sleutel gemaakt op ${time(key.created_at)}</span>` : html`<span class="status status--uit">Nog geen sleutel</span>`}</span>
       <button type="submit" class="knop--licht">${key ? 'Nieuwe sleutel maken (de oude stopt)' : 'Sleutel maken'}</button>
@@ -458,13 +497,8 @@ function newConnectionKey({ req, params }) {
   return { body: trainerPage('Koppelingssleutel', html`
     <h1>Koppeling voor ${t.name}</h1>
     <div class="melding"><strong>Je ziet deze adressen maar één keer.</strong> Kopieer ze nu. Ben je ze kwijt, maak dan een nieuwe sleutel.</div>
-    <div class="tabel-vak"><table>
-      <thead><tr><th>Stand</th><th>Adres voor de AI-app</th></tr></thead>
-      <tbody>
-        <tr><td>Zuinig: alleen wat nodig is</td><td class="mono">${base}</td></tr>
-        <tr><td>Breed: alles, ook persoonsgegevens en SQL</td><td class="mono">${base}/breed</td></tr>
-      </tbody>
-    </table></div>
+    <p><strong>Adres voor de AI-app:</strong></p>
+    <p class="mono">${base}</p>
     <h2>Zo koppel je het</h2>
     <ul>
       <li><strong>claude.ai:</strong> Instellingen, Connectors, "Aangepaste connector toevoegen". Plak het adres. (Hangt af van het abonnement.)</li>
@@ -484,7 +518,11 @@ function connectionKeyCheck({ url }) {
 
 async function deleteTraining({ req, params }) {
   const form = await readForm(req);
-  if (form.get('zeker') === 'ja') store.deleteTraining(Number(params.id));
+  if (form.get('zeker') === 'ja') {
+    store.deleteTraining(Number(params.id));
+    // The connection keeps its own log and technician requests: remove this training's part too.
+    await fetch(`${KOPPELING_URL}/internal/wissen`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ training: Number(params.id) }), signal: AbortSignal.timeout(3000) }).catch(() => {});
+  }
   return redirect('/trainer/');
 }
 

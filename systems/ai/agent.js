@@ -1,6 +1,9 @@
-// The Vezelvriend chat: Claude answers a participant's question and may use
-// the tools of the AI connection (systems/koppeling) to look things up itself.
-// This is step 3 and 4 of the context ladder: the AI fetches its own context.
+// The Vezelvriend chat. Two assistants, chosen per conversation:
+// - "zonder": Claude without connection. It sees only what the participant
+//   types or pastes (step 0-1 of the context ladder). No system prompt, like
+//   "Stuur naar AI": participants see the effect of exactly their own words.
+// - "koppeling": Claude with the AI connection (systems/koppeling), full
+//   access. It looks things up itself (step 3-4 of the context ladder).
 //
 // One turn = one question of the participant. Claude may call tools several
 // times before it answers; we stop after MAX_STEPS to keep cost and time in
@@ -8,9 +11,9 @@
 // ("Laat zien wat Claude opvroeg"), and a technician request becomes an
 // approval card: the AI only proposes, the participant decides.
 //
-// Unlike "Stuur naar AI" this chat has a short system prompt: the assistant
-// needs to know where it works and what time it is. The participant can read
-// it in the chat (SYSTEM_PROMPT is shown there), so nothing is hidden.
+// The assistant with connection has a short system prompt: it needs to know
+// where it works and what time it is. Participants can read it in the chat
+// (ASSISTANTS is shown there), so nothing is hidden.
 import Anthropic from '@anthropic-ai/sdk';
 
 const MODEL = process.env.AI_CHAT_MODEL || process.env.AI_MODEL || 'claude-sonnet-5-5';
@@ -25,10 +28,24 @@ const FALLBACK_MODELS = new Set(['claude-fable-5-1', 'claude-opus-5-5', 'claude-
 const client = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
 export const chatModel = () => (client ? MODEL : 'test (geen echte AI)');
 
-export const SYSTEM_PROMPT = `Je bent de AI-assistent van de klantenservice van Vezelvriend B.V., een fictief glasvezelbedrijf (bedacht voor een training). Je helpt medewerkers die een klant aan de lijn hebben.
+const SYSTEM_PROMPT = `Je bent de AI-assistent van de klantenservice van Vezelvriend B.V., een fictief glasvezelbedrijf (bedacht voor een training). Je helpt medewerkers die een klant aan de lijn hebben.
 Het is nu zaterdag 17-10-2026 10:15.
 Je kunt de systemen van Vezelvriend raadplegen met je gereedschappen. Een monteur kun je alleen aanvragen: een medewerker keurt het verzoek goed of af.
 Antwoord in het Nederlands, kort en praktisch.`;
+
+/** What the chat tells participants about the two assistants. */
+export const ASSISTANTS = {
+  zonder: {
+    name: 'Zonder koppeling',
+    sees: 'Claude ziet alleen wat jij typt of plakt. Het weet niets van Vezelvriend, de klanten of hoe laat het is.',
+    instruction: null,
+  },
+  koppeling: {
+    name: 'Met koppeling',
+    sees: 'Claude zoekt zelf in de systemen van Vezelvriend, met volledige toegang: klanten met naam, adres, telefoon, e-mail, geboortedatum en IBAN; modems; de historie op het adres, ook van vorige bewoners; storingen, de beslisboom, de documenten en de hele database. Een monteur kan het alleen aanvragen: jij keurt goed of af.',
+    instruction: SYSTEM_PROMPT,
+  },
+};
 
 async function koppeling(pathname, body) {
   const res = await fetch(`${KOPPELING_URL}${pathname}`, {
@@ -42,7 +59,7 @@ async function koppeling(pathname, body) {
 }
 
 /** Asks the connection to run one tool; returns { result } or { error }. */
-const callTool = (name, args, stand, source) => koppeling('/internal/tools/call', { name, arguments: args, stand, source });
+const callTool = (name, args, source) => koppeling('/internal/tools/call', { name, arguments: args, source });
 
 /** Turns one tool call into what the participant sees. */
 function itemsFor(name, args, outcome) {
@@ -68,19 +85,21 @@ function trim(messages) {
  * Runs one question. Returns the new API history, the new items for the
  * screen, the final answer text, and usage for the trainer's overview.
  */
-export async function runTurn({ apiMessages, question, stand, source }) {
+export async function runTurn({ apiMessages, question, assistant, source }) {
   const started = Date.now();
+  const withTools = assistant === 'koppeling';
   const messages = trim([...apiMessages, { role: 'user', content: question }]);
   const newItems = [];
-  if (!client) return fakeTurn({ messages, newItems, question, stand, source, started });
+  if (!client) return fakeTurn({ messages, newItems, question, withTools, source, started });
 
-  const tools = (await koppeling(`/internal/tools?stand=${stand}`)).map(({ name, description, input_schema }) => ({ name, description, input_schema }));
+  const tools = withTools ? (await koppeling('/internal/tools')).map(({ name, description, input_schema }) => ({ name, description, input_schema })) : [];
   let inputTokens = 0;
   let outputTokens = 0;
   let model = MODEL;
   try {
     for (let step = 0; step < MAX_STEPS; step++) {
-      const params = { model: MODEL, max_tokens: MAX_TOKENS, output_config: { effort: EFFORT }, system: SYSTEM_PROMPT, tools, messages };
+      const params = { model: MODEL, max_tokens: MAX_TOKENS, output_config: { effort: EFFORT }, messages };
+      if (withTools) { params.system = SYSTEM_PROMPT; params.tools = tools; }
       if (FALLBACK_MODELS.has(MODEL)) { params.betas = ['server-side-fallback-2026-07-01']; params.fallbacks = 'default'; }
       const response = await client.beta.messages.create(params);
       model = response.model;
@@ -94,7 +113,7 @@ export async function runTurn({ apiMessages, question, stand, source }) {
 
       const results = [];
       for (const block of response.content.filter((b) => b.type === 'tool_use')) {
-        const outcome = await callTool(block.name, block.input, stand, source).catch(() => ({ error: 'De koppeling is niet bereikbaar.' }));
+        const outcome = await callTool(block.name, block.input, source).catch(() => ({ error: 'De koppeling is niet bereikbaar.' }));
         newItems.push(...itemsFor(block.name, block.input, outcome));
         const text = outcome.error ?? JSON.stringify(outcome.result);
         results.push({ type: 'tool_result', tool_use_id: block.id, content: text.length > MAX_RESULT_CHARS ? `${text.slice(0, MAX_RESULT_CHARS)} [afgekapt]` : text, is_error: Boolean(outcome.error) });
@@ -118,17 +137,22 @@ const answerOf = (items) => items.filter((i) => i.type === 'tekst').map((i) => i
 
 // Test mode (no API key): no real AI, but the tools are really called, so the
 // whole flow (look-ups, the two modes, the approval card) can be tried for free.
-async function fakeTurn({ messages, newItems, question, stand, source, started }) {
+async function fakeTurn({ messages, newItems, question, withTools, source, started }) {
+  if (!withTools) {
+    newItems.push({ type: 'tekst', text: `Dit is een testantwoord: de chat draait zonder echte AI, en zonder koppeling.\n\nJe vraag was ${question.length} tekens lang. Een echte AI zou alleen kunnen werken met wat jij hebt getypt of geplakt.` });
+    messages.push({ role: 'assistant', content: answerOf(newItems) });
+    return { status: 'ok', apiMessages: messages, newItems, answer: answerOf(newItems), model: chatModel(), inputTokens: 0, outputTokens: 0, durationMs: Date.now() - started };
+  }
   const id = question.match(/K-\d{4,5}/i)?.[0]?.toUpperCase();
   const steps = id
     ? [['klantbeeld', { klantnummer: id }], ['modem_controleren', { klantnummer: id }], ['historie_op_adres', { klantnummer: id }], ['beslisboom', {}]]
     : [['zoek_klanten', { zoekterm: question.replace(/[^\p{L}\s-]/gu, ' ').trim().split(/\s+/).slice(-1)[0] ?? '' }]];
   if (id && /monteur/i.test(question)) steps.push(['monteur_inplannen', { klantnummer: id, reden: 'Testverzoek uit de testmodus.' }]);
   for (const [name, args] of steps) {
-    const outcome = await callTool(name, args, stand, source).catch(() => ({ error: 'De koppeling is niet bereikbaar.' }));
+    const outcome = await callTool(name, args, source).catch(() => ({ error: 'De koppeling is niet bereikbaar.' }));
     newItems.push(...itemsFor(name, args, outcome));
   }
-  newItems.push({ type: 'tekst', text: `Dit is een testantwoord: de chat draait zonder echte AI.\n\nIk heb ${steps.length} keer iets opgevraagd in de stand **${stand}**. Noem een klantnummer (bijvoorbeeld K-1004) om klantgegevens te laten ophalen, en het woord "monteur" om een monteursverzoek te zien.` });
+  newItems.push({ type: 'tekst', text: `Dit is een testantwoord: de chat draait zonder echte AI.\n\nIk heb ${steps.length} keer iets opgevraagd via de koppeling. Noem een klantnummer (bijvoorbeeld K-1004) om klantgegevens te laten ophalen, en het woord "monteur" om een monteursverzoek te zien.` });
   messages.push({ role: 'assistant', content: answerOf(newItems) });
   return { status: 'ok', apiMessages: messages, newItems, answer: answerOf(newItems), model: chatModel(), inputTokens: 0, outputTokens: 0, durationMs: Date.now() - started };
 }
