@@ -115,6 +115,10 @@ export function openStore(file) {
   if (!db.prepare('PRAGMA table_info(chats)').all().some((c) => c.name === 'assistant')) {
     db.exec("ALTER TABLE chats ADD COLUMN assistant TEXT NOT NULL DEFAULT 'zonder'");
   }
+  // The trainer can release the answers of "vind de fout" per training (self-study).
+  if (!db.prepare('PRAGMA table_info(trainings)').all().some((c) => c.name === 'answers_released')) {
+    db.exec('ALTER TABLE trainings ADD COLUMN answers_released INTEGER NOT NULL DEFAULT 0');
+  }
 
   const store = {
     db,
@@ -167,7 +171,7 @@ export function openStore(file) {
 
     activeParticipant(participantId) {
       return db.prepare(`
-        SELECT p.participant_id, p.label, t.name AS training_name
+        SELECT p.participant_id, p.label, t.name AS training_name, t.training_id, t.answers_released
         FROM participants p JOIN trainings t ON t.training_id = p.training_id
         WHERE p.participant_id = ? AND t.active = 1`).get(participantId) ?? null;
     },
@@ -234,6 +238,10 @@ export function openStore(file) {
 
     setActive(trainingId, active) {
       db.prepare('UPDATE trainings SET active = ? WHERE training_id = ?').run(active ? 1 : 0, trainingId);
+    },
+
+    setAnswersReleased(trainingId, released) {
+      db.prepare('UPDATE trainings SET answers_released = ? WHERE training_id = ?').run(released ? 1 : 0, trainingId);
     },
 
     createChat(participantId, context, assistant) {

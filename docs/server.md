@@ -25,7 +25,7 @@ Het override-bestand bevat geen geheimen, maar is wel specifiek voor de server; 
 
 ## AI-koppeling en trainerscherm
 
-De container `ai` beheert de deelnemerscodes, stuurt prompts van deelnemers naar Claude ("Stuur naar AI") en bewaart wat deelnemers **inleveren** uit hun eigen AI (bijvoorbeeld Copilot op het werk). Alles staat in een SQLite-database op het Docker-volume `ai-data`. Zonder API-sleutel staat "Stuur naar AI" uit; inleveren werkt wel, zodra er een trainerwachtwoord is ingesteld.
+De container `ai` beheert de deelnemerscodes, draait de chat met Claude naast de oefeningen en bewaart wat deelnemers **inleveren** uit hun eigen AI (bijvoorbeeld Copilot op het werk). Alles staat in een SQLite-database op het Docker-volume `ai-data`. Zonder API-sleutel staat de chat uit; inleveren werkt wel, zodra er een trainerwachtwoord is ingesteld.
 
 1. Kopieer `.env.example` naar `.env` in `/root/apps/vezelvriend` en vul in:
    - `ANTHROPIC_API_KEY`: de sleutel uit console.anthropic.com (workspace "Vezelvriend", met bestedingslimiet);
@@ -38,7 +38,9 @@ De container `ai` beheert de deelnemerscodes, stuurt prompts van deelnemers naar
 
 **Privacy.** De database bevat namen van deelnemers en alles wat ze verstuurd hebben. Vertel deelnemers dat vooraf (de site meldt het bij het inloggen), zet codes uit na de training, en verwijder trainingen als je ze niet meer nodig hebt (knop onderaan de trainingspagina).
 
-**Kosten.** Maximaal `AI_MAX_PER_DAY` vragen per deelnemer per dag (standaard 40) en een bestedingslimiet in de Anthropic Console. Het model staat in `AI_MODEL`.
+**Antwoorden van vind de fout.** Die staan niet in deze openbare repo. Op de server staan ze in `/root/apps/vezelvriend/private/vind-de-fout.json` (een kopie van `trainer-private/antwoorden/vind-de-fout.json`); de map wordt alleen-lezen in de container `ai` gezet. De trainer geeft ze per training vrij in `/trainer/`.
+
+**Kosten.** Maximaal `AI_MAX_PER_DAY` vragen per deelnemer per dag (standaard 40) en een bestedingslimiet in de Anthropic Console. Het model staat in `AI_CHAT_MODEL` (standaard claude-sonnet-5-5).
 
 ## Beveiliging
 

@@ -49,7 +49,8 @@ async function wipe({ req }) {
   const body = await readJson(req, 1_000);
   const training = Number(body.training) || null;
   wipeRequests(training);
-  wipeCalls(training);
+  // The trainer can wipe only the technician requests (between two groups), keeping the log.
+  if (body.alleen !== 'verzoeken') wipeCalls(training);
   return json(200, { ok: true });
 }
 

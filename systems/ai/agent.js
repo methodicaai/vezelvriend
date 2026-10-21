@@ -1,7 +1,7 @@
 // The Vezelvriend chat. Two assistants, chosen per conversation:
 // - "zonder": Claude without connection. It sees only what the participant
-//   types or pastes (step 0-1 of the context ladder). No system prompt, like
-//   "Stuur naar AI": participants see the effect of exactly their own words.
+//   types or pastes (step 0-1 of the context ladder). No system prompt:
+//   participants see the effect of exactly their own words.
 // - "koppeling": Claude with the AI connection (systems/koppeling), full
 //   access. It looks things up itself (step 3-4 of the context ladder).
 //

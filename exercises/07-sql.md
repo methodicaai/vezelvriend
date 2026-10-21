@@ -47,9 +47,17 @@ Vraag: welke actieve klanten wonen op hetzelfde adres? Toon klantnummer, naam en
 Leg in één zin per regel uit wat de query doet.
 ```
 
-## Reflectievragen
+## Op je eigen werk
+
+Is er bij jou een tabel of export waar je vragen over hebt? Wat moet de AI weten (kolommen, wat ze betekenen) om er een goede vraag voor te schrijven? En hoe controleer je de uitkomst zonder de AI?
+
+<details class="reflectie">
+<summary>Klaar? Open de reflectievragen</summary>
 
 - Wat ging er mis zonder het schema? Verzon de AI tabel- of kolomnamen?
 - Gaf een query die zonder foutmelding draaide ook het juiste antwoord? Hoe controleerde je dat?
 - Wat zegt de uitkomst van vraag 1 over de data in het Klantsysteem? Wie moet daar iets mee?
 - Bij vraag 4: welk getal klopt? Hoe kom je daarachter, en kan de AI je daarbij helpen?
+- Ging alles goed? Hoe weet je dat het de volgende keer ook goed gaat, met andere gegevens of een andere AI?
+
+</details>

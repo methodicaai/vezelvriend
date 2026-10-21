@@ -23,7 +23,7 @@ Het team wil met AI een overzicht maken van waar klanten gisteren over belden. D
    - wat er gewoon naar de AI mag;
    - wat je vervangt door een label, bijvoorbeeld `[IBAN]`;
    - wat je meldt aan het team dat de bron beheert.
-4. Bedenk hoe je het vervangen betrouwbaar doet: met de hand, met een zoekopdracht of met een SQL-vraag. Probeer het uit.
+4. Bedenk hoe je het vervangen betrouwbaar doet: met de hand, of met zoeken en vervangen in een teksteditor. Probeer het uit, en kijk daarna nog één keer of je niets hebt gemist.
 5. Geef pas daarna de opgeschoonde regels aan de AI en vraag om het overzicht.
 
 ## Voorbeeldprompt zonder context
@@ -43,9 +43,18 @@ Neem geen labels of klantnummers over in je antwoord.
 {{plak de opgeschoonde regels}}
 ```
 
-## Reflectievragen
+## Op je eigen werk
+
+Welke gegevens uit je eigen werk (mail, tickets, een export) zou je aan een AI willen geven? Wat moet je eruit halen voordat het mag? Zoek op wat het AI-beleid van je eigen werkgever erover zegt.
+
+<details class="reflectie">
+<summary>Klaar? Open de reflectievragen</summary>
 
 - Hoeveel regels bevatten iets dat niet naar de AI mocht? Vond je ze allemaal? Hoe weet je dat zeker?
 - Werkte een eenvoudige zoekopdracht voor alle gevallen?
 - Welke afspraak zou je met het bronteam willen maken, zodat dit niet meer gebeurt?
 - Mag een klantnummer wel naar de AI? Waarom wel of niet?
+- De notities bevatten ook de voornamen van medewerkers. Zijn dat persoonsgegevens? Mogen die naar de AI?
+- Ging alles goed? Hoe weet je dat het de volgende keer ook goed gaat, met andere gegevens of een andere AI?
+
+</details>

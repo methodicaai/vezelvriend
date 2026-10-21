@@ -5,7 +5,8 @@
 // Styling: .pad-* in public/assets/site.css; /assets/pad.js lights the trail up on scroll.
 interface Link { href: string; label: string; }
 // A step has one link (href + linkLabel) or several (links), like "Naar behoefte" on methodica.nl.
-interface Step { label?: string; title: string; text?: string; href?: string; linkLabel?: string; links?: Link[]; }
+// core: part of the short route (one hour); shown as a small badge.
+interface Step { label?: string; title: string; text?: string; href?: string; linkLabel?: string; links?: Link[]; core?: boolean; }
 interface Props { steps: Step[]; }
 const { steps } = Astro.props;
 const linksOf = (step: Step): Link[] => step.links ?? (step.href ? [{ href: step.href, label: step.linkLabel ?? 'Lees verder' }] : []);
@@ -23,7 +24,7 @@ const curve = (i: number) => i % 2 === 0
         <span class="spoor-licht"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d={curve(i)} /></svg></span>
       </div>
       <div class="pad-kaart">
-        {step.label && <p class="label">{step.label}</p>}
+        {step.label && <p class="label">{step.label}{step.core && <span class="pad-kern">kern</span>}</p>}
         <h3>{step.title}</h3>
         {step.text && <p>{step.text}</p>}
         {linksOf(step).length > 0 && (

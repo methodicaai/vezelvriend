@@ -26,7 +26,7 @@ Lees deze documenten. Ze staan ook in de [documentenmap](/training/oefeningen/do
 Doe dan het volgende:
 
 1. Laat de AI uit alleen het klantverhaal een user story met acceptatiecriteria maken (prompt A).
-2. Geef de AI daarna alle bronnen mee en vraag om een verbeterde versie van US-014 (prompt B).
+2. Schrijf nu **zelf** een prompt waarmee je de AI alle bronnen meegeeft en om een verbeterde versie van US-014 vraagt. Gebruik het [promptkader](/training/oefeningen/werkbladen/). Vergelijk je prompt daarna met prompt B hieronder: wat had jij niet, en wat had jij wel?
 3. Controleer zelf: zeggen de bronnen hetzelfde? Waar zitten tegenstrijdigheden of gaten?
 4. Schrijf je eigen eindversie van US-014 en een lijst met vragen voor de product owner.
 
@@ -49,9 +49,17 @@ Je bent een ervaren businessanalist. Hieronder staan een klantverhaal, de huidig
 3. Noem bij elk acceptatiecriterium uit welke bron het komt.
 ```
 
-## Reflectievragen
+## Op je eigen werk
+
+Neem een mailwisseling of een verslag uit je eigen werk. Laat de AI er de eisen uit halen, met de bron bij elke eis. Wat ontbrak, en wat had de AI verzonnen?
+
+<details class="reflectie">
+<summary>Klaar? Open de reflectievragen</summary>
 
 - Welke tegenstrijdigheid vond de AI wel, en welke niet? Welke vond jij zelf?
 - Wat had er misgegaan als je alleen het eerste antwoord had overgenomen?
 - Een afspraak staat ergens anders dan in de user story. Hoe voorkom je dat in jouw team?
 - Waarom is "noem de bron" een goede vraag aan een AI?
+- Ging alles goed? Hoe weet je dat het de volgende keer ook goed gaat, met andere gegevens of een andere AI?
+
+</details>

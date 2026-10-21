@@ -106,6 +106,9 @@ services:
     volumes:
       - ai-data:/data      # the conversations database survives restarts and updates
       - orders:/orders     # the trainer wipes the website orders from the trainer screen
+      # Trainer-only files that never go in this public repo (the answers of
+      # "vind de fout"). The folder exists only on the server; see docs/server.md.
+      - ./private:/private:ro
 
 volumes:
   ai-data:

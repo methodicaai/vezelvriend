@@ -21,15 +21,20 @@ In het chatvenster naast deze oefening werkt Claude **met koppeling**: Claude ka
 1. Typ in het chatvenster: **"Familie Bakker belt: internet doet het niet. Wat moet ik doen?"** Geef geen klantnummer en plak niets.
    - Vraagt Claude welke Familie Bakker je bedoelt? Er kunnen meer klanten met die naam zijn. Zoek in het [Klantbeeld](/klantbeeld/) de Familie Bakker met klantnummer **K-1004** en geef Claude het adres.
    - Kiest Claude zelf een klant? Kijk welke, en of dat de goede is.
-2. Lees het antwoord. Klopt het? Controleer het zelf in het [Klantbeeld](/klantbeeld/) met "Modem controleren" en [de beslisboom](/training/systemen/).
+2. Lees het antwoord. Klopt het? Doet Claude het goed, kijk dan ook waarom: wat had er mis kunnen gaan? Controleer het zelf in het [Klantbeeld](/klantbeeld/) met "Modem controleren" en [de beslisboom](/training/systemen/).
 3. Zet **"Laat zien wat Claude opvroeg"** aan. Klap de opvragingen open. Welke gegevens heeft Claude bekeken? Welke waren niet nodig voor je vraag?
-4. Stelt Claude voor om een monteur in te plannen? Dan zie je een kaart met **Goedkeuren** en **Afwijzen**. Bedenk eerst wat je wilt controleren, en besluit dan. Kijk daarna in het Klantbeeld op het tabblad Techniek: wat is er met het verzoek gebeurd?
+4. Stelt Claude voor om een monteur in te plannen? Dan zie je een kaart met **Goedkeuren** en **Afwijzen**. Bedenk eerst wat je wilt controleren, en besluit dan. Kijk daarna in het Klantbeeld op het tabblad Techniek: wat is er met het verzoek gebeurd? Je ziet daar misschien ook verzoeken van andere deelnemers: jullie werken in hetzelfde bedrijf.
 5. Begin een nieuw gesprek en stel dezelfde vraag voor **Familie De Wit**. Wat doet Claude nu?
 6. Leg je antwoorden naast die van oefening 1 (prompt B), waar je zelf de context koos.
 
 Liever een groter scherm? [Open de chat in een apart tabblad](/training/oefeningen/claude/) en kies daar "Met koppeling".
 
-## Reflectievragen
+## Op je eigen werk
+
+Kan jouw AI zelf zoeken in je mail of documenten (trede 3)? Stel een vraag over je werk en vraag om de bronnen met datum. Wat vond hij, wat miste hij, en wat had hij beter niet kunnen zien?
+
+<details class="reflectie">
+<summary>Klaar? Open de reflectievragen</summary>
 
 - Wat deed Claude toen de naam bij meer klanten paste: vragen, of zelf kiezen? Wat zou jij willen?
 - Wat kostte minder werk: zelf context kiezen (oefening 1) of Claude laten zoeken? Was het antwoord ook beter?
@@ -37,3 +42,6 @@ Liever een groter scherm? [Open de chat in een apart tabblad](/training/oefening
 - Wat heb je gecontroleerd voordat je de monteur goedkeurde of afwees? Had je dat ook gedaan als je haast had?
 - Wie heeft bepaald wat deze koppeling mag ophalen en doen? Lees het [AI-beleid van Vezelvriend](/training/oefeningen/documenten/): past deze koppeling daarbij?
 - Controlevraag van trede 3 en 4: waar komt dit vandaan, mocht de AI dat zien, en wie keurt goed wat de AI wil doen?
+- Ging alles goed? Hoe weet je dat het de volgende keer ook goed gaat, met andere gegevens of een andere AI?
+
+</details>

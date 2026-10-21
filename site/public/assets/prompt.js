@@ -5,9 +5,10 @@
 //   {{auto:key|what it holds}}   a field filled automatically from the
 //                                Klantbeeld once a customer is chosen
 // The fixed text is shown as is; every field is a clearly labelled box.
-// "Kopieer prompt" copies the whole prompt, "Stuur naar AI" sends the same
-// text (only when the server has an AI connection and the participant is
-// logged in with a code). Without JavaScript the plain block stays readable.
+// "Kopieer prompt" copies the whole prompt; "Zet in de chat" puts the same text
+// in the chat next to the exercise (chat.js listens for the "vv-prompt" event),
+// so participants always talk to Claude in one place. The participant reads it
+// there and sends it. Without JavaScript the plain block stays readable.
 //
 // Why fields instead of one big text box: participants see exactly which
 // context they still have to add and cannot change the fixed part, which
@@ -49,14 +50,15 @@
     return data;
   }
 
-  const sendButtons = [];
+  const chatButtons = [];
   const handInButtons = [];
+  const hasChat = Boolean(document.querySelector('.vc'));
 
   document.querySelectorAll('pre > code.language-prompt').forEach((code, blockIndex) => {
     const source = code.textContent.replace(/\n$/, '');
     const parts = source.split(FIELD); // even index = fixed text, odd index = field
     // <pre class="prompt-alleen-kopieren">: a prompt meant for the participant's own
-    // AI at work (such as the intake questions), so no "Stuur naar AI" or "Inleveren".
+    // AI at work (such as the intake questions), so no "Zet in de chat" or "Inleveren".
     const copyOnly = code.parentElement.classList.contains('prompt-alleen-kopieren');
     const fieldCount = (parts.length - 1) / 2;
 
@@ -147,20 +149,17 @@
     const actions = el('div', 'prompt-acties');
     const copyButton = el('button', 'prompt-knop', 'Kopieer prompt');
     copyButton.type = 'button';
-    const sendButton = el('button', 'prompt-knop prompt-knop--rand', 'Stuur naar AI');
-    sendButton.type = 'button';
-    sendButton.hidden = true;
+    const chatButton = el('button', 'prompt-knop prompt-knop--rand', 'Zet in de chat');
+    chatButton.type = 'button';
+    chatButton.hidden = true;
     const handInButton = el('button', 'prompt-knop prompt-knop--rand', 'Inleveren');
     handInButton.type = 'button';
     handInButton.hidden = true;
     const status = el('p', 'prompt-status');
     status.setAttribute('aria-live', 'polite');
-    actions.append(copyButton, sendButton, handInButton, status);
+    actions.append(copyButton, chatButton, handInButton, status);
     box.append(actions);
-    const answer = el('div', 'prompt-antwoord');
-    answer.hidden = true;
-    box.append(answer);
-    if (!copyOnly) sendButtons.push(sendButton);
+    if (!copyOnly && hasChat) chatButtons.push(chatButton);
     if (!copyOnly) handInButtons.push(handInButton);
 
     const setStatus = (text, warn) => {
@@ -174,7 +173,7 @@
       return empty;
     }).map((f) => f.label);
 
-    // One text for copying and for sending, so both are always identical.
+    // One text for copying and for the chat, so both are always identical.
     const promptText = () => parts.map((part, i) => {
       if (i % 2 === 0) return part;
       const f = fields[(i - 1) / 2];
@@ -189,34 +188,19 @@
       else setStatus('Gekopieerd. Plak de prompt in je AI-assistent.', false);
     });
 
-    // Empty fields are never sent silently: the first click warns, a second click sends anyway.
+    // Empty fields are never passed on silently: the first click warns, a second click goes ahead.
     let confirmedIncomplete = false;
     fields.forEach((f) => f.input.addEventListener('input', () => { confirmedIncomplete = false; }));
-    sendButton.addEventListener('click', async () => {
+    chatButton.addEventListener('click', () => {
       const missing = checkMissing();
       if (missing.length && !confirmedIncomplete) {
         confirmedIncomplete = true;
-        setStatus(`Nog niet ingevuld: ${missing.join('; ')}. Vul dit eerst in, of klik nogmaals op "Stuur naar AI" om toch te versturen.`, true);
+        setStatus(`Nog niet ingevuld: ${missing.join('; ')}. Vul dit eerst in, of klik nogmaals op "Zet in de chat" om het toch te doen.`, true);
         return;
       }
       confirmedIncomplete = false;
-      sendButton.disabled = true;
-      setStatus('Bezig met versturen naar de AI...', false);
-      try {
-        const data = await getJson('/api/ai/ask', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: promptText(), exercise, block: blockTitle }),
-        });
-        answer.hidden = false;
-        answer.replaceChildren(el('p', 'prompt-antwoord-kop', 'Antwoord van de AI'), el('div', 'prompt-antwoord-tekst', data.answer || data.note || ''));
-        if (data.note) setStatus(data.note, true);
-        else setStatus(missing.length ? 'Verstuurd, met lege vakken. Let daarop bij het antwoord.' : 'Antwoord ontvangen.', missing.length > 0);
-      } catch (err) {
-        setStatus(err.message, true);
-      } finally {
-        sendButton.disabled = false;
-      }
+      document.dispatchEvent(new CustomEvent('vv-prompt', { detail: { text: promptText() } }));
+      setStatus('De prompt staat in de chat. Lees hem na en klik daar op Verstuur.', false);
     });
 
     // "Inleveren": for participants who used their own AI (e.g. Copilot at work).
@@ -278,11 +262,11 @@
     code.parentElement.replaceWith(box);
   });
 
-  // "Stuur naar AI" only appears when the server has an AI connection; "Inleveren"
+  // "Zet in de chat" only appears when the server has an AI connection; "Inleveren"
   // and the login bar appear whenever participant codes work (no AI key needed).
-  if (sendButtons.length) {
+  if (handInButtons.length) {
     getJson('/api/ai/status').then((state) => {
-      if (state.enabled) sendButtons.forEach((b) => { b.hidden = false; });
+      if (state.enabled) chatButtons.forEach((b) => { b.hidden = false; });
       if (state.handIn) handInButtons.forEach((b) => { b.hidden = false; });
       if (state.enabled || state.handIn) showLoginBar(state);
     }).catch(() => { /* no server: copy only */ });
@@ -293,12 +277,12 @@
     if (!article) return;
     const bar = el('section', 'prompt-login');
     bar.setAttribute('aria-label', 'Inloggen voor de AI');
-    article.prepend(bar);
+    article.append(bar);
 
     const render = (s) => {
       bar.replaceChildren();
       if (s.loggedIn) {
-        bar.append(el('p', 'prompt-login-tekst', `Ingelogd als ${s.participant.label} (${s.participant.training}). Je kunt nu inleveren.`));
+        bar.append(el('p', 'prompt-login-tekst', `Ingelogd als ${s.participant.label} (${s.participant.training}).`));
         const out = el('button', 'prompt-knop prompt-knop--rand', 'Uitloggen');
         out.type = 'button';
         out.addEventListener('click', async () => {
@@ -335,7 +319,7 @@
         });
         bar.append(form);
       }
-      bar.append(el('p', 'prompt-login-privacy', 'Let op: wat je inlevert of naar de AI stuurt, wordt bewaard, zodat de trainer het met je kan bespreken. Plak geen echte persoonsgegevens of werkgegevens.'));
+      bar.append(el('p', 'prompt-login-privacy', 'Wat je inlevert of in de chat zet, wordt bewaard, zodat de trainer het met je kan bespreken. Plak geen echte persoonsgegevens of werkgegevens.'));
     };
     render(state);
   }

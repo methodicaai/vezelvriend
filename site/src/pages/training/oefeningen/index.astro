@@ -11,16 +11,16 @@ const exHref = (n: number) => `/training/oefeningen/${byNumber(n)?.slug}/`;
 // to 4 (exercises 1 to 4 and the documents), the test, depth per role, and the
 // participant's own work last. Times are rough, for planning and self-study.
 const route = [
-  { label: 'Begin hier · 20 min', title: 'Wat kan AI voor jou?', text: 'Kies een taak uit je eigen werk en zoek uit welke AI je hebt.', href: '/training/oefeningen/wat-kan-ai/', linkLabel: 'Naar stap 1' },
+  { label: 'Begin hier · 20 min', title: 'Wat kan AI voor jou?', text: 'Kies een taak uit je eigen werk en zoek uit welke AI je hebt.', href: '/training/oefeningen/wat-kan-ai/', linkLabel: 'Naar stap 1', core: true },
   { label: 'Uitleg · 10 min', title: 'De contexttrap', text: 'Vijf manieren waarop context bij een AI komt. Lees nu trede 0 en 1.', href: '/training/oefeningen/contexttrap/', linkLabel: 'Naar de contexttrap' },
-  { label: 'Trede 0 en 1 · 30 min', title: byNumber(1)?.title ?? 'Context maakt het verschil', text: 'Dezelfde klantvraag, eerst kaal en daarna met gegevens die je zelf kiest.', href: exHref(1), linkLabel: 'Naar oefening 1' },
+  { label: 'Trede 0 en 1 · 30 min', title: byNumber(1)?.title ?? 'Context maakt het verschil', text: 'Dezelfde klantvraag, eerst kaal en daarna met gegevens die je zelf kiest.', href: exHref(1), linkLabel: 'Naar oefening 1', core: true },
   { label: 'Trede 1 · 30 min', title: byNumber(2)?.title ?? 'Wat mag er naar de AI?', text: 'Vijftig notities van de servicedesk. Wat geef je aan de AI, en wat niet?', href: exHref(2), linkLabel: 'Naar oefening 2' },
   { label: 'Trede 2 · 25 min', title: 'Jij kiest de documenten', text: 'Zet de documenten van Vezelvriend in je AI en vraag ernaar. Kloppen je bronnen?', href: '/training/oefeningen/documenten/', linkLabel: 'Naar de documenten' },
   { label: 'Trede 3 en 4 · 25 min', title: byNumber(3)?.title ?? 'Claude zoekt zelf', text: 'Claude haalt alles zelf op en wil een monteur aanvragen. Wat komt er ongevraagd mee?', href: exHref(3), linkLabel: 'Naar oefening 3' },
   { label: 'Trede 4 · 30 min', title: byNumber(4)?.title ?? 'Guardrails schrijven', text: 'Schrijf regels voor wat de AI wel en niet mag, en probeer ze te breken.', href: exHref(4), linkLabel: 'Naar oefening 4' },
   { label: 'Proef · 20 min', title: 'Vind de fout', text: 'Acht AI-antwoorden. Eerst schatten hoe zeker je bent, dan controleren in de bron.', href: '/training/oefeningen/vind-de-fout/', linkLabel: 'Naar de proef' },
   { label: 'Naar je rol · 45 min per oefening', title: 'Verdiepen in je eigen vak', text: 'Analisten maken een user story, testers testcases. SQL en de code zijn voor allebei.', links: [link(5, 'Oefening 5: analist'), link(6, 'Oefening 6: tester'), link(7, 'Oefening 7: SQL'), { href: '/training/oefeningen/code/', label: 'De code' }] },
-  { label: 'Eigen werk · 35 min', title: 'Werkbladen', text: 'Je eigen taak uit stap 1 in je eigen AI, en je als-dan-kaart om mee af te sluiten.', href: '/training/oefeningen/werkbladen/', linkLabel: 'Naar de werkbladen' },
+  { label: 'Eigen werk · 35 min', title: 'Werkbladen', text: 'Je eigen taak uit stap 1 in je eigen AI, en je als-dan-kaart om mee af te sluiten.', href: '/training/oefeningen/werkbladen/', linkLabel: 'Naar de werkbladen', core: true },
 ];
 ---
 <Base title="Oefeningen">
@@ -34,6 +34,10 @@ const route = [
   <section class="sectie">
     <div class="wrap">
       <h2>De route</h2>
+      <div class="kort-route">
+        <p><strong>Maar een uur?</strong> Doe de drie stappen met <span class="pad-kern">kern</span>: Wat kan AI voor jou? (15 min), oefening 1 bij Mevrouw Jansen (25 min) en de werkbladen met je eigen taak (20 min). De rest kun je later doen.</p>
+        <p><strong>Een dagdeel?</strong> Stap 1 tot en met 8, en sluit af met de werkbladen. De verdieping voor je rol doe je in een tweede dagdeel.</p>
+      </div>
       <Pad steps={route} />
     </div>
   </section>

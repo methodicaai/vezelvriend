@@ -24,6 +24,8 @@ const APPS = {
     TRAINER_PASSWORD: process.env.TRAINER_PASSWORD ?? 'test',
     COOKIE_SECURE: '0', // plain http on localhost
     KOPPELING_URL: 'http://localhost:3006',
+    // Locally the answers of "vind de fout" come straight from the trainer folder.
+    ANSWERS_FILE: path.join(here, '..', 'trainer-private', 'antwoorden', 'vind-de-fout.json'),
   },
   'mijn/server.js': { PORT: '3005', COOKIE_SECURE: '0' },
   'koppeling/server.js': { PORT: '3006', AI_URL: 'http://localhost:3003' },

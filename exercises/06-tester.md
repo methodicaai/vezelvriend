@@ -16,7 +16,7 @@ Je gebruikt AI om testcases te bedenken en leert dat de AI vooral de voor de han
 ## Opdracht
 
 1. Lees de beslisboom bij [De systemen](/training/systemen/), of [download hem als tekst](/training/oefeningen/beslisboom.txt).
-2. Laat de AI testcases maken, eerst kaal (prompt A), dan met de beslisboom en de definities erbij (prompt B).
+2. Laat de AI testcases maken, eerst kaal (prompt A). Schrijf daarna **zelf** een prompt met de beslisboom erbij, met het [promptkader](/training/oefeningen/werkbladen/). Vergelijk je prompt met prompt B hieronder, en gebruik de beste.
 3. Vul de lijst zelf aan met randgevallen. Denk in elk geval aan:
    - een meting die **precies 15 minuten** oud is;
    - een snelheid die precies op de grens van "normaal" ligt;
@@ -43,9 +43,17 @@ Je bent een ervaren tester. Hieronder staat een beslisboom die de klantenservice
 3. Noem gevallen waarin de boom onduidelijk is of tegenstrijdige uitkomsten kan geven.
 ```
 
-## Reflectievragen
+## Op je eigen werk
+
+Neem een regel of beschrijving uit je eigen werk. Laat de AI testgevallen maken en vul zelf de randgevallen aan. Welke had de AI niet bedacht?
+
+<details class="reflectie">
+<summary>Klaar? Open de reflectievragen</summary>
 
 - Welke randgevallen bedacht de AI zelf, en welke moest jij toevoegen?
 - Waar was de beslisboom niet eenduidig? Wie moet dat beslissen: jij, de AI of de product owner?
 - Wat doet een dubbele klant in de zoekresultaten met je test, en met een echt telefoongesprek?
 - Hoe weet je of de verwachte uitkomsten van de AI kloppen?
+- Ging alles goed? Hoe weet je dat het de volgende keer ook goed gaat, met andere gegevens of een andere AI?
+
+</details>

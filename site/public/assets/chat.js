@@ -268,6 +268,15 @@
   });
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
 
+  // "Zet in de chat" on a prompt block (prompt.js): the prompt lands in the input,
+  // the participant reads it and sends it. Nothing is sent automatically.
+  document.addEventListener('vv-prompt', (e) => {
+    if (!form.isConnected) { root.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    input.value = e.detail.text;
+    root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    input.focus();
+  });
+
   // ------------------------------------------------------------ start: login or chat
   function loginForm(message) {
     main.replaceChildren(bar);

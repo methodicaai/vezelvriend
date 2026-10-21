@@ -33,3 +33,6 @@ docker-compose.override.yml
 # Generated world (real BAG addresses + 2000 fake customers): stays on the server,
 # never in the public repo. Built by tools/world/.
 data/generated/
+
+# Trainer-only files on the server (answers of "vind de fout"), mounted into the ai container.
+private/

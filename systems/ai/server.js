@@ -10,7 +10,8 @@
 // The AI never reads the fake systems: the participant still decides what
 // context goes into the prompt. That stays the core of the training.
 import crypto from 'node:crypto';
-import { aiEnabled, aiModel, askClaude } from './claude.js';
+import fs from 'node:fs';
+import { aiEnabled } from './claude.js';
 import { ASSISTANTS, chatModel, decideRequest, runTurn } from './agent.js';
 import { openStore } from './store.js';
 import { KEEP_DAYS, readOrders, writeOrders } from '../shared/orders.js';
@@ -53,7 +54,7 @@ const redirect = (location, headers = {}) => ({ status: 303, headers: { Location
 function status({ req }) {
   const p = participantFrom(req);
   return json(200, {
-    enabled: aiEnabled(),   // "Stuur naar AI" (needs an API key)
+    enabled: aiEnabled(),   // the chat with Claude (needs an API key)
     handIn: true,           // "Inleveren" works with codes only, no AI key needed
     loggedIn: Boolean(p),
     participant: p ? { label: p.label, training: p.training_name } : null,
@@ -83,31 +84,6 @@ function check({ req }) {
 
 function logout() {
   return json(200, { ok: true }, { 'Set-Cookie': cookie(PARTICIPANT_COOKIE, '', 0) });
-}
-
-async function ask({ req }) {
-  if (!aiEnabled()) return json(503, { error: 'De AI-koppeling staat uit.' });
-  const p = participantFrom(req);
-  if (!p) return json(401, { error: 'Log eerst in met je deelnemerscode (bovenaan de pagina).' });
-  const body = await readJson(req);
-  const prompt = typeof body.prompt === 'string' ? body.prompt.trim() : '';
-  if (!prompt) return json(400, { error: 'De prompt is leeg.' });
-  if (prompt.length > MAX_PROMPT_CHARS) return json(400, { error: `De prompt is te lang (meer dan ${MAX_PROMPT_CHARS} tekens).` });
-  if (store.countToday(p.participant_id) >= MAX_PER_DAY) {
-    return json(429, { error: `Je hebt vandaag al ${MAX_PER_DAY} vragen gesteld. Dat is het maximum per dag.` });
-  }
-
-  const result = await askClaude(prompt);
-  store.saveMessage({
-    participantId: p.participant_id,
-    exercise: String(body.exercise ?? '').slice(0, 100),
-    promptBlock: String(body.block ?? '').slice(0, 200),
-    prompt,
-    ...result,
-  });
-  if (result.status === 'error') return json(502, { error: result.participantMessage });
-  if (result.status === 'refusal') return json(200, { answer: result.answer ?? '', note: result.error });
-  return json(200, { answer: result.answer });
 }
 
 // ---------------------------------------------------------------- the Vezelvriend chat (Claude with the AI connection)
@@ -291,11 +267,12 @@ const trainerOnly = (fn) => async (ctx) => {
   return fn(ctx);
 };
 
-function trainingList() {
+async function trainingList() {
   const trainings = store.trainings();
+  const requests = await requestsPanel();
   return { body: trainerPage('Trainingen', html`
     <h1>Trainingen</h1>
-    <p class="uitleg">AI: ${aiEnabled() ? html`aan, model <span class="mono">${aiModel()}</span>` : 'uit (geen API-sleutel ingesteld)'} · maximaal ${MAX_PER_DAY} vragen per deelnemer per dag.</p>
+    <p class="uitleg">AI: ${aiEnabled() ? html`aan, model <span class="mono">${chatModel()}</span>` : 'uit (geen API-sleutel ingesteld)'} · maximaal ${MAX_PER_DAY} vragen per deelnemer per dag.</p>
     <div class="tabel-vak"><table>
       <thead><tr><th>Training</th><th>Aangemaakt</th><th>Deelnemers</th><th>AI-vragen</th><th>Ingeleverd</th><th>Codes</th></tr></thead>
       <tbody>${trainings.length === 0 ? html`<tr><td colspan="6" class="leeg">Nog geen trainingen.</td></tr>` : trainings.map((t) => html`<tr>
@@ -304,6 +281,7 @@ function trainingList() {
         <td>${t.active ? html`<span class="status status--ok">werken</span>` : html`<span class="status status--uit">uitgezet</span>`}</td></tr>`)}</tbody>
     </table></div>
     ${ordersPanel()}
+    ${requests}
     <h2>Nieuwe training</h2>
     <form method="post" action="/trainer/training" class="paneel">
       <p><label for="naam"><strong>Naam van de training</strong></label><br>
@@ -327,6 +305,51 @@ function ordersPanel() {
       <p><label><input type="checkbox" name="zeker" value="ja" required> Ja, wis alle ${count} bestellingen</label></p>
       <p><button type="submit">Bestellingen wissen</button></p>
     </form>`}`;
+}
+
+// Technician requests that Claude made through the connection (exercise 3). All
+// participants share one world, so the trainer clears them between two groups.
+async function requestsPanel() {
+  const list = await fetch(`${KOPPELING_URL}/internal/verzoeken`, { signal: AbortSignal.timeout(3000) }).then((r) => r.json()).catch(() => null);
+  if (!Array.isArray(list)) return html`<h2>Monteursverzoeken van de AI</h2><p class="uitleg">De koppeling is niet bereikbaar.</p>`;
+  const open = list.filter((r) => r.status === 'wacht op goedkeuring').length;
+  return html`<h2>Monteursverzoeken van de AI</h2>
+    <p class="uitleg">${list.length === 0 ? 'Er zijn geen monteursverzoeken.' : `${list.length} verzoek${list.length === 1 ? '' : 'en'}, waarvan ${open} nog wacht${open === 1 ? '' : 'en'} op goedkeuring.`} Alle deelnemers zien dezelfde verzoeken in het Klantbeeld. Wis ze vóór een nieuwe groep, zodat oefening 3 schoon begint.</p>
+    ${list.length === 0 ? '' : html`<form method="post" action="/trainer/verzoeken/wissen" class="paneel">
+      <p><label><input type="checkbox" name="zeker" value="ja" required> Ja, wis alle ${list.length} monteursverzoeken</label></p>
+      <p><button type="submit">Monteursverzoeken wissen</button></p>
+    </form>`}`;
+}
+
+async function wipeTechnicianRequests({ req }) {
+  const form = await readForm(req);
+  if (form.get('zeker') === 'ja') {
+    await fetch(`${KOPPELING_URL}/internal/wissen`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ alleen: 'verzoeken' }), signal: AbortSignal.timeout(3000) }).catch(() => {});
+  }
+  return redirect('/trainer/');
+}
+
+// The answers of "vind de fout" are trainer material: they are not in the public
+// repo or the site. On the server they sit in a private file (ANSWERS_FILE, mounted
+// read-only) and reach participants only after the trainer releases them.
+const ANSWERS_FILE = process.env.ANSWERS_FILE ?? '/private/vind-de-fout.json';
+function readAnswers() {
+  try { const list = JSON.parse(fs.readFileSync(ANSWERS_FILE, 'utf8')); return Array.isArray(list) ? list : null; } catch { return null; }
+}
+
+function findTheErrorAnswers({ req }) {
+  const p = participantFrom(req);
+  if (!p && !isTrainer(req)) return json(401, { error: 'Log eerst in met je deelnemerscode.' });
+  if (p && !p.answers_released) return json(200, { released: false });
+  const answers = readAnswers();
+  if (!answers) return json(200, { released: false });
+  return json(200, { released: true, answers });
+}
+
+async function setAnswersReleased({ req, params }) {
+  const form = await readForm(req);
+  store.setAnswersReleased(Number(params.id), form.get('vrijgeven') === '1');
+  return redirect(`/trainer/training/${Number(params.id)}`);
 }
 
 async function wipeOrders({ req }) {
@@ -377,6 +400,12 @@ async function trainingDetail({ params, url }) {
       <button type="submit" class="knop--licht">${t.active ? 'Codes uitzetten (training afgelopen)' : 'Codes weer aanzetten'}</button>
       <a class="knop knop--licht" href="/trainer/training/${t.training_id}/export.csv">Download als CSV</a>
     </form>
+    <form method="post" action="/trainer/training/${t.training_id}/antwoorden" class="zoek">
+      <input type="hidden" name="vrijgeven" value="${t.answers_released ? '0' : '1'}">
+      <span>Antwoorden van vind de fout: ${t.answers_released ? html`<span class="status status--ok">vrijgegeven</span>` : html`<span class="status status--uit">verborgen</span>`}${readAnswers() ? '' : ' (het antwoordbestand staat niet op deze server)'}</span>
+      <button type="submit" class="knop--licht">${t.answers_released ? 'Antwoorden weer verbergen' : 'Antwoorden vrijgeven'}</button>
+    </form>
+    <p class="uitleg">Vrijgegeven: deelnemers van deze training zien bij vind de fout de uitleg, nadat ze zelf hebben gekozen. Handig voor wie de proef alleen doet.</p>
 
     <h2>Deelnemers</h2>
     <div class="tabel-vak"><table>
@@ -550,7 +579,6 @@ serve({
     'POST /api/ai/login': login,
     'POST /api/ai/logout': logout,
     'GET /api/ai/check': check,
-    'POST /api/ai/ask': ask,
     'POST /api/ai/inleveren': handIn,
     'GET /api/ai/chat': chatInfo,
     'GET /api/ai/chats': listChats,
@@ -564,6 +592,9 @@ serve({
     'POST /trainer/uitloggen': trainerLogout,
     'POST /trainer/training': trainerOnly(createTraining),
     'POST /trainer/bestellingen/wissen': trainerOnly(wipeOrders),
+    'POST /trainer/verzoeken/wissen': trainerOnly(wipeTechnicianRequests),
+    'POST /trainer/training/:id/antwoorden': trainerOnly(setAnswersReleased),
+    'GET /api/ai/vindfout': findTheErrorAnswers,
     'GET /trainer/training/:id': trainerOnly(trainingDetail),
     'POST /trainer/training/:id/actief': trainerOnly(setActive),
     'POST /trainer/training/:id/verwijderen': trainerOnly(deleteTraining),

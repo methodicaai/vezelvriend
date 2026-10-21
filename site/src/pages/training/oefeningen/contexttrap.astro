@@ -5,8 +5,8 @@
 // exercises on purpose: beginners learn more from studying a good and a bad
 // example than from trying straight away.
 //
-// Behind the participant login (under /training/oefeningen/) because the
-// example of Familie De Wit shows how that scenario ends.
+// The examples use a made-up customer (Familie Peters) on another day, so they
+// show the method without giving away a scenario of the exercises.
 // Steps 2 and 3 use a neutral project example, so no pitfall of the
 // exercises is given away here.
 import Base from '../../../layouts/TrainingLayout.astro';
@@ -23,8 +23,8 @@ const steps: Step[] = [
     check: 'Klopt het feitelijk?', risk: 'Het antwoord klinkt goed, maar is algemeen.',
     intro: 'Je stelt alleen een vraag. De AI weet niets van jouw klant, jouw bedrijf of hoe laat het is. Voor algemene kennis is dat prima, voor een beslissing over één klant niet.',
     weak: {
-      prompt: 'Een klant belt en zegt: "Mijn modem doet het niet." Wat moet ik doen?',
-      answer: '1. Laat de klant het modem 30 seconden uitzetten en weer aanzetten.\n2. Controleer of alle kabels goed vastzitten.\n3. Werkt het daarna nog niet, plan dan een monteur in.',
+      prompt: 'Een klant zegt dat zijn internet traag is. Hoe los ik dat op?',
+      answer: '1. Laat de klant het modem 30 seconden uitzetten en weer aanzetten.\n2. Laat hem dichter bij de router gaan zitten, of een netwerkkabel proberen.\n3. Helpt dat niet, plan dan een monteur in.',
       note: 'Klinkt logisch, maar past op elke klant en daardoor op geen enkele. De AI weet niet of er een storing is, hoe het modem ervoor staat, of hoe jullie werken.',
     },
     strong: {
@@ -40,13 +40,13 @@ const steps: Step[] = [
     check: 'Heb ik de juiste gegevens, en niet te veel?', risk: 'Te veel, te weinig of de verkeerde gegevens.',
     intro: 'Jij kiest wat de AI te zien krijgt en plakt het in de vraag. Je hebt alles in de hand, maar het kost werk, en kiezen is een vak.',
     weak: {
-      prompt: 'Hier is alles wat ik over de klant heb:\nFamilie De Wit, telefoon 06-00000101, dewit@example.com, klant sinds 2021.\nModem Vezelbox VB-200, serienummer VB200-024017, MAC 02:56:46:00:50:01, firmware 4.2.1.\nHistorie: 2024, klant vroeg of het modem naar de woonkamer kan.\nDe klant zegt dat internet het niet doet. Wat moet ik doen?',
+      prompt: 'Hier is alles wat ik over de klant heb:\nFamilie Peters, telefoon 06-00000999, peters@example.com, klant sinds 2020.\nModem Vezelbox VB-200, serienummer VB200-099999, MAC 02:56:46:00:99:99, firmware 4.2.1.\nHistorie: 2023, klant vroeg of het modem naar de woonkamer kan.\nDe klant zegt dat internet het niet doet. Wat moet ik doen?',
       answer: 'Omdat het modem eerder is verplaatst, kan de bekabeling naar de woonkamer de oorzaak zijn. Laat de klant de kabels controleren. Helpt dat niet, herstart dan het modem op afstand en plan een monteur in.',
       note: 'Te veel en het verkeerde: naam, telefoon en e-mail zijn niet nodig. Een oud gesprek stuurt de AI de verkeerde kant op. En wat er echt toe doet, ontbreekt: de meting, de straatstatus, de tijd en jullie werkwijze.',
     },
     strong: {
-      prompt: 'Je helpt een medewerker van de klantenservice van een glasvezelbedrijf.\nHet is nu zaterdag 17-10-2026 10:15.\nDe klant zegt: "Mijn internet doet het niet."\n\nModemgegevens:\n- laatste meting 10:11: offline, geen sessie\n- vorige meting 08:30: online, 472 Mbit/s\n- straatstatus: storing sinds 08:40, ticket INC-2026-0412\n\nOnze werkwijze: (de beslisboom uit de documentatie)\n\nWat is de volgende stap, en wat zeg ik tegen de klant? Leg kort uit waarom.',
-      answer: 'Stap 1 van de beslisboom past: er is een storing in de straat sinds 08:40. Plan geen monteur in, maar koppel het gesprek aan ticket INC-2026-0412.\nTegen de klant: "Er is een storing bij u in de straat. Onze monteurs zijn ermee bezig. U hoeft niets te doen; zodra het is opgelost, werkt uw internet weer."',
+      prompt: 'Je helpt een medewerker van de klantenservice van een glasvezelbedrijf.\nHet is nu vrijdag 16-10-2026 16:40.\nDe klant zegt: "Mijn internet doet het niet."\n\nModemgegevens:\n- laatste meting 16:35: offline, geen sessie\n- vorige meting 15:00: online, 486 Mbit/s\n- straatstatus: storing sinds 15:20, ticket INC-2026-0398\n\nOnze werkwijze: (de beslisboom uit de documentatie)\n\nWat is de volgende stap, en wat zeg ik tegen de klant? Leg kort uit waarom.',
+      answer: 'Stap 1 van de beslisboom past: er is een storing in de straat sinds 15:20. Plan geen monteur in, maar koppel het gesprek aan ticket INC-2026-0398.\nTegen de klant: "Er is een storing bij u in de straat. Onze monteurs zijn ermee bezig. U hoeft niets te doen; zodra het is opgelost, werkt uw internet weer."',
       note: 'Alleen wat nodig is voor de beslissing, plus de tijd en de werkwijze. Geen naam, telefoon of e-mail.',
     },
     checkHow: ['Staat alles erin wat de beslissing bepaalt (hier: meting, tijd, straatstatus, werkwijze)?', 'Staat er iets in dat er niet in hoort, zoals persoonsgegevens of oude historie?', 'Kloppen de gegevens die je plakte nog met het systeem?'],
@@ -92,12 +92,12 @@ const steps: Step[] = [
     intro: 'Een koppeling haalt automatisch gegevens uit andere systemen, of een agent voert zelf een taak uit. Wat er wordt opgehaald en gedaan, is vooraf ingesteld. Dat moet je dus vooraf goed afspreken.',
     weak: {
       prompt: 'Instructie voor de storingsagent:\nHaal bij elke melding alle klantgegevens en de volledige historie op het adres op.\nIs het modem offline, plan dan een monteur in.',
-      answer: '(De agent plant voor Familie De Wit een monteur in. Er is een storing in de straat, dus de monteur kan niets doen. Intussen gingen naam, telefoon en de historie van iedereen die ooit op het adres woonde, mee naar de AI.)',
+      answer: '(De agent plant voor Familie Peters een monteur in. Er is een storing in de straat, dus de monteur kan niets doen. Intussen gingen naam, telefoon en de historie van iedereen die ooit op het adres woonde, mee naar de AI.)',
       note: 'Niemand ziet het voordat het gebeurt. De agent haalt meer op dan nodig, en doet iets wat geld kost en de klant een dagdeel.',
     },
     strong: {
       prompt: 'Instructie voor de storingsagent:\nHaal alleen op: de laatste meting met tijd, de straatstatus en de laatste herstart.\nVolg de beslisboom en stel de volgende stap voor, met uitleg.\nPlan zelf niets in. Een medewerker keurt elke monteursafspraak goed.',
-      answer: 'Voorstel: geen monteur. Er is een storing in de straat sinds 08:40 (ticket INC-2026-0412). Koppel de melding aan dit ticket.\nWacht op goedkeuring van een medewerker.',
+      answer: 'Voorstel: geen monteur. Er is een storing in de straat sinds 15:20 (ticket INC-2026-0398). Koppel de melding aan dit ticket.\nWacht op goedkeuring van een medewerker.',
       note: 'De koppeling haalt alleen op wat nodig is. De agent stelt voor, een mens beslist.',
     },
     checkHow: ['Welke gegevens haalt de koppeling op, en zijn die allemaal nodig?', 'Welke acties mag de agent zelf doen, en welke pas na goedkeuring?', 'Wie heeft dit afgesproken, en waar staat dat?'],
