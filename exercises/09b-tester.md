@@ -1,11 +1,11 @@
 ---
-number: 6
+stap: "9b"
 title: Testcases uit de beslisboom
 role: Tester
 summary: Leid met AI testcases af uit de beslisboom, inclusief randgevallen, en toets ze aan het Klantsysteem en het Klantbeeld.
 ---
 
-# Oefening 6: Testcases uit de beslisboom
+# Stap 9b: Testcases uit de beslisboom
 
 ## Doel
 

@@ -307,14 +307,14 @@ function ordersPanel() {
     </form>`}`;
 }
 
-// Technician requests that Claude made through the connection (exercise 3). All
+// Technician requests that Claude made through the connection (step 6). All
 // participants share one world, so the trainer clears them between two groups.
 async function requestsPanel() {
   const list = await fetch(`${KOPPELING_URL}/internal/verzoeken`, { signal: AbortSignal.timeout(3000) }).then((r) => r.json()).catch(() => null);
   if (!Array.isArray(list)) return html`<h2>Monteursverzoeken van de AI</h2><p class="uitleg">De koppeling is niet bereikbaar.</p>`;
   const open = list.filter((r) => r.status === 'wacht op goedkeuring').length;
   return html`<h2>Monteursverzoeken van de AI</h2>
-    <p class="uitleg">${list.length === 0 ? 'Er zijn geen monteursverzoeken.' : `${list.length} verzoek${list.length === 1 ? '' : 'en'}, waarvan ${open} nog wacht${open === 1 ? '' : 'en'} op goedkeuring.`} Alle deelnemers zien dezelfde verzoeken in het Klantbeeld. Wis ze vóór een nieuwe groep, zodat oefening 3 schoon begint.</p>
+    <p class="uitleg">${list.length === 0 ? 'Er zijn geen monteursverzoeken.' : `${list.length} verzoek${list.length === 1 ? '' : 'en'}, waarvan ${open} nog wacht${open === 1 ? '' : 'en'} op goedkeuring.`} Alle deelnemers zien dezelfde verzoeken in het Klantbeeld. Wis ze vóór een nieuwe groep, zodat stap 6 schoon begint.</p>
     ${list.length === 0 ? '' : html`<form method="post" action="/trainer/verzoeken/wissen" class="paneel">
       <p><label><input type="checkbox" name="zeker" value="ja" required> Ja, wis alle ${list.length} monteursverzoeken</label></p>
       <p><button type="submit">Monteursverzoeken wissen</button></p>

@@ -1,11 +1,11 @@
 ---
-number: 1
+stap: "3"
 title: Context maakt het verschil
 role: Iedereen
 summary: Dezelfde klantvraag, eerst kaal en daarna met de gegevens uit het Klantbeeld. Wat verandert er aan het antwoord van de AI?
 ---
 
-# Oefening 1: Context maakt het verschil
+# Stap 3: Context maakt het verschil
 
 ## Doel
 

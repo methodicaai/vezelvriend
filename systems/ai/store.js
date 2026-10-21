@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS messages (
   message_id     INTEGER PRIMARY KEY,
   participant_id INTEGER NOT NULL REFERENCES participants(participant_id) ON DELETE CASCADE,
   sent_at        TEXT NOT NULL,
-  exercise       TEXT,                      -- e.g. '01-context'
+  exercise       TEXT,                      -- e.g. '03-context'
   prompt_block   TEXT,                      -- heading above the prompt, e.g. 'Voorbeeldprompt met context (B)'
   prompt         TEXT NOT NULL,
   answer         TEXT,

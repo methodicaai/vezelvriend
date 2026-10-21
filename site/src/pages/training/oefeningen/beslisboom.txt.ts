@@ -1,4 +1,4 @@
-// The decision tree as a plain text file, to paste into a prompt (exercise 1,
+// The decision tree as a plain text file, to paste into a prompt (step 3,
 // prompt B) or give to an AI. Same source as the systems page and the repo.
 import tree from '../../../../../docs/decision-tree.md?raw';
 

@@ -39,7 +39,7 @@ Meer uitleg: [docs/architecture.md](docs/architecture.md).
 
 ## Prompts invullen, kopiëren en naar de AI sturen
 
-De voorbeeldprompts in de oefeningen zijn invulblokken: vaste tekst plus duidelijk gelabelde vakken voor wat je zelf invult, met een knop om de prompt te kopiëren. Bij oefening 1 is er ook prompt C, waarin alle context automatisch uit het Klantbeeld wordt opgehaald.
+De voorbeeldprompts in de oefeningen zijn invulblokken: vaste tekst plus duidelijk gelabelde vakken voor wat je zelf invult, met een knop om de prompt te kopiëren. Bij stap 3 is er ook prompt C, waarin alle context automatisch uit het Klantbeeld wordt opgehaald.
 
 Als de trainer de AI-koppeling aanzet (zie [docs/server.md](docs/server.md)), kunnen deelnemers met een persoonlijke code inloggen en een prompt direct naar Claude sturen. Gesprekken worden bewaard, zodat de trainer ze kan bespreken; het trainerscherm staat op `/trainer/`.
 

@@ -33,7 +33,7 @@ const steps: Step[] = [
       note: 'Een goede kale vraag: algemene kennis, geen gegevens van een klant nodig. Toch controleer je of het klopt, want "bij ons in één kastje" heeft de AI gegokt.',
     },
     checkHow: ['Klopt het feitelijk, en is het niet te algemeen voor wat je ermee wilt doen?', 'Heeft de AI iets aangenomen over jouw situatie dat hij niet kan weten?'],
-    practice: [{ href: '/training/oefeningen/01-context/', label: 'Oefening 1, prompt A' }],
+    practice: [{ href: '/training/oefeningen/03-context/', label: 'Stap 3, prompt A' }],
   },
   {
     nr: 1, name: 'Zelf plakken', who: 'Jij kiest en plakt', copilot: 'Copilot Chat zonder werkdata',
@@ -50,7 +50,7 @@ const steps: Step[] = [
       note: 'Alleen wat nodig is voor de beslissing, plus de tijd en de werkwijze. Geen naam, telefoon of e-mail.',
     },
     checkHow: ['Staat alles erin wat de beslissing bepaalt (hier: meting, tijd, straatstatus, werkwijze)?', 'Staat er iets in dat er niet in hoort, zoals persoonsgegevens of oude historie?', 'Kloppen de gegevens die je plakte nog met het systeem?'],
-    practice: [{ href: '/training/oefeningen/01-context/', label: 'Oefening 1, prompt B' }],
+    practice: [{ href: '/training/oefeningen/03-context/', label: 'Stap 3, prompt B' }],
   },
   {
     nr: 2, name: 'Jij kiest de documenten', who: 'Jij, met bestanden of een vaste werkruimte', copilot: 'Bestand toevoegen, Notebooks of Pages',
@@ -84,7 +84,7 @@ const steps: Step[] = [
       note: 'Met bron en datum kun je zelf beoordelen wat de laatste stand is. Wat de AI niet vond, is net zo belangrijk als wat hij wel vond.',
     },
     checkHow: ['Open de genoemde bronnen: staat het er echt, en is dit de laatste stand?', '"Niet gevonden" is niet "bestaat niet". Wat kan de AI gemist hebben?', 'Kwam er iets mee dat niet voor dit doel bedoeld is? Dan hoort het ook niet in je antwoord.'],
-    practice: [{ href: '/training/oefeningen/03-claude-zoekt-zelf/', label: 'Oefening 3: Claude zoekt zelf' }],
+    practice: [{ href: '/training/oefeningen/06-claude-zoekt-zelf/', label: 'Stap 6: Claude zoekt zelf' }],
   },
   {
     nr: 4, name: 'Koppelingen en agents', who: 'Een systeem haalt op, of voert zelf iets uit', copilot: 'Connectoren, agents, Copilot Studio',
@@ -101,17 +101,17 @@ const steps: Step[] = [
       note: 'De koppeling haalt alleen op wat nodig is. De agent stelt voor, een mens beslist.',
     },
     checkHow: ['Welke gegevens haalt de koppeling op, en zijn die allemaal nodig?', 'Welke acties mag de agent zelf doen, en welke pas na goedkeuring?', 'Wie heeft dit afgesproken, en waar staat dat?'],
-    practice: [{ href: '/training/oefeningen/03-claude-zoekt-zelf/', label: 'Oefening 3: de monteur goedkeuren' }, { href: '/training/oefeningen/04-guardrails/', label: 'Oefening 4: regels voor de AI' }, { href: '/training/oefeningen/01-context/', label: 'Oefening 1, prompt C' }],
+    practice: [{ href: '/training/oefeningen/06-claude-zoekt-zelf/', label: 'Stap 6: de monteur goedkeuren' }, { href: '/training/oefeningen/07-guardrails/', label: 'Stap 7: regels voor de AI' }, { href: '/training/oefeningen/03-context/', label: 'Stap 3, prompt C' }],
   },
 ];
 ---
 <Base title="De contexttrap" description="Vijf manieren waarop context bij een AI komt, met per trede een goed en een slecht voorbeeld en een controlevraag.">
   <section class="hero">
     <div class="hero-inner">
-      <p class="eyebrow">Stap 2 van de route · lees nu trede 0 en 1 (± 10 minuten)</p>
+      <p class="eyebrow">Stap 2 · lees nu trede 0 en 1 (± 10 minuten)</p>
       <h1>De contexttrap</h1>
       <p class="lead">Goede context erin, kritisch nakijken eruit. Er zijn vijf manieren waarop context bij een AI komt. Per trede zie je hieronder een zwak en een sterk voorbeeld, en de vraag waarmee je de uitkomst controleert.</p>
-      <p class="lead">Lees nu het overzicht en <a href="#trede-0">trede 0</a> en <a href="#trede-1">trede 1</a>, en ga dan naar oefening 1. De andere treden lees je later: elke oefening verwijst naar de trede waar hij over gaat.</p>
+      <p class="lead">Lees nu het overzicht en <a href="#trede-0">trede 0</a> en <a href="#trede-1">trede 1</a>, en ga dan naar stap 3. De andere treden lees je later: elke oefening verwijst naar de trede waar hij over gaat.</p>
     </div>
   </section>
 
@@ -173,7 +173,7 @@ const steps: Step[] = [
     <div class="wrap">
       <h2>Op welke trede sta jij?</h2>
       <p class="prose">Weet je nog niet welke AI je hebt en wat die kan? Plak de vijf vragen van <a href="/training/oefeningen/wat-kan-ai/">Wat kan AI voor jou?</a> in je eigen AI.</p>
-      <p><a class="knop knop--vol" href="/training/oefeningen/01-context/">Naar oefening 1</a></p>
+      <p><a class="knop knop--vol" href="/training/oefeningen/03-context/">Naar stap 3</a></p>
     </div>
   </section>
 </Base>

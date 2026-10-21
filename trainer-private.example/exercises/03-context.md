@@ -1,4 +1,4 @@
-# Oefening 02-data-pitfall (trainerversie)
+# Oefening 03-context (trainerversie)
 
 ## Wat je wilt zien
 ## Antwoorden

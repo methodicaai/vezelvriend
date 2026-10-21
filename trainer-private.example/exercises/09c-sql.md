@@ -1,4 +1,4 @@
-# Oefening 04-guardrails (trainerversie)
+# Oefening 09c-sql (trainerversie)
 
 ## Wat je wilt zien
 ## Antwoorden

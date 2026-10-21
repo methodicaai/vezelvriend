@@ -1,11 +1,11 @@
 ---
-number: 5
+stap: "9a"
 title: Van klantverhaal naar user story
 role: Businessanalist
 summary: Maak met AI een user story met acceptatiecriteria uit een klantverhaal, en controleer de bronnen waar de AI op leunt.
 ---
 
-# Oefening 5: Van klantverhaal naar user story
+# Stap 9a: Van klantverhaal naar user story
 
 ## Doel
 

@@ -1,4 +1,4 @@
-# Oefening 07-sql (trainerversie)
+# Oefening 07-guardrails (trainerversie)
 
 ## Wat je wilt zien
 ## Antwoorden

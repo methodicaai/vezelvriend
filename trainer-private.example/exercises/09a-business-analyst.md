@@ -1,4 +1,4 @@
-# Oefening 01-context (trainerversie)
+# Oefening 09a-business-analyst (trainerversie)
 
 ## Wat je wilt zien
 ## Antwoorden

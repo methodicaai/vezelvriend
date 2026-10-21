@@ -7,7 +7,8 @@ export function getExercises() {
   return Object.entries(files)
     .map(([path, mod]) => ({
       slug: path.split('/').pop()!.replace(/\.md$/, ''),
-      number: mod.frontmatter.number,
+      // The step on the route ("3", "9a"): the same number the participant sees everywhere.
+      step: String(mod.frontmatter.stap),
       title: mod.frontmatter.title,
       role: mod.frontmatter.role,
       summary: mod.frontmatter.summary,
@@ -15,5 +16,5 @@ export function getExercises() {
       connection: mod.frontmatter.koppeling === 'aan',
       Content: mod.Content,
     }))
-    .sort((a, b) => a.number - b.number);
+    .sort((a, b) => a.step.localeCompare(b.step, 'nl', { numeric: true }));
 }

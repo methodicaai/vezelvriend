@@ -1,11 +1,11 @@
 ---
-number: 7
+stap: "9c"
 title: SQL schrijven met AI
 role: Businessanalist en tester
 summary: Laat de AI SQL schrijven voor vragen over de klantdata. Met en zonder het schema als context. Klopt de uitkomst?
 ---
 
-# Oefening 7: SQL schrijven met AI
+# Stap 9c: SQL schrijven met AI
 
 ## Doel
 
