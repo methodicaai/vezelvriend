@@ -55,6 +55,9 @@
   document.querySelectorAll('pre > code.language-prompt').forEach((code, blockIndex) => {
     const source = code.textContent.replace(/\n$/, '');
     const parts = source.split(FIELD); // even index = fixed text, odd index = field
+    // <pre class="prompt-alleen-kopieren">: a prompt meant for the participant's own
+    // AI at work (such as the intake questions), so no "Stuur naar AI" or "Inleveren".
+    const copyOnly = code.parentElement.classList.contains('prompt-alleen-kopieren');
     const fieldCount = (parts.length - 1) / 2;
 
     // The heading above the block ("Voorbeeldprompt met context (B)") tells the
@@ -157,8 +160,8 @@
     const answer = el('div', 'prompt-antwoord');
     answer.hidden = true;
     box.append(answer);
-    sendButtons.push(sendButton);
-    handInButtons.push(handInButton);
+    if (!copyOnly) sendButtons.push(sendButton);
+    if (!copyOnly) handInButtons.push(handInButton);
 
     const setStatus = (text, warn) => {
       status.className = 'prompt-status' + (warn ? ' prompt-status--let-op' : '');

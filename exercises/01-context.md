@@ -11,6 +11,8 @@ summary: Dezelfde klantvraag, eerst kaal en daarna met de gegevens uit het Klant
 
 Je ervaart dat een AI-antwoord zo goed is als de context die je meegeeft. Je leert welke gegevens het verschil maken.
 
+Lees eerst [de contexttrap](/training/oefeningen/contexttrap/): daar zie je per trede een zwak en een sterk voorbeeld.
+
 ## Opdracht
 
 Een klant belt: **"Mijn modem doet het niet."**

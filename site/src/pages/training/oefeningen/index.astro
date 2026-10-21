@@ -14,6 +14,10 @@ const exercises = getExercises();
   </section>
   <section class="sectie">
     <div class="wrap">
+      <div class="trap-let-op">
+        <p><strong>Begin met de contexttrap.</strong> Vijf manieren waarop context bij een AI komt, met per trede een zwak en een sterk voorbeeld en de vraag waarmee je de uitkomst controleert.</p>
+        <p><a href="/training/oefeningen/contexttrap/">Naar de contexttrap</a></p>
+      </div>
       {exercises.length === 0 && <p>De oefeningen komen binnenkort.</p>}
       <Vlak items={exercises.map((ex) => ({
         label: `Oefening ${ex.number} · ${ex.role}`,

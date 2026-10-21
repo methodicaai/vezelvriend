@@ -1,0 +1,197 @@
+---
+// The context ladder: five ways context reaches an AI, each with a worked
+// example (a weak and a strong prompt side by side, with an example answer)
+// and the check question for that step. Worked examples come before the
+// exercises on purpose: beginners learn more from studying a good and a bad
+// example than from trying straight away.
+//
+// Behind the participant login (under /training/oefeningen/) because the
+// example of Familie De Wit shows how that scenario ends.
+// Steps 2 and 3 use a neutral project example, so no pitfall of the
+// exercises is given away here.
+import Base from '../../../layouts/TrainingLayout.astro';
+
+interface Example { prompt: string; answer: string; note: string }
+interface Step {
+  nr: number; name: string; who: string; copilot: string; check: string; risk: string;
+  intro: string; weak: Example; strong: Example; checkHow: string[]; practice?: { href: string; label: string };
+}
+
+const steps: Step[] = [
+  {
+    nr: 0, name: 'Kale vraag', who: 'Niemand', copilot: 'Elke chat-AI',
+    check: 'Klopt het feitelijk?', risk: 'Het antwoord klinkt goed, maar is algemeen.',
+    intro: 'Je stelt alleen een vraag. De AI weet niets van jouw klant, jouw bedrijf of hoe laat het is. Voor algemene kennis is dat prima, voor een beslissing over één klant niet.',
+    weak: {
+      prompt: 'Een klant belt en zegt: "Mijn modem doet het niet." Wat moet ik doen?',
+      answer: '1. Laat de klant het modem 30 seconden uitzetten en weer aanzetten.\n2. Controleer of alle kabels goed vastzitten.\n3. Werkt het daarna nog niet, plan dan een monteur in.',
+      note: 'Klinkt logisch, maar past op elke klant en daardoor op geen enkele. De AI weet niet of er een storing is, hoe het modem ervoor staat, of hoe jullie werken.',
+    },
+    strong: {
+      prompt: 'Leg in gewone taal voor een klant uit wat het verschil is tussen een modem en een wifi-router. Maximaal vijf zinnen.',
+      answer: 'Het modem is de verbinding tussen je huis en ons glasvezelnetwerk. De wifi-router verdeelt die verbinding draadloos door je huis. Bij ons zitten ze vaak in één kastje, de Vezelbox. Werkt internet via een kabel wel, maar wifi niet? Dan ligt het meestal aan de wifi, niet aan de verbinding.',
+      note: 'Een goede kale vraag: algemene kennis, geen gegevens van een klant nodig. Toch controleer je of het klopt, want "bij ons in één kastje" heeft de AI gegokt.',
+    },
+    checkHow: ['Klopt het feitelijk, en is het niet te algemeen voor wat je ermee wilt doen?', 'Heeft de AI iets aangenomen over jouw situatie dat hij niet kan weten?'],
+    practice: { href: '/training/oefeningen/01-context/', label: 'Oefening 1, prompt A' },
+  },
+  {
+    nr: 1, name: 'Zelf plakken', who: 'Jij kiest en plakt', copilot: 'Copilot Chat zonder werkdata',
+    check: 'Heb ik de juiste gegevens, en niet te veel?', risk: 'Te veel, te weinig of de verkeerde gegevens.',
+    intro: 'Jij kiest wat de AI te zien krijgt en plakt het in de vraag. Je hebt alles in de hand, maar het kost werk, en kiezen is een vak.',
+    weak: {
+      prompt: 'Hier is alles wat ik over de klant heb:\nFamilie De Wit, telefoon 06-00000101, dewit@example.com, klant sinds 2021.\nModem Vezelbox VB-200, serienummer VB200-024017, MAC 02:56:46:00:50:01, firmware 4.2.1.\nHistorie: 2024, klant vroeg of het modem naar de woonkamer kan.\nDe klant zegt dat internet het niet doet. Wat moet ik doen?',
+      answer: 'Omdat het modem eerder is verplaatst, kan de bekabeling naar de woonkamer de oorzaak zijn. Laat de klant de kabels controleren. Helpt dat niet, herstart dan het modem op afstand en plan een monteur in.',
+      note: 'Te veel en het verkeerde: naam, telefoon en e-mail zijn niet nodig. Een oud gesprek stuurt de AI de verkeerde kant op. En wat er echt toe doet, ontbreekt: de meting, de straatstatus, de tijd en jullie werkwijze.',
+    },
+    strong: {
+      prompt: 'Je helpt een medewerker van de klantenservice van een glasvezelbedrijf.\nHet is nu zaterdag 17-10-2026 10:15.\nDe klant zegt: "Mijn internet doet het niet."\n\nModemgegevens:\n- laatste meting 10:11: offline, geen sessie\n- vorige meting 08:30: online, 472 Mbit/s\n- straatstatus: storing sinds 08:40, ticket INC-2026-0412\n\nOnze werkwijze: (de beslisboom uit de documentatie)\n\nWat is de volgende stap, en wat zeg ik tegen de klant? Leg kort uit waarom.',
+      answer: 'Stap 1 van de beslisboom past: er is een storing in de straat sinds 08:40. Plan geen monteur in, maar koppel het gesprek aan ticket INC-2026-0412.\nTegen de klant: "Er is een storing bij u in de straat. Onze monteurs zijn ermee bezig. U hoeft niets te doen; zodra het is opgelost, werkt uw internet weer."',
+      note: 'Alleen wat nodig is voor de beslissing, plus de tijd en de werkwijze. Geen naam, telefoon of e-mail.',
+    },
+    checkHow: ['Staat alles erin wat de beslissing bepaalt (hier: meting, tijd, straatstatus, werkwijze)?', 'Staat er iets in dat er niet in hoort, zoals persoonsgegevens of oude historie?', 'Kloppen de gegevens die je plakte nog met het systeem?'],
+    practice: { href: '/training/oefeningen/01-context/', label: 'Oefening 1, prompt B' },
+  },
+  {
+    nr: 2, name: 'Jij kiest de documenten', who: 'Jij, met bestanden of een vaste werkruimte', copilot: 'Bestand toevoegen, Notebooks of Pages',
+    check: 'Zijn mijn bronnen actueel en eenduidig?', risk: 'Oude of tegenstrijdige documenten.',
+    intro: 'Je geeft hele documenten mee, of zet ze in een vaste werkruimte. Dat scheelt plakken, maar de AI leest alles wat je meegeeft, ook wat verouderd is.',
+    weak: {
+      prompt: '(Bijlagen: "Eisen klantportaal v2", "Eisen klantportaal v3", "Verslag overleg 14 oktober")\n\nMaak een lijst van alle eisen voor het klantportaal.',
+      answer: '- De klant kan facturen downloaden als pdf en Excel.\n- De klant kan zijn adres zelf wijzigen.\n- Inloggen gaat met tweestapsverificatie.\n- ...',
+      note: 'De AI weet niet welk document leidend is, en mengt oud en nieuw. Je ziet niet waar elke eis vandaan komt, dus je kunt het niet controleren.',
+    },
+    strong: {
+      prompt: '(Bijlagen: "Eisen klantportaal v3", "Verslag overleg 14 oktober")\n\nVersie 3 van de eisen is leidend. Het verslag is van na versie 3.\nMaak een lijst van de eisen. Noem bij elke eis de bron (document en paragraaf).\nMeld apart waar het verslag afwijkt van versie 3.\nVerzin geen eisen: staat iets er niet in, zeg dat dan.',
+      answer: '- Facturen downloaden als pdf (v3, par. 2.1)\n- Adres zelf wijzigen (v3, par. 2.4)\n- Inloggen met tweestapsverificatie (v3, par. 3.2)\n\nAfwijking: in het overleg van 14 oktober is afgesproken dat de download als Excel vervalt. Versie 3 noemt die nog (par. 2.1).',
+      note: 'Jij bepaalt welke bronnen meetellen en welke leidend is. De AI noemt de bron per eis, en meldt tegenstrijdigheden in plaats van ze stilletjes op te lossen.',
+    },
+    checkHow: ['Zijn dit de nieuwste versies, en weet de AI welke leidend is?', 'Open twee of drie bronverwijzingen: staat het er echt?', 'Spreken de documenten elkaar tegen? Wie beslist dan?'],
+  },
+  {
+    nr: 3, name: 'De AI zoekt zelf', who: 'De AI, in alles waar jij bij kunt', copilot: 'Microsoft 365 Copilot met werkdata',
+    check: 'Waar komt dit vandaan, en mocht de AI dat zien?', risk: 'De AI vindt dingen die je niet zocht, die verouderd zijn, of die niet voor dit doel bedoeld zijn.',
+    intro: 'De AI doorzoekt zelf je mail, documenten, chats en vergaderingen. Jij kiest niet meer wat erin gaat. Dat is snel, maar je ziet niet wat hij las en wat hij miste.',
+    weak: {
+      prompt: 'Wat is er afgesproken over de livegang van het klantportaal?',
+      answer: 'De livegang van het klantportaal is gepland op 1 december.',
+      note: 'Geen bron, geen datum. Komt dit uit een oud overleg of uit de laatste mail? Uit een document dat voor jou bedoeld was? En wat heeft de AI niet gevonden?',
+    },
+    strong: {
+      prompt: 'Zoek in mijn mail, Teams-chats en vergaderverslagen van de afgelopen vier weken wat er is afgesproken over de livegang van het klantportaal.\nNoem bij elke afspraak de bron: wat voor bron, de datum, en de afzender of het overleg.\nZeg ook wat je niet kon vinden, en waar bronnen elkaar tegenspreken.\nLaat vertrouwelijke zaken over personen buiten beschouwing.',
+      answer: '- 2 oktober, overleg stuurgroep: livegang 1 december, onder voorbehoud van de testresultaten.\n- 18 oktober, mail van de projectleider: livegang verschoven naar 15 januari, omdat de koppeling met de facturatie later klaar is.\n\nTegenstrijdig: de mail van 18 oktober is nieuwer dan het besluit van de stuurgroep.\nNiet gevonden: een nieuw besluit van de stuurgroep over 15 januari.',
+      note: 'Met bron en datum kun je zelf beoordelen wat de laatste stand is. Wat de AI niet vond, is net zo belangrijk als wat hij wel vond.',
+    },
+    checkHow: ['Open de genoemde bronnen: staat het er echt, en is dit de laatste stand?', '"Niet gevonden" is niet "bestaat niet". Wat kan de AI gemist hebben?', 'Kwam er iets mee dat niet voor dit doel bedoeld is? Dan hoort het ook niet in je antwoord.'],
+  },
+  {
+    nr: 4, name: 'Koppelingen en agents', who: 'Een systeem haalt op, of voert zelf iets uit', copilot: 'Connectoren, agents, Copilot Studio',
+    check: 'Wat gaat de koppeling doen, en wie keurt het goed?', risk: 'Te veel gegevens, en acties zonder dat iemand meekijkt.',
+    intro: 'Een koppeling haalt automatisch gegevens uit andere systemen, of een agent voert zelf een taak uit. Wat er wordt opgehaald en gedaan, is vooraf ingesteld. Dat moet je dus vooraf goed afspreken.',
+    weak: {
+      prompt: 'Instructie voor de storingsagent:\nHaal bij elke melding alle klantgegevens en de volledige historie op het adres op.\nIs het modem offline, plan dan een monteur in.',
+      answer: '(De agent plant voor Familie De Wit een monteur in. Er is een storing in de straat, dus de monteur kan niets doen. Intussen gingen naam, telefoon en de historie van iedereen die ooit op het adres woonde, mee naar de AI.)',
+      note: 'Niemand ziet het voordat het gebeurt. De agent haalt meer op dan nodig, en doet iets wat geld kost en de klant een dagdeel.',
+    },
+    strong: {
+      prompt: 'Instructie voor de storingsagent:\nHaal alleen op: de laatste meting met tijd, de straatstatus en de laatste herstart.\nVolg de beslisboom en stel de volgende stap voor, met uitleg.\nPlan zelf niets in. Een medewerker keurt elke monteursafspraak goed.',
+      answer: 'Voorstel: geen monteur. Er is een storing in de straat sinds 08:40 (ticket INC-2026-0412). Koppel de melding aan dit ticket.\nWacht op goedkeuring van een medewerker.',
+      note: 'De koppeling haalt alleen op wat nodig is. De agent stelt voor, een mens beslist.',
+    },
+    checkHow: ['Welke gegevens haalt de koppeling op, en zijn die allemaal nodig?', 'Welke acties mag de agent zelf doen, en welke pas na goedkeuring?', 'Wie heeft dit afgesproken, en waar staat dat?'],
+    practice: { href: '/training/oefeningen/01-context/', label: 'Oefening 1, prompt C' },
+  },
+];
+---
+<Base title="De contexttrap" description="Vijf manieren waarop context bij een AI komt, met per trede een goed en een slecht voorbeeld en een controlevraag.">
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Eerst lezen, dan oefenen</p>
+      <h1>De contexttrap</h1>
+      <p class="lead">Goede context erin, kritisch nakijken eruit. Er zijn vijf manieren waarop context bij een AI komt. Per trede zie je hieronder een zwak en een sterk voorbeeld, en de vraag waarmee je de uitkomst controleert.</p>
+    </div>
+  </section>
+
+  <section class="sectie">
+    <div class="wrap">
+      <div class="tabel-vak">
+        <table class="tabel">
+          <thead><tr><th>Trede</th><th>Wie kiest de context?</th><th>Controlevraag</th><th>Bijvoorbeeld</th></tr></thead>
+          <tbody>
+            {steps.map((s) => (
+              <tr><td><a href={`#trede-${s.nr}`}><strong>{s.nr} {s.name}</strong></a></td><td>{s.who}</td><td>{s.check}</td><td>{s.copilot}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="trap-let-op">
+        <p><strong>Hoger is niet beter.</strong> De treden zijn afwegingen, geen niveaus. Hoe hoger, hoe minder werk voor jou, maar hoe minder je zelf ziet wat er in de AI gaat. Een organisatie kan bewust op trede 1 blijven staan. Op welke trede jij staat, hangt af van de AI die je mag gebruiken.</p>
+        <p><strong>In de oefeningen zitten bewust fouten.</strong> Fouten maken is de bedoeling: daar leer je het meest van. Na elke oefening bespreek je met de trainer wat je zag, waarom het gebeurde, en wat het betekent voor jouw werk.</p>
+      </div>
+    </div>
+  </section>
+
+  {steps.map((s) => (
+    <section class={`sectie${s.nr % 2 === 1 ? ' sectie--vlak' : ''}`} id={`trede-${s.nr}`}>
+      <div class="wrap">
+        <p class="label">Trede {s.nr} · {s.who}</p>
+        <h2>{s.name}</h2>
+        <p class="prose">{s.intro}</p>
+
+        <div class="trap-vergelijk">
+          <div class="trap-voorbeeld trap-voorbeeld--zwak">
+            <p class="trap-kop">Zwak</p>
+            <pre class="trap-prompt">{s.weak.prompt}</pre>
+            <p class="trap-sub">Antwoord van de AI (voorbeeld)</p>
+            <p class="trap-antwoord">{s.weak.answer}</p>
+            <p class="trap-noot">{s.weak.note}</p>
+          </div>
+          <div class="trap-voorbeeld trap-voorbeeld--sterk">
+            <p class="trap-kop">Sterk</p>
+            <pre class="trap-prompt">{s.strong.prompt}</pre>
+            <p class="trap-sub">Antwoord van de AI (voorbeeld)</p>
+            <p class="trap-antwoord">{s.strong.answer}</p>
+            <p class="trap-noot">{s.strong.note}</p>
+          </div>
+        </div>
+
+        <div class="trap-controle">
+          <p class="trap-kop">Controlevraag: {s.check}</p>
+          <ul>{s.checkHow.map((c) => <li>{c}</li>)}</ul>
+          <p class="trap-risico"><strong>Nieuw risico op deze trede:</strong> {s.risk}</p>
+          {s.practice && <p><a href={s.practice.href}>Oefen het: {s.practice.label}</a></p>}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="sectie">
+    <div class="wrap">
+      <h2>Op welke trede sta jij?</h2>
+      <p class="prose">Plak deze vragen in de AI die je op je werk gebruikt. Ze testen niets en zoeken niets op: de AI vertelt alleen wat hij kan. Twijfel je of je dit mag vragen? Kijk dan in het menu van je AI, of vraag het je IT-afdeling.</p>
+      <pre class="prompt-alleen-kopieren"><code class="language-prompt">Ik ga binnenkort een training volgen over het gebruik van AI. Ik wil weten wat ik met jou kan doen. Beantwoord de vragen hieronder over je eigen mogelijkheden. Zoek daarvoor niets op en laat niets zien uit mijn mail, documenten of andere bestanden: vertel alleen wat je kunt. Weet je iets niet zeker, zeg dat dan.
+
+1. Kun je op internet zoeken?
+2. Kan ik een bestand toevoegen aan dit gesprek?
+3. Kan ik documenten en instructies bewaren op een vaste plek, zodat ik ze later weer kan gebruiken (bijvoorbeeld een project of notebook)?
+4. Kun je zelf in mijn documenten of mail zoeken, of moet ik je de informatie zelf geven?
+5. Onthoud je iets van mij tussen gesprekken?
+
+Antwoord per vraag met ja, nee of weet ik niet, en één zin uitleg.</code></pre>
+      <div class="tabel-vak">
+        <table class="tabel">
+          <thead><tr><th>Jouw antwoorden</th><th>Jouw trede</th></tr></thead>
+          <tbody>
+            <tr><td>Alleen 1 en/of 2 is ja</td><td>Trede 1: zelf plakken en bestanden toevoegen</td></tr>
+            <tr><td>Ook 3 is ja</td><td>Trede 2: jij kiest de documenten</td></tr>
+            <tr><td>4 is ja</td><td>Trede 3: de AI zoekt zelf</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="prose">Koppelingen en agents (trede 4) stellen beheerders in. Of die er zijn, weet je IT-afdeling het best.</p>
+      <p><a class="knop knop--vol" href="/training/oefeningen/01-context/">Naar oefening 1</a></p>
+    </div>
+  </section>
+  <script is:inline src="/assets/prompt.js" defer></script>
+</Base>
