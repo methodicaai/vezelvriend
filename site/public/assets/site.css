@@ -221,3 +221,33 @@ h3{margin:0 0 .5rem;line-height:1.3}
 .trap-controle{border:1px solid var(--kleur-lijn);border-radius:var(--radius);padding:1.1rem 1.4rem;background:var(--kleur-zacht)}
 .trap-controle ul{margin:.25rem 0 .75rem;padding-left:1.2rem}
 .trap-risico{margin:.5rem 0;font-size:.95rem}
+
+/* Vind de fout (/training/oefeningen/vind-de-fout/) */
+.vf-lijst{display:grid;gap:1.25rem;margin:2rem 0}
+.vf-item{border:1px solid var(--kleur-lijn);border-radius:var(--radius);background:var(--kleur-achtergrond);padding:1.1rem 1.4rem;margin:0;min-width:0}
+.vf-item legend{font-weight:800;padding:0 .4rem;display:flex;align-items:center;gap:.5rem}
+.vf-nr{display:inline-grid;place-items:center;width:1.8rem;height:1.8rem;border-radius:50%;background:var(--kleur-ink);color:var(--kleur-achtergrond);font-size:.9rem}
+.vf-vraag{margin:.25rem 0 0}
+.vf-waar{font-size:.92rem;color:var(--kleur-muted);margin:.75rem 0}
+.vf-keuze{display:grid;gap:.3rem;margin:.6rem 0}
+.vf-keuze-kop{font-weight:700;font-size:.92rem}
+.vf-opties{display:flex;flex-wrap:wrap;gap:.35rem 1.1rem}
+.vf-opties input{accent-color:var(--kleur-accent)}
+.vf-uitleg{display:grid;gap:.3rem;font-weight:700;font-size:.92rem;margin-top:.6rem}
+.vf-uitleg textarea{font:inherit;font-weight:400;padding:.6rem .75rem;border:1px solid var(--kleur-lijn);border-radius:var(--radius-klein);background:var(--kleur-vlak);color:var(--kleur-ink);width:100%;box-sizing:border-box}
+.vf-acties{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;margin:0 0 2rem}
+
+/* Worksheets (/training/oefeningen/werkbladen/): the if-then card */
+.ad-kaart{display:grid;gap:1rem;margin:1.25rem 0;padding:1.25rem 1.5rem;border:1px solid var(--kleur-lijn);border-radius:var(--radius);background:var(--kleur-achtergrond)}
+.ad-rij{display:grid;gap:.3rem;font-weight:700;font-size:.92rem}
+.ad-rij--twee,.ad-rij--voornemen{grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+@media (max-width:700px){.ad-rij--twee,.ad-rij--voornemen{grid-template-columns:minmax(0,1fr)}}
+.ad-rij label{display:grid;gap:.3rem}
+.ad-kaart input,.ad-kaart select,.ad-kaart textarea{font:inherit;font-weight:400;padding:.6rem .75rem;border:1px solid var(--kleur-lijn);border-radius:var(--radius-klein);background:var(--kleur-vlak);color:var(--kleur-ink);width:100%;box-sizing:border-box}
+/* Print only the card */
+@media print{
+  body *{visibility:hidden}
+  .ad-kaart,.ad-kaart *{visibility:visible}
+  .ad-kaart{position:absolute;left:0;top:0;width:100%;border:0}
+  .ad-kaart::before{content:"Mijn als-dan-kaart";display:block;font-size:1.4rem;font-weight:800;margin-bottom:.5rem}
+}

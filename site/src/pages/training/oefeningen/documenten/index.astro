@@ -1,0 +1,55 @@
+---
+// Documents page: step 2 of the context ladder ("you choose the documents").
+// Participants put these documents in their own AI and ask questions about
+// them. Because the documents are made up, this is safe to do in the AI they
+// use at work, if their employer allows it.
+import Base from '../../../../layouts/TrainingLayout.astro';
+import Vlak from '../../../../components/Vlak.astro';
+import { getDocuments } from '../../../../documents';
+
+const docs = getDocuments();
+const href = (slug: string) => `/training/oefeningen/documenten/${slug}.txt`;
+---
+<Base title="Documenten van Vezelvriend" description="Bedrijfsdocumenten van het oefenbedrijf, om in je eigen AI te zetten (trede 2 van de contexttrap).">
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Trede 2 · jij kiest de documenten</p>
+      <h1>Documenten van Vezelvriend</h1>
+      <p class="lead">Dit zijn de documenten van het oefenbedrijf: van de klantenservice, verkoop, het productteam en de directie. Zet ze in je AI en stel er vragen over. Zo oefen je trede 2 in de AI die je zelf gebruikt, zonder echte werkgegevens.</p>
+    </div>
+  </section>
+
+  <section class="sectie">
+    <div class="wrap">
+      <Vlak columns={3} items={docs.map((d) => ({ label: d.kind, title: d.title, text: d.about, href: href(d.slug), linkLabel: 'Bekijk of download' }))} />
+    </div>
+  </section>
+
+  <section class="sectie sectie--vlak">
+    <div class="wrap prose">
+      <h2>Opdracht</h2>
+      <ol>
+        <li><strong>Mag het?</strong> Ga na of je deze verzonnen documenten in de AI van je werk mag zetten. Twijfel je, gebruik dan de AI van Vezelvriend of vraag de trainer.</li>
+        <li><strong>Kies je bronnen.</strong> Download de documenten die je nodig denkt te hebben (rechtsklik op de link en kies "Opslaan"). Voeg ze toe aan een nieuw gesprek, of zet ze in een vaste werkruimte zoals een notebook.</li>
+        <li><strong>Stel deze vragen,</strong> één voor één:
+          <ul>
+            <li>Een klant met een storing in de straat vraagt hoe snel het is opgelost. Wat zeg ik?</li>
+            <li>Wat kost Vezel 500 per maand?</li>
+            <li>Wat moet er volgens US-014 gebouwd worden?</li>
+            <li>Mag ik het telefoonnummer van een klant in de AI zetten als dat handig is?</li>
+          </ul>
+        </li>
+        <li><strong>Vraag bij elk antwoord de bron:</strong> welk document, welk stuk, en van wanneer?</li>
+        <li><strong>Controleer:</strong> zijn je bronnen actueel en eenduidig? Vergelijk de antwoorden met de <a href="/">website</a>, <a href="/pakket/">Pakket samenstellen</a> en het <a href="/klantbeeld/">Klantbeeld</a>.</li>
+      </ol>
+      <h2>Nabespreken</h2>
+      <ul>
+        <li>Welke documenten koos je, en waarom? Welke liet je weg?</li>
+        <li>Spraken de documenten elkaar tegen? Merkte de AI dat op, of koos hij stilletjes één antwoord?</li>
+        <li>Was elk document nog actueel? Hoe kon je dat zien?</li>
+        <li>Wat betekent dit voor de documenten die jij op je werk aan een AI geeft?</li>
+      </ul>
+      <p><a href="/training/oefeningen/contexttrap/#trede-2">Terug naar trede 2 van de contexttrap</a></p>
+    </div>
+  </section>
+</Base>

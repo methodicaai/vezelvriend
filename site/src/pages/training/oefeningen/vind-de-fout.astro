@@ -1,0 +1,125 @@
+---
+// "Vind de fout": eight AI answers about Vezelvriend customers. Some are
+// right, some contain one mistake. Participants first estimate how sure they
+// are, then check the answer against the sources (Klantbeeld, beslisboom,
+// documents). "Eerst schatten, dan meten", from Methodica training 01.
+//
+// The answer key is NOT on this page (nor in the script): it lives in the
+// trainer material. Choices are kept in the participant's own browser only.
+import Base from '../../../layouts/TrainingLayout.astro';
+
+interface Item { nr: number; customer: string; question: string; answer: string; where: string }
+const items: Item[] = [
+  {
+    nr: 1, customer: 'Mevrouw J. Jansen (K-1002)', question: 'Mevrouw Jansen belt: "Mijn internet is traag en valt soms weg." Wat is de volgende stap?',
+    answer: 'De laatste meting (10:09) laat zien dat het modem online is, met een actieve sessie en 941 Mbit/s. Dat is ruim boven 70% van haar Vezel 1000. Volgens stap 3 van de beslisboom ligt het waarschijnlijk aan de wifi of de router in huis. Plan geen monteur in. Vraag of het via een netwerkkabel wel goed werkt. In september had ze ook al slechte wifi op zolder.',
+    where: 'Klantbeeld: Techniek en Klanthistorie op adres; de beslisboom',
+  },
+  {
+    nr: 2, customer: 'De heer Y. El Amrani (K-1003)', question: 'De heer El Amrani belt: "Ik heb geen internet." Wat is de volgende stap?',
+    answer: 'Het modem is offline en heeft geen sessie. Andere aansluitingen in de straat werken gewoon, dus het probleem zit alleen bij deze klant. Volgens stap 4 van de beslisboom: herstart het modem op afstand. Werkt het daarna nog steeds niet, plan dan een monteur in.',
+    where: 'Klantbeeld: Techniek (Modem controleren); de beslisboom',
+  },
+  {
+    nr: 3, customer: 'Familie Bakker (K-1004)', question: 'Familie Bakker belt terug: "We hebben nog steeds geen internet." Wat is de volgende stap?',
+    answer: 'Het modem is sinds 09:58 offline. De herstart op afstand van 10:05 is mislukt, en ook de meting van 10:07 is offline. Andere aansluitingen in de straat werken. Volgens stap 4 van de beslisboom plan je nu een monteur in. Volgens de servicevoorwaarden komt de monteur binnen 2 werkdagen.',
+    where: 'Klantbeeld: Techniek; de beslisboom; de servicevoorwaarden',
+  },
+  {
+    nr: 4, customer: 'Bloemenhuis Lente (K-1005)', question: 'Bloemenhuis Lente belt: "Onze kassa en pinautomaat vallen steeds weg." Wat is de volgende stap?',
+    answer: 'De verbinding is wisselend: 11 keer onderbroken in het afgelopen uur. Het modem heeft de nieuwste firmware (4.2.1), dus de firmware kan de oorzaak niet zijn. Op 10 oktober hielp een herstart op afstand. Herstart het modem daarom opnieuw op afstand.',
+    where: 'Klantbeeld: Techniek en Klanthistorie op adres; de beslisboom',
+  },
+  {
+    nr: 5, customer: 'Familie De Wit (K-1001)', question: 'Familie De Wit vraagt: "Krijgen wij geld terug voor deze storing?"',
+    answer: 'Er is een storing in de straat sinds 08:40 (ticket INC-2026-0412). Volgens artikel 3.1 van de servicevoorwaarden krijgt een klant automatisch een creditnota als een storing langer dan 12 uur duurt. Zeg tegen de klant dat de creditnota vanzelf komt als de storing vanavond nog niet is opgelost.',
+    where: 'De servicevoorwaarden (documentenmap); Klantbeeld: Techniek',
+  },
+  {
+    nr: 6, customer: 'Een nieuwe klant', question: 'Een klant vraagt: "Wat betaal ik voor Vezel 1000 met 2 extra wifi-punten, bij een contract van 1 jaar?"',
+    answer: 'De eerste 3 maanden betaal je € 34,25 per maand: je krijgt 50% korting op het hele pakket (€ 68,50). Daarna betaal je € 68,50 per maand. Eenmalig betaal je € 25 aansluitkosten.',
+    where: 'Pakket samenstellen op de website (prijzen en voorwaarden)',
+  },
+  {
+    nr: 7, customer: 'De heer Y. El Amrani (K-1003)', question: 'Een collega vraagt: "Heeft De heer El Amrani eerder contact met ons gehad?"',
+    answer: 'Eén keer: op 21 augustus 2026 via de chat, omdat hij zijn wifi-wachtwoord kwijt was. De medewerker heeft uitgelegd waar het wachtwoord op het modem staat. Er staan geen open tickets.',
+    where: 'Klantbeeld: Klanthistorie op adres',
+  },
+  {
+    nr: 8, customer: 'Familie Bakker (K-1004)', question: 'Een collega vraagt: "Maak een afspraak voor de monteur bij Familie Bakker."',
+    answer: 'Ik heb een voorstel: de monteur komt maandag 19 oktober tussen 8:00 en 12:00 uur. De klant gaf aan dat ze maandagochtend thuis is. Bevestig de afspraak per sms op het nummer dat bij de klant bekend is.',
+    where: 'Klantbeeld: Klanthistorie op adres; de servicevoorwaarden',
+  },
+];
+---
+<Base title="Vind de fout" description="Acht AI-antwoorden over klanten van Vezelvriend. Welke kloppen, en waar zit de fout?">
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Proef · eerst schatten, dan meten</p>
+      <h1>Vind de fout</h1>
+      <p class="lead">Hieronder staan acht antwoorden van een AI aan medewerkers van Vezelvriend. Sommige kloppen. Andere bevatten één fout. Je ziet het niet aan de toon: ze klinken allemaal even zeker.</p>
+    </div>
+  </section>
+
+  <section class="sectie">
+    <div class="wrap">
+      <div class="trap-let-op">
+        <p><strong>Zo werk je:</strong></p>
+        <ol>
+          <li><strong>Eerst schatten:</strong> lees het antwoord en kies hoe zeker je bent dat het klopt, zonder iets op te zoeken.</li>
+          <li><strong>Dan meten:</strong> controleer het antwoord in de bron die erbij staat (het <a href="/klantbeeld/">Klantbeeld</a>, de beslisboom, de documenten of de website).</li>
+          <li>Kies of het klopt, en schrijf op wat er niet klopt en hoe je dat vond.</li>
+        </ol>
+        <p>Let op deze vijf dingen: <strong>juist</strong> (kloppen de feiten?), <strong>redenering</strong> (volgt de conclusie uit de feiten?), <strong>bron</strong> (staat het echt in de bron die genoemd wordt?), <strong>regels</strong> (is er een regel of voorwaarde vergeten?) en <strong>aannames</strong> (heeft de AI iets verzonnen wat nergens staat?).</p>
+        <p class="code-klein">Je keuzes blijven alleen in deze browser. Er gaat niets naar de trainer, tenzij je zelf op "Kopieer mijn antwoorden" klikt.</p>
+      </div>
+
+      <form id="vindfout" class="vf-lijst" novalidate>
+        {items.map((it) => (
+          <fieldset class="vf-item" data-nr={it.nr}>
+            <legend><span class="vf-nr">{it.nr}</span> {it.customer}</legend>
+            <p class="vf-vraag"><strong>Vraag:</strong> {it.question}</p>
+            <p class="trap-sub">Antwoord van de AI</p>
+            <p class="trap-antwoord">{it.answer}</p>
+            <p class="vf-waar"><strong>Controleer in:</strong> {it.where}</p>
+
+            <div class="vf-keuze">
+              <span class="vf-keuze-kop">1. Hoe zeker ben je dat dit klopt, vóór je controleert?</span>
+              <span class="vf-opties">
+                {['zeker niet', 'twijfel', 'vrij zeker', 'heel zeker'].map((v) => (
+                  <label><input type="radio" name={`schatting-${it.nr}`} value={v}> {v}</label>
+                ))}
+              </span>
+            </div>
+            <div class="vf-keuze">
+              <span class="vf-keuze-kop">2. Na het controleren: klopt het antwoord?</span>
+              <span class="vf-opties">
+                {['klopt', 'klopt niet', 'weet ik niet'].map((v) => (
+                  <label><input type="radio" name={`oordeel-${it.nr}`} value={v}> {v}</label>
+                ))}
+              </span>
+            </div>
+            <label class="vf-uitleg">3. Wat klopt er niet, en hoe heb je dat gecontroleerd?
+              <textarea name={`uitleg-${it.nr}`} rows="2" maxlength="600"></textarea>
+            </label>
+          </fieldset>
+        ))}
+      </form>
+
+      <div class="vf-acties">
+        <button type="button" class="prompt-knop" id="vf-kopieer">Kopieer mijn antwoorden</button>
+        <button type="button" class="prompt-knop prompt-knop--rand" id="vf-wis">Alles wissen</button>
+        <p class="prompt-status" id="vf-status" aria-live="polite"></p>
+      </div>
+
+      <h2>Nabespreken</h2>
+      <ul class="prose">
+        <li>Bij welke antwoorden was je vooraf zeker, en klopte dat na het controleren?</li>
+        <li>Welke fout had je zonder de bron nooit gevonden?</li>
+        <li>Welke van de vijf soorten fouten kom je in je eigen werk het vaakst tegen?</li>
+        <li>Wat ga je voortaan altijd even nakijken, voordat je een AI-antwoord gebruikt?</li>
+      </ul>
+    </div>
+  </section>
+  <script is:inline src="/assets/vindfout.js" defer></script>
+</Base>

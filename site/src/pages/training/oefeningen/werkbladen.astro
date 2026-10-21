@@ -1,0 +1,91 @@
+---
+// Worksheets for module C (your own task in your own AI) and the close of the
+// training: the prompt frame as a fill-in prompt, and the if-then card.
+// Both are meant for the participant's own AI and own notes, so the prompt is
+// copy-only and the card is kept in this browser only.
+import Base from '../../../layouts/TrainingLayout.astro';
+
+// The fill-in prompt: {{...}} are the fields that prompt.js turns into boxes.
+const FRAME = "Rol: {{wie ben jij, en voor wie is het antwoord bedoeld?}}\n\nSituatie: {{wat speelt er? Noem ook de datum als die ertoe doet}}\n\nContext: {{alleen de gegevens die de uitkomst bepalen; geen namen of persoonsgegevens als dat niet nodig is}}\n\nWerkwijze en bronnen: {{welke regels of documenten gelden, en welke is leidend?}}\n\nVraag: {{wat wil je precies weten of laten maken?}}\n\nVorm: {{bijvoorbeeld: maximaal 10 regels, als lijst, in gewone taal}}\n\nNoem bij elk punt waar je het op baseert. Zeg wat je niet zeker weet of niet kon vinden. Verzin niets.";
+---
+<Base title="Werkbladen" description="Het promptkader en de als-dan-kaart, voor je eigen taak in je eigen AI.">
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Op je eigen trede</p>
+      <h1>Werkbladen</h1>
+      <p class="lead">Nu doe je het op je eigen werk: een echte taak, in de AI die je mag gebruiken. Gebruik het promptkader om je vraag op te bouwen, en sluit af met je als-dan-kaart.</p>
+    </div>
+  </section>
+
+  <section class="sectie">
+    <div class="wrap">
+      <h2>1. Het promptkader</h2>
+      <p class="prose">Zeven onderdelen. Niet elke vraag heeft ze allemaal nodig, maar sla er nooit zomaar een over. Vul de vakken in en kopieer de prompt naar je eigen AI. Plak geen gegevens die je werkgever niet in een AI toestaat.</p>
+      <div class="tabel-vak">
+        <table class="tabel">
+          <thead><tr><th>Onderdeel</th><th>Waarom</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Rol</strong></td><td>De AI weet niet wie je bent en voor wie het antwoord is.</td></tr>
+            <tr><td><strong>Situatie en tijd</strong></td><td>De AI weet niet wat er speelt, en ook niet welke dag het is.</td></tr>
+            <tr><td><strong>Context</strong></td><td>Alleen wat de uitkomst bepaalt. Te veel is ook fout.</td></tr>
+            <tr><td><strong>Werkwijze en bronnen</strong></td><td>Jullie regels, en welk document leidend is.</td></tr>
+            <tr><td><strong>Vraag</strong></td><td>Eén duidelijke vraag of taak.</td></tr>
+            <tr><td><strong>Vorm</strong></td><td>Hoe lang, welke opbouw, voor wie.</td></tr>
+            <tr><td><strong>Controle</strong></td><td>Laat de AI zeggen waar het vandaan komt en wat hij niet zeker weet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Promptkader om in te vullen</h3>
+      <pre class="prompt-alleen-kopieren"><code class="language-prompt">{FRAME}</code></pre>
+
+      <h3>Na het antwoord: de controlevraag van jouw trede</h3>
+      <div class="tabel-vak">
+        <table class="tabel">
+          <thead><tr><th>Trede</th><th>Controlevraag</th></tr></thead>
+          <tbody>
+            <tr><td>0 Kale vraag</td><td>Klopt het feitelijk?</td></tr>
+            <tr><td>1 Zelf plakken</td><td>Heb ik de juiste gegevens, en niet te veel?</td></tr>
+            <tr><td>2 Jij kiest de documenten</td><td>Zijn mijn bronnen actueel en eenduidig?</td></tr>
+            <tr><td>3 De AI zoekt zelf</td><td>Waar komt dit vandaan, en mocht de AI dat zien?</td></tr>
+            <tr><td>4 Koppelingen en agents</td><td>Wat gaat de koppeling doen, en wie keurt het goed?</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sectie sectie--vlak">
+    <div class="wrap">
+      <h2>2. Mijn als-dan-kaart</h2>
+      <p class="prose">Een voornemen werkt beter als het concreet is: <em>als</em> ik in een bepaalde situatie ben, <em>dan</em> doe ik iets bepaalds. Schrijf er twee of drie op voor je eigen werk. Na vier weken kijken we samen hoe het ging.</p>
+      <p class="code-klein">Wat je hier invult, blijft alleen in deze browser. Print de kaart of kopieer hem, zodat je hem bewaart.</p>
+
+      <form id="alsdan" class="ad-kaart" novalidate>
+        <div class="ad-rij ad-rij--twee">
+          <label>Mijn AI op het werk<input name="tool" maxlength="80" placeholder="Bijvoorbeeld: Microsoft 365 Copilot"></label>
+          <label>Mijn trede<select name="trede">
+            <option value="">Kies</option>
+            <option>0 Kale vraag</option><option>1 Zelf plakken</option><option>2 Jij kiest de documenten</option>
+            <option>3 De AI zoekt zelf</option><option>4 Koppelingen en agents</option>
+          </select></label>
+        </div>
+        {[1, 2, 3].map((n) => (
+          <div class="ad-rij ad-rij--voornemen">
+            <label>Als ik…<textarea name={`als-${n}`} rows="2" maxlength="300" placeholder={n === 1 ? 'een overleg laat samenvatten tot actiepunten' : ''}></textarea></label>
+            <label>…dan…<textarea name={`dan-${n}`} rows="2" maxlength="300" placeholder={n === 1 ? 'vraag ik de AI de bron per actiepunt te noemen en controleer ik er twee' : ''}></textarea></label>
+          </div>
+        ))}
+        <label class="ad-rij">Wat ik bewust zelf blijf doen, zonder AI<textarea name="zelf" rows="2" maxlength="300"></textarea></label>
+        <label class="ad-rij">Wat ik nog moet uitzoeken (bijvoorbeeld bij IT: wat mag hier?)<textarea name="uitzoeken" rows="2" maxlength="300"></textarea></label>
+      </form>
+      <div class="vf-acties">
+        <button type="button" class="prompt-knop" id="ad-print">Print mijn kaart</button>
+        <button type="button" class="prompt-knop prompt-knop--rand" id="ad-kopieer">Kopieer mijn kaart</button>
+        <p class="prompt-status" id="ad-status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+  <script is:inline src="/assets/prompt.js" defer></script>
+  <script is:inline src="/assets/werkbladen.js" defer></script>
+</Base>

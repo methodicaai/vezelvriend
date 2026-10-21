@@ -2,18 +2,27 @@
 // (file page). External script because the Content-Security-Policy forbids
 // inline scripts.
 (() => {
+  // Copy with a fallback: some browsers (or embedded views) refuse the clipboard API.
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; } catch {
+      const area = document.createElement('textarea');
+      area.className = 'prompt-verborgen';
+      area.value = text;
+      document.body.append(area);
+      area.select();
+      const ok = document.execCommand('copy');
+      area.remove();
+      return ok;
+    }
+  }
+
   // ---- copy a whole file, to paste it into an AI as context
   const file = document.getElementById('code-bestand');
   const copy = document.getElementById('code-kopieer');
   if (file && copy) {
     copy.addEventListener('click', async () => {
       const text = [...file.querySelectorAll('code')].map((c) => c.textContent).join('\n');
-      try {
-        await navigator.clipboard.writeText(`Bestand: ${file.dataset.path}\n\n${text}\n`);
-        copy.textContent = 'Gekopieerd';
-      } catch {
-        copy.textContent = 'Kopiëren lukte niet';
-      }
+      copy.textContent = (await copyText(`Bestand: ${file.dataset.path}\n\n${text}\n`)) ? 'Gekopieerd' : 'Kopiëren lukte niet';
       setTimeout(() => { copy.textContent = 'Kopieer bestand'; }, 2000);
     });
   }

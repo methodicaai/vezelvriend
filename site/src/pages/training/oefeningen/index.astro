@@ -14,10 +14,14 @@ const exercises = getExercises();
   </section>
   <section class="sectie">
     <div class="wrap">
-      <div class="trap-let-op">
-        <p><strong>Begin met de contexttrap.</strong> Vijf manieren waarop context bij een AI komt, met per trede een zwak en een sterk voorbeeld en de vraag waarmee je de uitkomst controleert.</p>
-        <p><a href="/training/oefeningen/contexttrap/">Naar de contexttrap</a></p>
-      </div>
+      <h2>Eerst dit</h2>
+      <Vlak columns={2} items={[
+        { label: 'Begin hier', title: 'De contexttrap', text: 'Vijf manieren waarop context bij een AI komt, met per trede een zwak en een sterk voorbeeld en de controlevraag.', href: '/training/oefeningen/contexttrap/', linkLabel: 'Naar de contexttrap' },
+        { label: 'Proef', title: 'Vind de fout', text: 'Acht AI-antwoorden over klanten. Eerst schatten hoe zeker je bent, dan controleren in de bron.', href: '/training/oefeningen/vind-de-fout/', linkLabel: 'Naar de proef' },
+        { label: 'Trede 2', title: 'Documenten van Vezelvriend', text: 'De bedrijfsdocumenten om in je eigen AI te zetten en er vragen over te stellen.', href: '/training/oefeningen/documenten/', linkLabel: 'Naar de documenten' },
+        { label: 'Eigen werk', title: 'Werkbladen', text: 'Het promptkader voor je eigen taak, en je als-dan-kaart om mee af te sluiten.', href: '/training/oefeningen/werkbladen/', linkLabel: 'Naar de werkbladen' },
+      ]} />
+      <h2>Oefeningen</h2>
       {exercises.length === 0 && <p>De oefeningen komen binnenkort.</p>}
       <Vlak items={exercises.map((ex) => ({
         label: `Oefening ${ex.number} · ${ex.role}`,

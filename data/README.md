@@ -11,6 +11,8 @@ Alle data in deze map is **verzonnen** voor de training. Vezelvriend B.V. bestaa
 | `documents/call-guide.json` | Gespreksleidraad | Klantbeeld |
 | `documents/service-document.md` | Servicevoorwaarden | Oefening 3 |
 | `documents/customer-story-de-wit.md` | Klantverhaal | Oefening 3 |
+| `documents/ai-policy.md` | AI-beleid van Vezelvriend | Documentenmap, "Wat mag hier?" |
+| `documents/rates-2025.md` | Tarievenoverzicht | Documentenmap (trede 2) |
 | `backlog/` | User stories in ontwikkeling | Oefening 3 |
 | `mail/` | Mails binnen het bedrijf | Oefening 3 |
 | `accounting/open-items.csv` | Export uit de boekhouding (apart systeem) | Oefening 6 |
