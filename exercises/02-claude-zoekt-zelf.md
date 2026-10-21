@@ -1,12 +1,12 @@
 ---
-number: 7
+number: 2
 title: Claude zoekt zelf
 role: Iedereen
 summary: Dezelfde klantvraag als in oefening 1, maar nu haalt Claude alles zelf op via een koppeling met de systemen. Wat wint je, en wat komt er ongevraagd mee?
 koppeling: aan
 ---
 
-# Oefening 7: Claude zoekt zelf
+# Oefening 2: Claude zoekt zelf
 
 ## Doel
 

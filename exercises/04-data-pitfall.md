@@ -1,11 +1,11 @@
 ---
-number: 5
+number: 4
 title: Wat mag er naar de AI?
 role: Iedereen
 summary: Vijftig logregels van de servicedesk. Wat geef je aan de AI, wat vervang je, en wat meld je aan het bronteam?
 ---
 
-# Oefening 5: Wat mag er naar de AI?
+# Oefening 4: Wat mag er naar de AI?
 
 ## Doel
 

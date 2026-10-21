@@ -1,11 +1,11 @@
 ---
-number: 4
+number: 6
 title: Testcases uit de beslisboom
 role: Tester
 summary: Leid met AI testcases af uit de beslisboom, inclusief randgevallen, en toets ze aan het Klantsysteem en het Klantbeeld.
 ---
 
-# Oefening 4: Testcases uit de beslisboom
+# Oefening 6: Testcases uit de beslisboom
 
 ## Doel
 

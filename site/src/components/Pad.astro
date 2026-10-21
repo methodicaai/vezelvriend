@@ -1,0 +1,39 @@
+---
+// Winding path in the methodica.nl style (section type "pad" on methodica.nl/trainingen/):
+// numbered stepping stones on a dotted trail through the middle, cards alternating
+// left and right. On narrow screens the trail moves to the left edge.
+// Styling: .pad-* in public/assets/site.css; /assets/pad.js lights the trail up on scroll.
+interface Link { href: string; label: string; }
+// A step has one link (href + linkLabel) or several (links), like "Naar behoefte" on methodica.nl.
+interface Step { label?: string; title: string; text?: string; href?: string; linkLabel?: string; links?: Link[]; }
+interface Props { steps: Step[]; }
+const { steps } = Astro.props;
+const linksOf = (step: Step): Link[] => step.links ?? (step.href ? [{ href: step.href, label: step.linkLabel ?? 'Lees verder' }] : []);
+// The trail bends right on odd steps and left on even steps, towards the card.
+const curve = (i: number) => i % 2 === 0
+  ? 'M50 0 C50 18 82 26 82 50 S50 82 50 100'
+  : 'M50 0 C50 18 18 26 18 50 S50 82 50 100';
+---
+<ol class="pad-lijst">
+  {steps.map((step, i) => (
+    <li class="pad-stap">
+      <div class="pad-spoor" aria-hidden="true">
+        <span class="pad-steen">{i + 1}</span>
+        <span class="spoor-basis"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d={curve(i)} /></svg></span>
+        <span class="spoor-licht"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d={curve(i)} /></svg></span>
+      </div>
+      <div class="pad-kaart">
+        {step.label && <p class="label">{step.label}</p>}
+        <h3>{step.title}</h3>
+        {step.text && <p>{step.text}</p>}
+        {linksOf(step).length > 0 && (
+          <p class="links">
+            {linksOf(step).map((l) => (
+              <a href={l.href}>{l.label}<span aria-hidden="true"> →</span></a>
+            ))}
+          </p>
+        )}
+      </div>
+    </li>
+  ))}
+</ol>

@@ -1,4 +1,4 @@
-# Oefening 03-business-analyst (trainerversie)
+# Oefening 06-tester (trainerversie)
 
 ## Wat je wilt zien
 ## Antwoorden

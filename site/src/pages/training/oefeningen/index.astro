@@ -1,37 +1,40 @@
 ---
 import Base from '../../../layouts/TrainingLayout.astro';
-import Vlak from '../../../components/Vlak.astro';
+import Pad from '../../../components/Pad.astro';
 import { getExercises } from '../../../exercises';
 const exercises = getExercises();
+const byNumber = (n: number) => exercises.find((ex) => ex.number === n);
+const ex1 = byNumber(1);
+const ex2 = byNumber(2);
+
+const link = (n: number, label: string) => ({ href: `/training/oefeningen/${byNumber(n)?.slug}/`, label });
+
+// The route follows the context ladder (contexttrap) from step 0 to 4, then the
+// test, depth (for everyone, then per role) and the participant's own work last.
+const route = [
+  { label: 'Begin hier', title: 'De contexttrap', text: 'Vijf manieren waarop context bij een AI komt, elk met een zwak en een sterk voorbeeld.', href: '/training/oefeningen/contexttrap/', linkLabel: 'Naar de contexttrap' },
+  { label: 'Trede 0 en 1', title: ex1?.title ?? 'Context maakt het verschil', text: 'Dezelfde klantvraag, eerst kaal en daarna met gegevens die je zelf kiest.', href: `/training/oefeningen/${ex1?.slug}/`, linkLabel: 'Naar oefening 1' },
+  { label: 'Trede 2', title: 'Jij kiest de documenten', text: 'Zet de documenten van Vezelvriend in je AI en vraag ernaar. Kloppen je bronnen?', href: '/training/oefeningen/documenten/', linkLabel: 'Naar de documenten' },
+  { label: 'Trede 3 en 4', title: ex2?.title ?? 'Claude zoekt zelf', text: 'Claude haalt alles zelf op via een koppeling. Wat komt er ongevraagd mee?', href: `/training/oefeningen/${ex2?.slug}/`, linkLabel: 'Naar oefening 2' },
+  { label: 'Proef', title: 'Vind de fout', text: 'Acht AI-antwoorden. Eerst schatten hoe zeker je bent, dan controleren in de bron.', href: '/training/oefeningen/vind-de-fout/', linkLabel: 'Naar de proef' },
+  { label: 'Voor iedereen', title: 'Grenzen en data', text: 'Regels voor wat de AI mag adviseren, en kijken wat je wel en niet aan de AI geeft.', links: [link(3, 'Oefening 3: guardrails'), link(4, 'Oefening 4: wat mag naar de AI?')] },
+  { label: 'Naar je rol', title: 'Verdiepen in je eigen vak', text: 'Analisten maken een user story, testers testcases. SQL en de code zijn voor allebei.', links: [link(5, 'Oefening 5: analist'), link(6, 'Oefening 6: tester'), link(7, 'Oefening 7: SQL'), { href: '/training/oefeningen/code/', label: 'De code' }] },
+  { label: 'Eigen werk', title: 'Werkbladen', text: 'Het promptkader voor je eigen taak, en je als-dan-kaart om mee af te sluiten.', href: '/training/oefeningen/werkbladen/', linkLabel: 'Naar de werkbladen' },
+];
 ---
 <Base title="Oefeningen">
   <section class="hero">
     <div class="hero-inner">
       <p class="eyebrow">Oefeningen</p>
       <h1>Oefenen met context, grenzen en data</h1>
-      <p class="lead">Elke oefening heeft een doel, een opdracht, een voorbeeldprompt zonder en met context, en een reflectievraag. Antwoorden staan er bewust niet bij: die bespreek je met de trainer.</p>
+      <p class="lead">Volg de route van boven naar beneden, of doe wat de trainer aangeeft. Antwoorden staan er bewust niet bij: die bespreek je met de trainer. Naast elke oefening staat een chat met Claude; je kunt hem ook <a href="/training/oefeningen/claude/">los openen</a>.</p>
     </div>
   </section>
   <section class="sectie">
     <div class="wrap">
-      <h2>Eerst dit</h2>
-      <Vlak columns={3} items={[
-        { label: 'Begin hier', title: 'De contexttrap', text: 'Vijf manieren waarop context bij een AI komt, met per trede een zwak en een sterk voorbeeld en de controlevraag.', href: '/training/oefeningen/contexttrap/', linkLabel: 'Naar de contexttrap' },
-        { label: 'Proef', title: 'Vind de fout', text: 'Acht AI-antwoorden over klanten. Eerst schatten hoe zeker je bent, dan controleren in de bron.', href: '/training/oefeningen/vind-de-fout/', linkLabel: 'Naar de proef' },
-        { label: 'Trede 2', title: 'Documenten van Vezelvriend', text: 'De bedrijfsdocumenten om in je eigen AI te zetten en er vragen over te stellen.', href: '/training/oefeningen/documenten/', linkLabel: 'Naar de documenten' },
-        { label: 'Eigen werk', title: 'Werkbladen', text: 'Het promptkader voor je eigen taak, en je als-dan-kaart om mee af te sluiten.', href: '/training/oefeningen/werkbladen/', linkLabel: 'Naar de werkbladen' },
-        { label: 'Chat', title: 'Claude voor Vezelvriend', text: 'Chat met Claude in een eigen tabblad: zonder koppeling, of met een koppeling waarmee Claude zelf in de systemen zoekt.', href: '/training/oefeningen/claude/', linkLabel: 'Open de chat' },
-        { label: 'Code', title: 'De code van Vezelvriend', text: 'Lees hoe de website en de systemen echt werken. Wat belooft een pagina, en wat controleert de code?', href: '/training/oefeningen/code/', linkLabel: 'Naar de code' },
-      ]} />
-      <h2>Oefeningen</h2>
-      {exercises.length === 0 && <p>De oefeningen komen binnenkort.</p>}
-      <Vlak items={exercises.map((ex) => ({
-        label: `Oefening ${ex.number} · ${ex.role}`,
-        title: ex.title,
-        text: ex.summary,
-        href: `/training/oefeningen/${ex.slug}/`,
-        linkLabel: 'Naar de oefening',
-      }))} />
+      <h2>De route</h2>
+      <Pad steps={route} />
     </div>
   </section>
+  <script is:inline src="/assets/pad.js" defer></script>
 </Base>

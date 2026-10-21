@@ -1,11 +1,11 @@
 ---
-number: 6
+number: 7
 title: SQL schrijven met AI
 role: Businessanalist en tester
 summary: Laat de AI SQL schrijven voor vragen over de klantdata. Met en zonder het schema als context. Klopt de uitkomst?
 ---
 
-# Oefening 6: SQL schrijven met AI
+# Oefening 7: SQL schrijven met AI
 
 ## Doel
 

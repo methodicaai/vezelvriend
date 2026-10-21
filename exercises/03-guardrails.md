@@ -1,11 +1,11 @@
 ---
-number: 2
+number: 3
 title: Guardrails schrijven
 role: Iedereen
 summary: Schrijf regels voor wat de AI wel en niet mag adviseren, en test ze op de vijf klanten.
 ---
 
-# Oefening 2: Guardrails schrijven
+# Oefening 3: Guardrails schrijven
 
 ## Doel
 

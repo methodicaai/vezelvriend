@@ -9,13 +9,13 @@ Alle data in deze map is **verzonnen** voor de training. Vezelvriend B.V. bestaa
 | `schema.sql` | Tabellen en kolommen van de database | Klantsysteem, Klantbeeld |
 | `seed/*.json` | De inhoud van de database, één bestand per tabel | Klantsysteem, Klantbeeld |
 | `documents/call-guide.json` | Gespreksleidraad | Klantbeeld |
-| `documents/service-document.md` | Servicevoorwaarden | Oefening 3 |
-| `documents/customer-story-de-wit.md` | Klantverhaal | Oefening 3 |
+| `documents/service-document.md` | Servicevoorwaarden | Oefening 5 |
+| `documents/customer-story-de-wit.md` | Klantverhaal | Oefening 5 |
 | `documents/ai-policy.md` | AI-beleid van Vezelvriend | Documentenmap, "Wat mag hier?" |
 | `documents/rates-2025.md` | Tarievenoverzicht | Documentenmap (trede 2) |
-| `backlog/` | User stories in ontwikkeling | Oefening 3 |
-| `mail/` | Mails binnen het bedrijf | Oefening 3 |
-| `accounting/open-items.csv` | Export uit de boekhouding (apart systeem) | Oefening 6 |
+| `backlog/` | User stories in ontwikkeling | Oefening 5 |
+| `mail/` | Mails binnen het bedrijf | Oefening 5 |
+| `accounting/open-items.csv` | Export uit de boekhouding (apart systeem) | Oefening 7 |
 
 **Gedeelde sleutels:** `customer_id` (K-....) en `address_id` (A-....) verbinden alle tabellen en bestanden.
 

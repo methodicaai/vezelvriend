@@ -271,7 +271,7 @@ const facts = [
   `| 5 Escaleren | Bloemenhuis Lente (K-1005) | ${fmt('A-2010')} |`, '',
   `Offline door de storing in ${outageStreet}: ${measurements.filter((m) => m.status === 'offline').length} modems in totaal offline.`,
   `Verouderde firmware: ${modems.filter((m) => m.firmware !== world.latestFirmware).length} modems.`,
-  `Actieve klanten met een ander actief record op hetzelfde adres: zie de SQL-vraag in oefening 6.`,
+  `Actieve klanten met een ander actief record op hetzelfde adres: zie de SQL-vraag in oefening 7.`,
 ];
 fs.writeFileSync(path.join(ROOT, 'data', 'generated', 'world-facts.md'), facts.join('\n') + '\n');
 console.log(facts.join('\n'));

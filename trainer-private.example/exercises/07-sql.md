@@ -1,4 +1,4 @@
-# Oefening 04-tester (trainerversie)
+# Oefening 07-sql (trainerversie)
 
 ## Wat je wilt zien
 ## Antwoorden
