@@ -181,3 +181,24 @@ h3{margin:0 0 .5rem;line-height:1.3}
 .inlog-form .knop{justify-self:start;cursor:pointer;font:inherit;font-weight:700;margin-top:.4rem}
 .inlog-melding{color:#B3261E;font-weight:700;margin:0;min-height:1.2em}
 @media (prefers-color-scheme:dark){.inlog-melding{color:#F2B8B5}}
+
+/* Code browser (/training/oefeningen/code/) */
+.code-zoek{margin:2rem 0;padding:1.25rem 1.5rem;border:1px solid var(--kleur-lijn);border-radius:var(--radius);background:var(--kleur-vlak)}
+.code-zoek input{display:block;width:100%;box-sizing:border-box;margin-top:.5rem;font:inherit;padding:.7rem .9rem;border:1px solid var(--kleur-lijn);border-radius:var(--radius-klein);background:var(--kleur-achtergrond);color:var(--kleur-ink)}
+.code-klein{font-size:.88rem;color:var(--kleur-muted);margin:.25rem 0}
+.code-resultaten{list-style:none;margin:.5rem 0 0;padding:0;max-height:28rem;overflow-y:auto}
+.code-resultaten li{display:grid;gap:.15rem;padding:.45rem 0;border-bottom:1px solid var(--kleur-lijn)}
+.code-resultaten code,.code-regels code{font-family:Consolas,'Cascadia Mono','Courier New',monospace;font-size:.85rem}
+.code-resultaten code{color:var(--kleur-muted);white-space:pre-wrap;word-break:break-word}
+.code-map{margin:1.25rem 0}
+.code-map-naam{font-family:Consolas,'Cascadia Mono','Courier New',monospace;font-size:1rem;margin:0}
+.code-lijst{margin:.35rem 0 0;padding-left:1.2rem}
+.code-lijst li{margin:.15rem 0}
+.code-titel{font-family:Consolas,'Cascadia Mono','Courier New',monospace;font-size:clamp(1.4rem,4vw,2rem);word-break:break-all}
+.code-balk{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.5rem;margin:1rem 0 .5rem}
+.code-knop{display:inline-block;font:inherit;font-size:.9rem;padding:.4rem .8rem;border:1px solid var(--kleur-lijn);border-radius:var(--radius-klein);background:var(--kleur-vlak);color:var(--kleur-ink);cursor:pointer;text-decoration:none;margin-left:.25rem}
+.code-regels{list-style:none;margin:0;padding:.75rem 0;background:var(--kleur-donker);color:#EEF2F6;border-radius:12px;overflow-x:auto;font-size:.85rem;line-height:1.55}
+.code-regels li{display:flex;min-width:max-content;padding-right:1rem}
+.code-regels li:target{background:rgba(255,214,102,.18)}
+.code-nr{flex:0 0 3.5rem;text-align:right;padding-right:1rem;color:#7F8C99;text-decoration:none;user-select:none;font-family:Consolas,'Cascadia Mono','Courier New',monospace}
+.code-regels code{white-space:pre;color:inherit;background:none}

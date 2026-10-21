@@ -1,0 +1,31 @@
+---
+// One source file with line numbers. Every line has an anchor (#L12), so a
+// participant can point to a line in a finding or a prompt.
+import Base from '../../../../layouts/TrainingLayout.astro';
+import { FOLDERS, GITHUB, getCodeFiles } from '../../../../code';
+
+export function getStaticPaths() {
+  return getCodeFiles().map((file) => ({ params: { path: file.path }, props: { file } }));
+}
+const { file } = Astro.props;
+---
+<Base title={file.path} description={`Broncode van Vezelvriend: ${file.path}`}>
+  <section class="sectie">
+    <div class="wrap">
+      <p><a href="/training/oefeningen/code/">Alle code</a>{file.folder && <> · {file.folder}</>}</p>
+      <h1 class="code-titel">{file.name}</h1>
+      {FOLDERS[file.folder] && <p class="code-klein">{FOLDERS[file.folder]}</p>}
+      <div class="code-balk">
+        <span class="code-klein">{file.path} · {file.lines.length} regels</span>
+        <span>
+          <button type="button" class="code-knop" id="code-kopieer">Kopieer bestand</button>
+          <a class="code-knop" href={GITHUB + file.path}>Op GitHub</a>
+        </span>
+      </div>
+      <ol class="code-regels" id="code-bestand" data-path={file.path}>
+        {file.lines.map((line, i) => <li id={`L${i + 1}`}><a class="code-nr" href={`#L${i + 1}`} aria-hidden="true" tabindex="-1">{i + 1}</a><code>{line || ' '}</code></li>)}
+      </ol>
+    </div>
+  </section>
+  <script is:inline src="/assets/code.js" defer></script>
+</Base>

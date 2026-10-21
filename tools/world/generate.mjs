@@ -1,6 +1,6 @@
 // Generates the Vezelvriend world for the city district in data/generated/bag.json:
 // real BAG addresses, 2000 fictional customers, network segments per street,
-// an outage, and the five training scenarios with all their pitfalls.
+// an outage, and the five training scenarios (details: trainer material).
 //
 //   node tools/world/generate.mjs [--customers 2000]
 //
@@ -73,8 +73,8 @@ for (const street of [...byStreet.keys()].sort()) {
 // ------------------------------------------------------------ scenario streets
 
 // Five streets with enough addresses for a believable neighbourhood, in a
-// stable "random" order. Street 3 needs an address with a house letter for
-// the address-spelling pitfall (V-007).
+// stable "random" order. Street 3 needs an address with a house letter
+// (scenario 3 lives at one).
 const candidates = shuffle([...byStreet.entries()].filter(([, list]) => list.length >= 25).map(([s]) => s).sort());
 if (candidates.length < 5) throw new Error('Te weinig straten met minstens 25 adressen in deze wijk.');
 const withLetter = candidates.filter((s) => byStreet.get(s).some((a) => a.house_letter && !a.house_suffix));
@@ -154,7 +154,7 @@ for (let i = 0; i < extra; i++) {
   const n = 3000 + i;
   const id = `K-${n}`;
   const active = chance(ACTIVE_SHARE);
-  // A former customer usually lived where someone else now lives (pitfall V-002 everywhere).
+  // A former customer usually lived where someone else now lives.
   const reuse = !active && activeAddresses.length > 0 && chance(0.6);
   const a = reuse ? pick(activeAddresses) : free.pop();
   if (!a) break;
@@ -216,7 +216,7 @@ for (let i = 0; i < extra; i++) {
 // ------------------------------------------------------------ network map, area status, accounting
 
 // The network map is kept by network management and mostly matches the
-// address. For the El Amrani scenario it is spelled differently (pitfall V-007).
+// address, with exceptions described in the trainer material.
 function variantSpelling(street, suffix, number) {
   const s = street.match(/(laan|straat|weg|singel|plein|kade|dijk|markt|steeg|hof)$/i)
     ? street.replace(/(laan|straat|weg|singel|plein|kade|dijk|markt|steeg|hof)$/i, 's$1') : `${street}s`;
@@ -236,7 +236,7 @@ const areaStatus = segments.map((seg) => seg === segmentRename['S-KABEL']
   : { network_segment: seg, status: 'normaal', since: null, ticket_id: null, description: null });
 
 // Accounting export (a separate system): matches the customer system,
-// except for Bloemenhuis Lente, where the credit note is missing (pitfall V-005).
+// with exceptions described in the trainer material.
 const accounting = ['customer_id;customer_name;invoice_id;invoice_date;amount_eur;status'];
 for (const c of customers.filter((x) => x.open_balance_eur > 0)) {
   if (c.customer_id === 'K-1005') {

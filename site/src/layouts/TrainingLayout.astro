@@ -14,11 +14,14 @@ const nav = [
   { href: '/training/bedrijf/', label: 'Het bedrijf Vezelvriend' },
   { href: '/training/systemen/', label: 'De systemen' },
   { href: '/training/oefeningen/', label: 'Oefeningen' },
+  { href: '/training/oefeningen/code/', label: 'Code' },
   { href: '/training/over-methodica/', label: 'Over Methodica' },
   { href: '/', label: 'Naar vezelvriend.nl' },
 ];
 const path = Astro.url.pathname;
-const isCurrent = (href: string) => href === '/' ? false : href === '/training/' ? path === '/training/' : path.startsWith(href);
+const CODE = '/training/oefeningen/code/';
+const isCurrent = (href: string) => href === '/' ? false : href === '/training/' ? path === '/training/'
+  : href === '/training/oefeningen/' ? path.startsWith(href) && !path.startsWith(CODE) : path.startsWith(href);
 ---
 <!doctype html>
 <html lang="nl">

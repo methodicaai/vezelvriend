@@ -9,6 +9,10 @@ COPY config ./config
 COPY exercises ./exercises
 COPY docs ./docs
 COPY data ./data
+# Read by the code browser on the training site (/training/oefeningen/code/).
+COPY README.md docker-compose.yml ./
+COPY systems ./systems
+COPY gateway ./gateway
 # Use the generated world (real BAG addresses, 2000 customers) when it exists on
 # this machine: it is made by tools/world/ and never committed to git.
 RUN if [ -d data/generated/seed ]; then cp data/generated/seed/*.json data/seed/ &&       if [ -f data/generated/accounting/open-items.csv ]; then cp data/generated/accounting/open-items.csv data/accounting/; fi; fi

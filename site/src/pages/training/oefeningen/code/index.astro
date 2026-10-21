@@ -1,0 +1,48 @@
+---
+// Code browser: overview with search. Under /training/oefeningen/ so the same
+// participant login protects it (nginx auth_request).
+import Base from '../../../../layouts/TrainingLayout.astro';
+import Vlak from '../../../../components/Vlak.astro';
+import { FOLDERS, GITHUB, getCodeFiles } from '../../../../code';
+
+const files = getCodeFiles();
+const folders = [...new Set(files.map((f) => f.folder))];
+const href = (path: string) => `/training/oefeningen/code/${path}/`;
+---
+<Base title="De code van Vezelvriend" description="Lees de broncode van de website en de systemen van het oefenbedrijf.">
+  <section class="sectie">
+    <div class="wrap">
+      <p><a href="/training/oefeningen/">Alle oefeningen</a></p>
+      <h1>De code van Vezelvriend</h1>
+      <p class="lead">Hier lees je hoe de website en de systemen echt werken. Wat belooft een pagina, en wat controleert de code? Kopieer een bestand en geef het mee aan je AI: code is ook context.</p>
+
+      <Vlak columns={3} items={[
+        { label: 'Bestellen', title: 'Wat er gebeurt als je bestelt', text: 'De adrescheck, de regels en de prijsberekening aan de kant van de server.', href: href('systems/mijn/server.js'), linkLabel: 'systems/mijn/server.js' },
+        { label: 'Regels', title: 'Producten en voorwaarden', text: 'Snelheden, extra\'s, looptijden en de voorwaarden van de pakket-samensteller.', href: href('data/products.json'), linkLabel: 'data/products.json' },
+        { label: 'Database', title: 'Het databaseschema', text: 'Alle tabellen en kolommen. Handig bij de SQL-oefening.', href: href('data/schema.sql'), linkLabel: 'data/schema.sql' },
+      ]} />
+
+      <div class="code-zoek">
+        <label for="code-zoekveld"><strong>Zoek in alle code</strong></label>
+        <input id="code-zoekveld" type="search" placeholder="Bijvoorbeeld: iban, postcode, korting" autocomplete="off" data-index="/training/oefeningen/code/zoek.json">
+        <p id="code-zoek-status" class="code-klein" aria-live="polite"></p>
+        <ol id="code-zoek-resultaten" class="code-resultaten"></ol>
+      </div>
+
+      <h2>Alle bestanden</h2>
+      {folders.map((folder) => (
+        <div class="code-map">
+          <h3 class="code-map-naam">{folder || '(hoofdmap)'}</h3>
+          {FOLDERS[folder] && <p class="code-klein">{FOLDERS[folder]}</p>}
+          <ul class="code-lijst">
+            {files.filter((f) => f.folder === folder).map((f) => (
+              <li><a href={href(f.path)}>{f.name}</a> <span class="code-klein">{f.lines.length} regels</span></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <p class="code-klein">Dezelfde code staat ook op <a href={GITHUB.replace('/blob/main/', '')}>GitHub</a>. Niet hier: de klantgegevens (die bekijk je in het Klantsysteem) en de hulpmiddelen waarmee de oefenwereld wordt gebouwd.</p>
+    </div>
+  </section>
+  <script is:inline src="/assets/code.js" defer></script>
+</Base>

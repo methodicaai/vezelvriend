@@ -1,0 +1,9 @@
+# Never send secrets, trainer material or local clutter into a Docker build.
+.env
+.env.*
+!.env.example
+.git
+trainer-private
+**/node_modules
+site/dist
+site/.astro
