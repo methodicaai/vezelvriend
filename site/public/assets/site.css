@@ -322,3 +322,19 @@ details.reflectie[open] summary{margin-bottom:.5rem}
 
 /* Exercise with the ladder explanation above it: the hero carries the title. */
 .markdown--zonder-titel > h1:first-child { display: none; }
+
+/* Traffic-light surfaces (Vlak tone): soft background, stronger first cell, label in the tone. */
+.vlak--groen{--toon-bg:#EAF4EE;--toon-accent:#D2E9DA;--toon-lijn:#C3DFCC;--toon-tekst:#2E7D4F}
+.vlak--oranje{--toon-bg:#FDF2E2;--toon-accent:#F8E0BC;--toon-lijn:#EED3A9;--toon-tekst:#8A5200}
+.vlak--rood{--toon-bg:#FBEBE9;--toon-accent:#F4D2CE;--toon-lijn:#EBC2BD;--toon-tekst:#B3261E}
+@media (prefers-color-scheme:dark){
+  .vlak--groen{--toon-bg:#15281D;--toon-accent:#1D3828;--toon-lijn:#2B4A37;--toon-tekst:#8FD3A8}
+  .vlak--oranje{--toon-bg:#2B2213;--toon-accent:#3A2D17;--toon-lijn:#4F3D20;--toon-tekst:#F0B865}
+  .vlak--rood{--toon-bg:#331B19;--toon-accent:#452320;--toon-lijn:#5C302C;--toon-tekst:#F2B8B5}
+}
+.vlak--groen,.vlak--oranje,.vlak--rood{background:var(--toon-bg);border-color:var(--toon-lijn)}
+:is(.vlak--groen,.vlak--oranje,.vlak--rood) .vlak-vak{box-shadow:1px 0 0 var(--toon-lijn),0 1px 0 var(--toon-lijn)}
+:is(.vlak--groen,.vlak--oranje,.vlak--rood) .vlak-vak--accent{background:var(--toon-accent)}
+:is(.vlak--groen,.vlak--oranje,.vlak--rood) .vlak-label{color:var(--toon-tekst)}
+.kop-toon{display:inline-block;width:.7em;height:.7em;border-radius:50%;margin-right:.4em;vertical-align:.08em}
+.kop-toon--groen{background:#2E7D4F}.kop-toon--oranje{background:#E09B30}.kop-toon--rood{background:#B3261E}

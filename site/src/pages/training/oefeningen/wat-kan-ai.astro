@@ -19,16 +19,26 @@ const tasks = [
   { label: 'Leren', title: 'Jezelf iets eigen maken', text: 'Een nieuw begrip of vakgebied laten uitleggen, met voorbeelden. Jezelf laten overhoren. Een Excel-formule stap voor stap laten uitleggen.' },
 ];
 
-// Where AI is weak depends on what it has to work with: the same task can be
-// fine with the right context or tool, and risky without. Sources (22-10-2026):
-// BCG/Harvard "jagged frontier" field experiment, Autoriteit Persoonsgegevens
-// on data leaks via AI chatbots, EU AI Act (employment decisions are high-risk).
-const goodOrRisky = [
-  { topic: 'Feiten en bronnen', good: 'je de documenten meegeeft, of hij zelf zoekt, en hij bij elk antwoord de bron noemt.', risky: 'hij het uit zijn geheugen haalt. Dan verzint hij soms een wetsartikel, citaat of link die niet bestaat, en dat klinkt overtuigend.' },
-  { topic: 'Rekenen en tellen', good: 'hij met een rekenhulpmiddel werkt, zoals code of Excel, en je kunt zien hoe hij rekent.', risky: 'hij uit het hoofd rekent of telt in een lang antwoord: rijen tellen, totalen van veel getallen, percentages halverwege een tekst.' },
-  { topic: 'Wat bij jullie geldt', good: 'je de regels, de werkwijze en de laatste stand meegeeft.', risky: 'hij moet raden hoe jullie werken, of wat de laatste stand is.' },
-  { topic: 'Lange stukken', good: 'je vraagt naar een bepaald onderdeel, met de vindplaats erbij.', risky: 'hij alles in één keer moet samenvatten. Dan mist hij dingen, vaak in het midden.' },
-  { topic: 'Controleren', good: 'jij het nakijkt in de bron.', risky: 'je hem vraagt "weet je het zeker?". Dan krijg je vaak alleen een andere toon, geen controle.' },
+// Traffic light, as in step 4b. Orange: where AI is weak depends on what it
+// has to work with; the same task can go well with the right context or tool,
+// and wrong without. Sources (22-10-2026): BCG/Harvard "jagged frontier" field
+// experiment, Autoriteit Persoonsgegevens on data leaks via AI chatbots, EU AI
+// Act (decisions about employees are high-risk).
+const orange = [
+  { label: 'Feiten en bronnen', title: 'Uit je bronnen, niet uit zijn hoofd', text: 'Goed als je de documenten meegeeft en hij bij elk antwoord de bron noemt. Riskant als hij het uit zijn geheugen haalt: dan verzint hij soms een wetsartikel, citaat of link die niet bestaat.' },
+  { label: 'Rekenen en tellen', title: 'Met een rekenhulpmiddel', text: 'Goed als hij rekent met code of Excel en je ziet hoe. Riskant als hij uit het hoofd rekent of telt in een lang antwoord: rijen tellen, totalen, percentages halverwege een tekst.' },
+  { label: 'Wat bij jullie geldt', title: 'Hij kent jullie niet', text: 'Goed als je de regels, de werkwijze en de laatste stand meegeeft. Riskant als hij moet raden hoe jullie werken of wat de laatste stand is.' },
+  { label: 'Lange stukken', title: 'Vraag gericht', text: 'Goed als je vraagt naar een bepaald onderdeel, met de vindplaats erbij. Riskant als hij alles in één keer moet samenvatten: dan mist hij dingen, vaak in het midden.' },
+  { label: 'Controleren', title: 'Jij kijkt na, niet hij', text: 'Goed als jij het nakijkt in de bron. Riskant als je vraagt "weet je het zeker?": dan krijg je vaak alleen een andere toon, geen controle.' },
+  { label: 'Het lastige', title: 'Je ziet het niet altijd', text: 'Een fout antwoord klinkt net zo zeker als een goed antwoord. Daarom kijk je bij oranje altijd na.' },
+];
+const red = [
+  { label: 'Over mensen', title: 'Beslissen over mensen', text: 'Selectie, beoordeling of ontslag laat je niet aan AI over. De Europese AI-wet noemt dat hoog risico.' },
+  { label: 'Gegevens', title: 'Persoonsgegevens zonder afspraak', text: 'Geen persoonsgegevens of vertrouwelijke stukken, tenzij je werkgever dat heeft afgesproken. De Autoriteit Persoonsgegevens krijgt steeds meer meldingen van datalekken op deze manier.' },
+  { label: 'Acties', title: 'Zelf versturen of uitvoeren', text: 'Geen mail aan een klant, betaling of opdracht zonder dat iemand meekijkt.' },
+  { label: 'Advies', title: 'Het laatste woord', text: 'Bij juridisch, medisch of financieel advies beslist een deskundige, niet de AI.' },
+  { label: 'Gesprekken', title: 'Een mens nodig', text: 'Slecht nieuws of een conflict breng je zelf. Helpen voorbereiden mag wel.' },
+  { label: 'Controle', title: 'Werk dat je niet kunt nakijken', text: 'Kun jij de uitkomst niet beoordelen? Dan weet je ook niet of hij klopt.' },
 ];
 ---
 <Base title="Wat kan AI voor jou?" description="Ontdek welke taken in je werk geschikt zijn voor AI, en welke AI jij mag gebruiken.">
@@ -42,40 +52,29 @@ const goodOrRisky = [
 
   <section class="sectie">
     <div class="wrap">
-      <h2>Taken die zich goed lenen</h2>
-      <p class="prose">AI is sterk in werk met tekst: lezen, samenvatten, ordenen, herschrijven, ideeën bedenken. Hieronder staan voorbeelden. Streep in gedachten aan wat je vaak doet.</p>
-      <Vlak columns={3} items={tasks} />
+      <h2><span class="kop-toon kop-toon--groen" aria-hidden="true"></span>Groen licht</h2>
+      <p class="prose">Hier is AI sterk in: werk met tekst, zoals lezen, samenvatten, ordenen, herschrijven en ideeën bedenken. Streep in gedachten aan wat je vaak doet.</p>
+      <Vlak columns={3} items={tasks} tone="groen" />
     </div>
   </section>
 
   <section class="sectie sectie--vlak">
     <div class="wrap">
-      <h2>Waar AI juist niet goed in is</h2>
-      <p class="prose">Of AI ergens goed in is, hangt vaak af van wat je meegeeft. Dezelfde taak kan goed gaan of mis, afhankelijk van de context en de hulpmiddelen die de AI heeft.</p>
-      <div class="tabel-vak">
-        <table class="tabel">
-          <thead><tr><th>Onderwerp</th><th>Goed, als…</th><th>Riskant, als…</th></tr></thead>
-          <tbody>
-            {goodOrRisky.map((r) => <tr><td><strong>{r.topic}</strong></td><td>{r.good}</td><td>{r.risky}</td></tr>)}
-          </tbody>
-        </table>
-      </div>
-      <div class="prose">
-        <h3>Laat AI dit niet doen</h3>
-        <ul>
-          <li><strong>Beslissen over mensen,</strong> zoals selectie, beoordeling of ontslag. De Europese AI-wet noemt dat hoog risico.</li>
-          <li><strong>Persoonsgegevens of vertrouwelijke stukken verwerken</strong> zonder dat je werkgever dat heeft afgesproken. De Autoriteit Persoonsgegevens krijgt steeds meer meldingen van datalekken op deze manier.</li>
-          <li><strong>Zelf iets versturen of uitvoeren</strong> zonder dat iemand meekijkt, zoals een mail aan een klant of een betaling.</li>
-          <li><strong>Het laatste woord hebben</strong> bij juridisch, medisch of financieel advies.</li>
-          <li><strong>Gesprekken voeren die een mens vragen,</strong> zoals slecht nieuws of een conflict. Helpen voorbereiden mag wel.</li>
-          <li><strong>Werk doen waarvan jij de uitkomst niet kunt controleren.</strong></li>
-        </ul>
-        <p><strong>Het lastige:</strong> je ziet het verschil niet altijd. Een fout antwoord klinkt net zo zeker als een goed antwoord.</p>
-      </div>
+      <h2><span class="kop-toon kop-toon--oranje" aria-hidden="true"></span>Oranje: kijk uit</h2>
+      <p class="prose">Hier kan het goed gaan of mis. Dat hangt af van wat je meegeeft en welke hulpmiddelen de AI heeft.</p>
+      <Vlak columns={3} items={orange} tone="oranje" />
     </div>
   </section>
 
   <section class="sectie">
+    <div class="wrap">
+      <h2><span class="kop-toon kop-toon--rood" aria-hidden="true"></span>Rood: hier niet aan beginnen</h2>
+      <p class="prose">Dit laat je niet aan AI over, hoe goed het antwoord ook klinkt.</p>
+      <Vlak columns={3} items={red} tone="rood" />
+    </div>
+  </section>
+
+  <section class="sectie sectie--vlak">
     <div class="wrap prose">
       <h2>Zo kies je je eerste taak</h2>
       <p>Een goede eerste taak voldoet aan vier dingen:</p>
@@ -92,7 +91,7 @@ const goodOrRisky = [
     </div>
   </section>
 
-  <section class="sectie sectie--vlak">
+  <section class="sectie">
     <div class="wrap">
       <h2>Welke AI heb jij, en wat kan die?</h2>
       <p class="prose">Plak deze vragen in de AI die je op je werk gebruikt. Ze testen niets en zoeken niets op: de AI vertelt alleen wat hij kan. Twijfel je of je dit mag vragen? Kijk dan in het menu van je AI, of vraag het je IT-afdeling.</p>

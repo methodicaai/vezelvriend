@@ -6,12 +6,14 @@
 // House rule: every card grid on a new page uses this component, so all
 // pages look the same. Styling: .vlak in public/assets/site.css (training)
 // and public/vv/vezelvriend.css (company website).
+// tone: a traffic-light colour for the whole surface (training only), e.g. for
+// "green: AI does this well", "orange: watch out", "red: do not".
 interface Item { label?: string; title: string; text?: string; href?: string; linkLabel?: string; }
-interface Props { items: Item[]; columns?: 2 | 3; }
-const { items, columns = 2 } = Astro.props;
+interface Props { items: Item[]; columns?: 2 | 3; tone?: 'groen' | 'oranje' | 'rood'; }
+const { items, columns = 2, tone } = Astro.props;
 const external = (href: string) => href.startsWith('http');
 ---
-<div class={`vlak vlak--${columns}`}>
+<div class={`vlak vlak--${columns}${tone ? ` vlak--${tone}` : ''}`}>
   {items.map((item, i) => (
     <div class={`vlak-vak${i === 0 ? ' vlak-vak--accent' : ''}`}>
       {item.label && <p class="vlak-label">{item.label}</p>}
