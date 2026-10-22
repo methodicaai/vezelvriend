@@ -229,7 +229,10 @@ for (let i = 0; i < extra; i++) {
 // The network map is kept by network management and mostly matches the
 // address, with exceptions described in the trainer material.
 function variantSpelling(street, suffix, number) {
-  const s = street.match(/(laan|straat|weg|singel|plein|kade|dijk|markt|steeg|hof)$/i)
+  // Torenstraat -> Torensstraat; a street that already has the s loses it: Stationsweg -> Stationweg.
+  const s = /s(laan|straat|weg|singel|plein|kade|dijk|markt|steeg|hof)$/i.test(street)
+    ? street.replace(/s(laan|straat|weg|singel|plein|kade|dijk|markt|steeg|hof)$/i, '$1')
+    : street.match(/(laan|straat|weg|singel|plein|kade|dijk|markt|steeg|hof)$/i)
     ? street.replace(/(laan|straat|weg|singel|plein|kade|dijk|markt|steeg|hof)$/i, 's$1') : `${street}s`;
   return `${s} ${number}-${(suffix ?? 'a').toLowerCase()}`;
 }
