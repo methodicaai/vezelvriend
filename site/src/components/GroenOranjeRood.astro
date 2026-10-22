@@ -1,0 +1,75 @@
+---
+// "Groen, oranje of rood": part 2 of step 5 (shown below the notes exercise by
+// [slug].astro). The sorting test of Methodica training 3, rebuilt for
+// Vezelvriend. Participants first choose for twelve situations whether they may
+// do it, lock their choices, and then see what the (fictional) AI policy of
+// Vezelvriend says, with the article. Two situations are not covered by the
+// policy on purpose: there "weet ik niet" is the honest answer, and the lesson is
+// that a policy has gaps. The answers come from a public document (the AI policy
+// in the documents folder), so they may be in the page; /assets/sorteer.js only
+// shows them after the participant locked their choices, and colours every
+// situation green (same as the policy) or red (different).
+
+type Answer = 'groen' | 'oranje' | 'rood' | 'open';
+interface Situation { text: string; answer: Answer; why: string }
+const situations: Situation[] = [
+  { text: 'De servicevoorwaarden van de website laten herschrijven in gewone taal, in de AI-assistent van Vezelvriend.', answer: 'groen', why: 'Een openbare tekst, in de AI die Vezelvriend heeft ingericht (1.1). Wel zelf controleren voordat je hem gebruikt (3.1).' },
+  { text: 'Een klantmail met naam en klantnummer in een gratis chatbot plakken om snel een antwoord te laten schrijven.', answer: 'rood', why: 'Een openbare AI-dienst gebruik je alleen zonder gegevens van klanten (1.2).' },
+  { text: 'Dezelfde klantmail, zonder naam en klantnummer, in de AI-assistent van Vezelvriend plakken.', answer: 'oranje', why: 'Mag, met alleen de gegevens die nodig zijn (2.1). Het antwoord controleer je voordat het naar de klant gaat (3.1).' },
+  { text: 'De servicedesknotities van gisteren in de AI-assistent plakken voor een overzicht. Er staan twee rekeningnummers in.', answer: 'rood', why: 'Rekeningnummers geef je nooit mee (2.2). Haal ze eruit, meld het aan de eigenaar van de notities (2.3), en dan mag het wel.' },
+  { text: 'Een notitie laten samenvatten waarin staat dat een klant thuis medische apparatuur aan het internet heeft.', answer: 'rood', why: 'Gegevens over de gezondheid van klanten geef je nooit mee (2.2). Laat dat deel weg.' },
+  { text: 'Een tekst die je met AI hebt geschreven doorsturen naar een collega.', answer: 'oranje', why: 'Mag, als je erbij zegt dat hij met AI is gemaakt (3.2) en je hem eerst hebt gecontroleerd (3.1).' },
+  { text: 'De AI zelf een creditnota laten versturen naar een klant die lang zonder internet zat.', answer: 'rood', why: 'Een AI neemt geen beslissingen over klanten. Een creditnota wordt altijd door een medewerker goedgekeurd (3.3). Een concept laten maken mag wel.' },
+  { text: 'Een monteursverzoek van de AI goedkeuren, nadat je de meting en de beslisboom hebt gecontroleerd.', answer: 'groen', why: 'Precies zoals het hoort: de AI stelt voor, een medewerker beslist (3.3).' },
+  { text: 'Een collega koppelt zelf een AI aan het Klantsysteem, zodat hij niet meer hoeft te kopiëren.', answer: 'rood', why: 'Een koppeling wordt vooraf goedgekeurd door de eigenaar van het systeem en door Ruben, en er staat vast wat hij mag ophalen en doen (4.1 en 4.2).' },
+  { text: 'De AI-assistent zelf in je mailbox laten zoeken naar wat je vorige maand met een klant hebt afgesproken.', answer: 'open', why: 'Het beleid zegt niets over een AI die zelf in je mail zoekt. Het is ook geen koppeling met een systeem. Vraag het Ruben, en vraag of het in het beleid komt.' },
+  { text: 'Een opname van een klantgesprek laten uitschrijven door de AI-assistent.', answer: 'open', why: 'Het beleid noemt opnames niet. Weet de klant dat het gesprek is opgenomen? Waar blijft de opname? Vraag het Ruben.' },
+  { text: 'Een gratis chatbot vragen wat het verschil is tussen een modem en een wifi-router.', answer: 'groen', why: 'Een algemene vraag zonder gegevens van klanten, collega\'s of Vezelvriend (1.2).' },
+];
+const label: Record<Answer, string> = { groen: 'Groen', oranje: 'Oranje', rood: 'Rood', open: 'Staat niet in het beleid' };
+---
+<section class="gor" id="groen-oranje-rood">
+  <h2>Deel 2: groen, oranje of rood</h2>
+  <p>Twaalf situaties met AI bij Vezelvriend. Kies per situatie wat jij denkt dat mag. Doe het alleen en zoek niets op: het gaat om wat je nu denkt. Daarna zie je wat het AI-beleid van Vezelvriend zegt: groen is hetzelfde als het beleid, rood is anders.</p>
+  <p><strong>Groen</strong> = mag. <strong>Oranje</strong> = mag alleen onder voorwaarden. <strong>Rood</strong> = mag niet. <strong>Weet ik niet</strong> = ik zou het moeten navragen. Ook dat is een goed antwoord.</p>
+  <form id="sorteer" class="vf-lijst" novalidate>
+    {situations.map((s, i) => (
+      <fieldset class="vf-item" data-nr={i + 1} data-antwoord={s.answer}>
+        <legend><span class="vf-nr">{i + 1}</span> Situatie <span class="vf-uitslag"></span></legend>
+        <p class="vf-vraag">{s.text}</p>
+        <div class="vf-keuze">
+          <span class="vf-opties">
+            {['groen', 'oranje', 'rood', 'weet ik niet'].map((v) => (
+              <label><input type="radio" name={`keuze-${i + 1}`} value={v}> {v === 'weet ik niet' ? 'weet ik niet' : v[0].toUpperCase() + v.slice(1)}</label>
+            ))}
+          </span>
+        </div>
+        <div class="vf-antwoord" hidden>
+          <p class="vf-antwoord-kop">Het AI-beleid: {label[s.answer]}</p>
+          <p>{s.why}</p>
+        </div>
+      </fieldset>
+    ))}
+  </form>
+  <p class="prompt-status" id="sorteer-status" aria-live="polite"></p>
+  <p><button type="button" class="prompt-knop" id="sorteer-vast" disabled>Leg mijn keuzes vast en toon het beleid</button>
+    <button type="button" class="prompt-knop prompt-knop--rand" id="sorteer-wis">Opnieuw beginnen</button></p>
+
+  <div class="kort-uitslag" id="sorteer-uitslag" hidden aria-live="polite">
+    <h3>Jouw vergelijking</h3>
+    <p id="sorteer-tekst"></p>
+    <p>Lees het hele <a href="/training/oefeningen/documenten/ai-beleid/" target="_blank" rel="noopener">AI-beleid van Vezelvriend</a>. Wat zou jij erin willen toevoegen?</p>
+  </div>
+
+  <h3>Op je eigen werk</h3>
+  <p>Zoek het AI-beleid van je eigen organisatie op, of vraag erom. Neem drie situaties van hierboven en zoek het antwoord voor jouw organisatie. Waar staat het niet in? Bij wie kun je dat navragen?</p>
+  <details class="reflectie">
+    <summary>Klaar met deel 2? Open de reflectievragen</summary>
+    <ul>
+      <li>Waar was jij soepeler dan het beleid? Werk je daar nu misschien al op een manier die niet mag?</li>
+      <li>Waar was jij strenger? Laat je daar iets liggen wat wel mag?</li>
+      <li>Hoe vaak koos je "weet ik niet"? Bij welke situaties had het beleid zelf geen antwoord?</li>
+      <li>Kende je het AI-beleid van je eigen organisatie al? Waar staat het?</li>
+    </ul>
+  </details>
+</section>

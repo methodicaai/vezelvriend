@@ -11,7 +11,7 @@ De omgeving groeit stap voor stap: eerst wat in elke oefening nodig is, later de
 | 4 | **Backlog**: user stories en acceptatiecriteria, voor de oefeningen van businessanalisten | Gepland |
 | 5 | **De rest**: boekhouding, marketing, planning van monteurs, dashboard | Later |
 | 6 | **Echte adressen** uit de BAG via PDOK, per stad en wijk in te stellen | Klaar |
-| 7 | **Koppeling (MCP)**: de systemen gekoppeld aan Claude (chat op de site, stap 6) en via MCP aan een eigen AI-app, zodat deelnemers het verschil zien tussen zelf context geven en de AI zelf laten ophalen | Klaar |
+| 7 | **Koppeling (MCP)**: de systemen gekoppeld aan Claude (chat op de site, stap 7) en via MCP aan een eigen AI-app, zodat deelnemers het verschil zien tussen zelf context geven en de AI zelf laten ophalen | Klaar |
 
 ## Bewust nog niet
 

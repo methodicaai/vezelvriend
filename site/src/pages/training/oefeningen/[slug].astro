@@ -3,47 +3,39 @@
 // screens. The chat is fixed per exercise: without connection (the participant
 // chooses the context, as in most exercises) or with connection (frontmatter
 // "koppeling: aan", where Claude looks things up itself).
-// Frontmatter "trede" puts the explanation of those ladder steps above the
-// exercise: first the explanation, then do it yourself.
+// At the top: step, the name of the ladder step it practises, and the time
+// (src/route.ts). At the bottom: the button to the next step.
+// Exercise files that are part of a page with choices (step 9) get no page here.
 import Base from '../../../layouts/TrainingLayout.astro';
-import Trede from '../../../components/Trede.astro';
+import Volgende from '../../../components/Volgende.astro';
+import GroenOranjeRood from '../../../components/GroenOranjeRood.astro';
 import { getExercises } from '../../../exercises';
+import { headLine } from '../../../route';
 
 export function getStaticPaths() {
-  return getExercises().map((ex) => ({ params: { slug: ex.slug }, props: { ex } }));
+  return getExercises().filter((ex) => !ex.part).map((ex) => ({ params: { slug: ex.slug }, props: { ex } }));
 }
 const { ex } = Astro.props;
 const { Content } = ex;
 ---
 <Base title={ex.title} description={ex.summary}>
   <link rel="stylesheet" href="/assets/chat.css">
-  {ex.ladder.length > 0 && (
-    <>
-      <section class="hero">
-        <div class="hero-inner">
-          <p class="eyebrow"><a href="/training/oefeningen/">Terug naar de route</a> · Stap {ex.step}</p>
-          <h1>{ex.title}</h1>
-          <p class="lead">Eerst de uitleg: {ex.ladder.length > 1 ? `trede ${ex.ladder.slice(0, -1).join(', ')} en ${ex.ladder.at(-1)}` : `trede ${ex.ladder[0]}`} van de <a href="/training/oefeningen/contexttrap/">contexttrap</a>, met een zwak en een sterk voorbeeld. Daarna <a href="#zelf-doen">doe je het zelf</a>.</p>
-        </div>
-      </section>
-      {ex.ladder.map((nr, i) => <Trede nr={nr} tinted={i % 2 === 0} />)}
-    </>
-  )}
   <section class="sectie" id="zelf-doen">
     <div class="wrap oef-met-chat">
       <div class="oef-tekst">
-        {ex.ladder.length > 0
-          ? <p class="label">Stap {ex.step} · nu zelf doen</p>
-          : <><p><a href="/training/oefeningen/">Terug naar de route</a></p><p class="label">Stap {ex.step} · {ex.role}</p></>}
-        {/* With the explanation above, the hero already carries the title: hide the h1 of the Markdown. */}
-        <article class={`markdown${ex.ladder.length > 0 ? ' markdown--zonder-titel' : ''}`}><Content /></article>
+        <p class="eyebrow">{headLine(ex.step)}</p>
+        <article class="markdown"><Content /></article>
+        {ex.step === 5 && <GroenOranjeRood />}
+        <Volgende nr={ex.step} />
       </div>
       <aside class="oef-chat" aria-label={ex.connection ? 'Chat met Claude, met koppeling' : 'Chat met Claude, zonder koppeling'}>
         <div class="vc" data-vorm="paneel" data-context={ex.slug} data-assistent={ex.connection ? 'koppeling' : 'zonder'}></div>
       </aside>
-      {/* External files: no inline scripts (CSP). prompt.js turns the prompt blocks into fill-in fields. */}
+      {/* External files: no inline scripts (CSP). mijnklant.js first: prompt.js uses it for the own customer. */}
+      <script is:inline src="/assets/mijnklant.js" defer></script>
       <script is:inline src="/assets/prompt.js" defer></script>
       <script is:inline src="/assets/chat.js" defer></script>
+      {ex.step === 5 && <script is:inline src="/assets/sorteer.js" defer></script>}
     </div>
   </section>
 </Base>

@@ -1,27 +1,29 @@
 ---
-stap: "9a"
+stap: "9"
+onderdeel: verdiepen
+keuze: analist
 title: Van klantverhaal naar user story
 role: Businessanalist
 summary: Maak met AI een user story met acceptatiecriteria uit een klantverhaal, en controleer de bronnen waar de AI op leunt.
 ---
 
-# Stap 9a: Van klantverhaal naar user story
+# Analist: van klantverhaal naar user story
 
 ## Doel
 
 Je gebruikt AI om sneller een goede user story te schrijven, en je leert de bronnen te controleren in plaats van de AI blind te volgen.
 
-**Tijd:** ± 45 minuten.
+
 
 ## Opdracht
 
 Lees deze documenten. Ze staan ook in de [documentenmap](/training/oefeningen/documenten/):
 
-- [Klantverhaal Familie De Wit](/training/oefeningen/documenten/klantverhaal-de-wit.txt): het verhaal van de klant;
-- [Gespreksleidraad](/training/oefeningen/documenten/gespreksleidraad.txt): hoe de klantenservice een gesprek voert;
-- [Servicevoorwaarden](/training/oefeningen/documenten/servicevoorwaarden.txt): ook te lezen op de website, onder Service;
-- [User story US-014](/training/oefeningen/documenten/us-014.txt): de user story zoals die nu in de backlog staat;
-- [Mail van Sanne over US-014](/training/oefeningen/documenten/mail-sanne-us-014.txt): een mail van de product owner.
+- [Klantverhaal Familie De Wit](/training/oefeningen/documenten/klantverhaal-de-wit/): het verhaal van de klant;
+- [Gespreksleidraad](/training/oefeningen/documenten/gespreksleidraad/): hoe de klantenservice een gesprek voert;
+- [Servicevoorwaarden](/training/oefeningen/documenten/servicevoorwaarden/): ook te lezen op de website, onder Service;
+- [User story US-014](/training/oefeningen/documenten/us-014/): de user story zoals die nu in de backlog staat;
+- [Mail van Sanne over US-014](/training/oefeningen/documenten/mail-sanne-us-014/): een mail van de product owner.
 
 Doe dan het volgende:
 

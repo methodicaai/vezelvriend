@@ -2,8 +2,11 @@
 //
 // In the Markdown an exercise prompt is a ```prompt code block:
 //   {{what to fill in}}          a field the participant fills in by hand
+//   {{bron:system|what to fill}} the same, with a link to the system where the
+//                                participant finds it (for their own customer;
+//                                systems and links: /assets/mijnklant.js)
 //   {{auto:key|what it holds}}   a field filled automatically from the
-//                                Klantbeeld once a customer is chosen
+//                                Klantbeeld for the participant's own customer
 // The fixed text is shown as is; every field is a clearly labelled box.
 // "Kopieer prompt" copies the whole prompt; "Zet in de chat" puts the same text
 // in the chat next to the exercise (chat.js listens for the "vv-prompt" event),
@@ -83,17 +86,26 @@
         return;
       }
       const auto = part.match(/^auto:(\w+)\|(.+)$/);
+      const source = part.match(/^bron:(\w+)\|(.+)$/);
       const number = fields.length + 1;
-      const labelText = auto ? auto[2] : part;
+      const labelText = auto ? auto[2] : source ? source[2] : part;
       const key = storageKey(blockIndex, number);
       const label = el('label', `prompt-veld${auto ? ' prompt-veld--auto' : ''}`);
       const caption = el('span', 'prompt-veld-label', auto
         ? `Automatisch (${number}/${fieldCount}): ${labelText}`
         : `Vul in (${number}/${fieldCount}): ${labelText}`);
       label.append(caption);
+      if (source && window.vvKlant?.systems[source[1]]) {
+        const go = el('a', 'prompt-bron', `${window.vvKlant.systems[source[1]].label} ↗`);
+        go.target = '_blank';
+        go.rel = 'noopener';
+        go.href = window.vvKlant.link(source[1]);
+        window.vvKlant.onChange(() => { go.href = window.vvKlant.link(source[1]); });
+        label.append(go);
+      }
       const input = el('textarea');
       input.rows = auto ? 5 : 3;
-      input.placeholder = auto ? 'Wordt automatisch ingevuld zodra je een klant kiest' : labelText;
+      input.placeholder = auto ? 'Wordt automatisch ingevuld voor jouw klant' : labelText;
       input.value = load(key);
       input.addEventListener('input', () => {
         save(key, input.value);
@@ -110,40 +122,31 @@
       : autoFields.length === 0 ? `${manualCount} ${manualCount === 1 ? 'vak' : 'vakken'} om zelf in te vullen`
       : `${autoFields.length} ${autoFields.length === 1 ? 'vak wordt' : 'vakken worden'} automatisch ingevuld`;
 
-    // Blocks with automatic fields start with a customer picker.
+    // Blocks with automatic fields are filled for the participant's own customer
+    // (shown at the top of the exercise; the trainer may pick one there).
     if (autoFields.length) {
-      const picker = el('div', 'prompt-kies');
-      const pickLabel = el('label', 'prompt-veld-label', 'Kies de klant aan de lijn');
-      pickLabel.htmlFor = `klant-${blockIndex}`;
-      const select = el('select');
-      select.id = `klant-${blockIndex}`;
-      select.append(new Option('Kies een klant...', ''));
-      const pickStatus = el('p', 'prompt-status');
+      const pickStatus = el('p', 'prompt-status prompt-kies');
       pickStatus.setAttribute('aria-live', 'polite');
-      picker.append(pickLabel, select, pickStatus);
-      head.after(picker);
-
-      getJson(`${KLANTBEELD}/api/klanten`).then((list) => {
-        list.forEach((c) => select.append(new Option(`${c.name} (${c.customer_id}), ${c.address}`, c.customer_id)));
-      }).catch(() => { pickStatus.textContent = 'De klantenlijst kon niet worden opgehaald.'; });
-
-      select.addEventListener('change', async () => {
-        if (!select.value) return;
-        pickStatus.className = 'prompt-status';
-        pickStatus.textContent = 'Context ophalen uit het Klantbeeld...';
+      head.after(pickStatus);
+      const fill = async (klant) => {
+        if (!klant) { pickStatus.textContent = 'Kies eerst een klant bovenaan de oefening.'; return; }
+        pickStatus.className = 'prompt-status prompt-kies';
+        pickStatus.textContent = `Context ophalen uit het Klantbeeld voor ${klant.name}...`;
         try {
-          const context = await getJson(`${KLANTBEELD}/api/context/${encodeURIComponent(select.value)}`);
+          const context = await getJson(`${KLANTBEELD}/api/context/${encodeURIComponent(klant.customer_id)}`);
           autoFields.forEach((f) => {
             f.input.value = context[f.auto] ?? '';
             save(f.key, f.input.value);
             f.input.parentElement.classList.remove('prompt-veld--leeg');
           });
-          pickStatus.textContent = 'Alle context is automatisch ingevuld. Bekijk wat erin staat voordat je het verstuurt.';
+          pickStatus.textContent = `Alle context voor ${klant.name} (${klant.customer_id}) is automatisch ingevuld. Bekijk wat erin staat voordat je het verstuurt.`;
         } catch (err) {
-          pickStatus.className = 'prompt-status prompt-status--let-op';
+          pickStatus.className = 'prompt-status prompt-status--let-op prompt-kies';
           pickStatus.textContent = `Ophalen lukte niet: ${err.message}`;
         }
-      });
+      };
+      if (window.vvKlant) window.vvKlant.onChange(fill);
+      else pickStatus.textContent = 'De klant kon niet worden opgehaald.';
     }
 
     const actions = el('div', 'prompt-acties');

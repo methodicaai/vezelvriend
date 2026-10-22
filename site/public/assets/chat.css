@@ -97,3 +97,18 @@ button.vc-kies-kaart:hover{border-color:var(--vc-accent)}
 @media (prefers-color-scheme:dark){.vc-pagina{background:#0E1C1E}}
 .vc-fictief{margin:0;padding:.45rem 1rem;font-size:.8rem;background:#10282B;color:#E3EFED;display:flex;flex-wrap:wrap;gap:.15rem 1rem;justify-content:space-between;align-items:center;flex:none}
 .vc-fictief a{color:#7FE0D3}
+
+/* Red warning: something went in that should not go to an AI (systems/ai/sensitive.js).
+   The message gets a red box, and the whole chat turns red while the last message had one. */
+.vc{--vc-rood:#B3261E;--vc-rood-soft:#FBEBE9}
+@media (prefers-color-scheme:dark){.vc{--vc-rood:#F2B8B5;--vc-rood-soft:#331B19}}
+.vc--rood{border-color:var(--vc-rood)!important;box-shadow:0 0 0 3px var(--vc-rood-soft);background:var(--vc-rood-soft)}
+.vc--rood .vc-balk{background:var(--vc-rood);color:#fff}
+.vc--rood .vc-balk .vc-over summary,.vc--rood .vc-balk a,.vc--rood .vc-balk .vc-klein{color:#fff}
+.vc-vraag--rood{border:2px solid var(--vc-rood)!important}
+.vc-waarschuwing{margin-top:.6rem;padding:.7rem .85rem;border-radius:10px;background:var(--vc-rood-soft);border-left:4px solid var(--vc-rood);color:var(--vc-ink);font-size:.9rem}
+.vc-waarschuwing-kop{font-weight:800;color:var(--vc-rood);margin:0 0 .35rem}
+.vc-waarschuwing ul{margin:.25rem 0 .5rem;padding-left:1.2rem}
+.vc-waarschuwing li{word-break:break-word}
+.vc-waarschuwing p:last-child{margin:0}
+.vc-waarschuwing a{color:var(--vc-rood);font-weight:700}

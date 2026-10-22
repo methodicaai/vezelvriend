@@ -134,8 +134,9 @@
 
   function renderItem(item) {
     if (item.type === 'vraag') {
-      const n = el('div', 'vc-vraag');
+      const n = el('div', `vc-vraag${item.waarschuwingen?.length ? ' vc-vraag--rood' : ''}`);
       n.append(el('span', 'vc-label', 'Jij'), el('p', '', item.text));
+      if (item.waarschuwingen?.length) n.append(warning(item.waarschuwingen));
       return n;
     }
     if (item.type === 'tekst') {
@@ -155,6 +156,33 @@
     }
     if (item.type === 'goedkeuring') return approvalCard(item);
     return el('p', 'vc-melding', item.text ?? '');
+  }
+
+  /**
+   * Red warning under a message: what went in that should not go to an AI
+   * (found by the server, see systems/ai/sensitive.js). The chat warns, it
+   * does not block.
+   */
+  function warning(list) {
+    const box = el('div', 'vc-waarschuwing');
+    box.setAttribute('role', 'alert');
+    box.append(el('p', 'vc-waarschuwing-kop', 'Let op: hier stond informatie in die niet naar een AI mag'));
+    const ul = el('ul');
+    list.forEach((w) => ul.append(el('li', '', `${w.soort}: ${w.gevonden}`)));
+    box.append(ul);
+    const tip = el('p', '', 'Dit is nu naar de AI gegaan. Haal het de volgende keer eerst weg of vervang het door een label, zoals [IBAN]. ');
+    const how = el('a', '', 'Zo maak je gegevens veilig');
+    how.href = '/training/oefeningen/05-wat-mag-erin/#zo-maak-je-gegevens-veilig';
+    how.target = '_blank'; how.rel = 'noopener';
+    tip.append(how, '. De chat herkent niet alles: kijk ook zelf.');
+    box.append(tip);
+    return box;
+  }
+
+  /** The chat turns red as long as the last message had a warning. */
+  function paintWarning(items) {
+    const questions = items.filter((i) => i.type === 'vraag');
+    if (questions.length) root.classList.toggle('vc--rood', Boolean(questions.at(-1).waarschuwingen?.length));
   }
 
   function approvalCard(item) {
@@ -188,7 +216,8 @@
   }
 
   function showItems(items, replace) {
-    if (replace) thread.replaceChildren();
+    if (replace) { thread.replaceChildren(); root.classList.remove('vc--rood'); }
+    paintWarning(items);
     if (replace && items.length === 0) thread.append(chooser());
     for (const item of items) thread.append(renderItem(item));
     thread.scrollTop = thread.scrollHeight;
@@ -275,6 +304,8 @@
     input.value = e.detail.text;
     root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+    input.scrollTop = input.scrollHeight;
   });
 
   // ------------------------------------------------------------ start: login or chat

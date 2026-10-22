@@ -85,6 +85,18 @@ CREATE INDEX IF NOT EXISTS chats_by_participant ON chats(participant_id, updated
 -- One key per training for the AI connection (systems/koppeling): participants
 -- add https://<site>/mcp/<key> to an AI app of their own. Stored as a hash,
 -- shown once; it works only while the training is active.
+-- What participants write or paste on a page (step 1: their first attempt and
+-- what their own AI can do), so the trainer can read it. One text per field;
+-- kept until the trainer deletes it.
+CREATE TABLE IF NOT EXISTS notes (
+  participant_id INTEGER NOT NULL REFERENCES participants(participant_id) ON DELETE CASCADE,
+  page           TEXT NOT NULL,            -- e.g. 'wat-kan-ai'
+  field          TEXT NOT NULL,            -- e.g. 'poging-prompt'
+  text           TEXT NOT NULL,
+  updated_at     TEXT NOT NULL,
+  PRIMARY KEY (participant_id, page, field)
+);
+
 CREATE TABLE IF NOT EXISTS connection_keys (
   training_id INTEGER PRIMARY KEY REFERENCES trainings(training_id) ON DELETE CASCADE,
   key_hash    TEXT NOT NULL UNIQUE,
@@ -106,6 +118,9 @@ function newCode() {
 
 const nowIso = () => new Date().toISOString();
 
+/** The training that holds the trainer's fixed code (TRAINER_CODE), which may pick any customer. */
+export const FIXED_TRAINING = 'Vaste code van de trainer';
+
 export function openStore(file) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   const db = new DatabaseSync(file);
@@ -115,7 +130,15 @@ export function openStore(file) {
   if (!db.prepare('PRAGMA table_info(chats)').all().some((c) => c.name === 'assistant')) {
     db.exec("ALTER TABLE chats ADD COLUMN assistant TEXT NOT NULL DEFAULT 'zonder'");
   }
-  // The trainer can release the answers of "vind de fout" per training (self-study).
+  // Each participant gets a customer of their own for the exercises (step 3 and 4).
+  if (!db.prepare('PRAGMA table_info(participants)').all().some((c) => c.name === 'customer_id')) {
+    db.exec('ALTER TABLE participants ADD COLUMN customer_id TEXT');
+  }
+  // What the chat recognised as information that should not go to an AI (JSON list).
+  if (!db.prepare('PRAGMA table_info(messages)').all().some((c) => c.name === 'warnings')) {
+    db.exec('ALTER TABLE messages ADD COLUMN warnings TEXT');
+  }
+  // Answers of "vind de fout" could be released per training (that step was removed on 22-10-2026; column kept).
   if (!db.prepare('PRAGMA table_info(trainings)').all().some((c) => c.name === 'answers_released')) {
     db.exec('ALTER TABLE trainings ADD COLUMN answers_released INTEGER NOT NULL DEFAULT 0');
   }
@@ -165,7 +188,7 @@ export function openStore(file) {
      * works. Only its hash is stored, like every other code.
      */
     ensureFixedCode(code) {
-      const name = 'Vaste code van de trainer';
+      const name = FIXED_TRAINING;
       let t = db.prepare('SELECT training_id FROM trainings WHERE name = ?').get(name);
       if (!t) t = { training_id: Number(db.prepare('INSERT INTO trainings (name, created_at) VALUES (?, ?)').run(name, nowIso()).lastInsertRowid) };
       db.prepare('UPDATE trainings SET active = 1 WHERE training_id = ?').run(t.training_id);
@@ -186,7 +209,7 @@ export function openStore(file) {
 
     activeParticipant(participantId) {
       return db.prepare(`
-        SELECT p.participant_id, p.label, t.name AS training_name, t.training_id, t.answers_released
+        SELECT p.participant_id, p.label, p.customer_id, t.name AS training_name, t.training_id
         FROM participants p JOIN trainings t ON t.training_id = p.training_id
         WHERE p.participant_id = ? AND t.active = 1`).get(participantId) ?? null;
     },
@@ -199,10 +222,11 @@ export function openStore(file) {
 
     saveMessage(m) {
       db.prepare(`INSERT INTO messages (participant_id, sent_at, exercise, prompt_block, prompt, answer, status, error,
-                                        model, input_tokens, output_tokens, duration_ms)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+                                        model, input_tokens, output_tokens, duration_ms, warnings)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
         .run(m.participantId, nowIso(), m.exercise ?? null, m.promptBlock ?? null, m.prompt, m.answer ?? null,
-          m.status, m.error ?? null, m.model ?? null, m.inputTokens ?? null, m.outputTokens ?? null, m.durationMs ?? null);
+          m.status, m.error ?? null, m.model ?? null, m.inputTokens ?? null, m.outputTokens ?? null, m.durationMs ?? null,
+          m.warnings?.length ? JSON.stringify(m.warnings) : null);
     },
 
     saveSubmission(m) {
@@ -240,7 +264,9 @@ export function openStore(file) {
     participants(trainingId) {
       return db.prepare(`
         SELECT p.*, (SELECT COUNT(*) FROM messages m WHERE m.participant_id = p.participant_id) AS messages,
-               (SELECT COUNT(*) FROM submissions s WHERE s.participant_id = p.participant_id) AS submissions
+               (SELECT COUNT(*) FROM messages m WHERE m.participant_id = p.participant_id AND m.warnings IS NOT NULL) AS warnings,
+               (SELECT COUNT(*) FROM submissions s WHERE s.participant_id = p.participant_id) AS submissions,
+               (SELECT COUNT(*) FROM notes n WHERE n.participant_id = p.participant_id) AS notes
         FROM participants p WHERE p.training_id = ? ORDER BY p.participant_id`).all(trainingId);
     },
 
@@ -248,15 +274,59 @@ export function openStore(file) {
       return db.prepare(`
         SELECT m.*, p.label FROM messages m JOIN participants p ON p.participant_id = m.participant_id
         WHERE p.training_id = ? AND (? IS NULL OR p.participant_id = ?)
-        ORDER BY m.sent_at DESC`).all(trainingId, participantId, participantId);
+        ORDER BY m.sent_at DESC`).all(trainingId, participantId, participantId)
+        .map((m) => ({ ...m, warnings: m.warnings ? JSON.parse(m.warnings) : [] }));
+    },
+
+    /** Saves one field of a page; an empty text removes it. */
+    saveNote(participantId, page, field, text) {
+      if (!text.trim()) db.prepare('DELETE FROM notes WHERE participant_id = ? AND page = ? AND field = ?').run(participantId, page, field);
+      else db.prepare(`INSERT INTO notes (participant_id, page, field, text, updated_at) VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT (participant_id, page, field) DO UPDATE SET text = excluded.text, updated_at = excluded.updated_at`)
+        .run(participantId, page, field, text, nowIso());
+    },
+
+    notesOf(participantId, page) {
+      return db.prepare('SELECT field, text, updated_at FROM notes WHERE participant_id = ? AND page = ?').all(participantId, page);
+    },
+
+    notesOfTraining(trainingId, participantId = null) {
+      return db.prepare(`SELECT n.*, p.label FROM notes n JOIN participants p ON p.participant_id = n.participant_id
+        WHERE p.training_id = ? AND (? IS NULL OR p.participant_id = ?)
+        ORDER BY p.participant_id, n.page, n.field`).all(trainingId, participantId, participantId);
+    },
+
+    /** The trainer deletes the notes of one participant, or of the whole training. */
+    deleteNotes(trainingId, participantId = null) {
+      db.prepare(`DELETE FROM notes WHERE participant_id IN (SELECT participant_id FROM participants
+        WHERE training_id = ? AND (? IS NULL OR participant_id = ?))`).run(trainingId, participantId, participantId);
+    },
+
+    /**
+     * Gives a participant a customer of their own: at random, preferring a
+     * customer nobody else in the training has yet. Stays fixed afterwards.
+     */
+    assignCustomer(participantId, pool) {
+      const p = db.prepare('SELECT training_id, customer_id FROM participants WHERE participant_id = ?').get(participantId);
+      if (!p || p.customer_id || pool.length === 0) return p?.customer_id ?? null;
+      const used = new Map(pool.map((id) => [id, 0]));
+      for (const r of db.prepare('SELECT customer_id FROM participants WHERE training_id = ? AND customer_id IS NOT NULL').all(p.training_id)) {
+        if (used.has(r.customer_id)) used.set(r.customer_id, used.get(r.customer_id) + 1);
+      }
+      const least = Math.min(...used.values());
+      const candidates = pool.filter((id) => used.get(id) === least);
+      const pick = candidates[crypto.randomInt(candidates.length)];
+      db.prepare('UPDATE participants SET customer_id = ? WHERE participant_id = ?').run(pick, participantId);
+      return pick;
+    },
+
+    /** Only for the trainer's fixed code, which may pick any customer. */
+    setCustomer(participantId, customerId) {
+      db.prepare('UPDATE participants SET customer_id = ? WHERE participant_id = ?').run(customerId, participantId);
     },
 
     setActive(trainingId, active) {
       db.prepare('UPDATE trainings SET active = ? WHERE training_id = ?').run(active ? 1 : 0, trainingId);
-    },
-
-    setAnswersReleased(trainingId, released) {
-      db.prepare('UPDATE trainings SET answers_released = ? WHERE training_id = ?').run(released ? 1 : 0, trainingId);
     },
 
     createChat(participantId, context, assistant) {

@@ -1,8 +1,6 @@
 ---
 import Base from '../../layouts/TrainingLayout.astro';
 import Vlak from '../../components/Vlak.astro';
-// Same file as docs/decision-tree.md, so the site and the repo never disagree.
-import { Content as DecisionTree } from '../../../../docs/decision-tree.md';
 ---
 <Base title="De systemen">
   <section class="hero">
@@ -19,15 +17,10 @@ import { Content as DecisionTree } from '../../../../docs/decision-tree.md';
         { label: 'Beschikbaar', title: 'Website vezelvriend.nl', text: 'De website van het bedrijf, zoals klanten hem zien: abonnementen, storingen, service en servicevoorwaarden. Ook een bron, en net als in het echt niet altijd in lijn met wat intern wordt gezegd.', href: '/', linkLabel: 'Open de website' },
         { label: 'Beschikbaar', title: 'Klantsysteem', text: 'Lijst van alle klanten met contract en adres. Zoeken op naam, adres, postcode of klantnummer. Met een SQL-scherm waarin je zelf vragen aan de database stelt.', href: '/klantsysteem/', linkLabel: 'Open het Klantsysteem' },
         { label: 'Beschikbaar', title: 'Klantbeeld', text: 'Het scherm dat je tijdens een telefoongesprek gebruikt: gespreksleidraad, klantgegevens, klanthistorie op het adres en techniek, met de knop "Modem controleren".', href: '/klantbeeld/', linkLabel: 'Open het Klantbeeld' },
+        { label: 'Document', title: 'De beslisboom', text: 'De werkwijze van de klantenservice als een klant zegt: "mijn internet doet het niet". Als document van Vezelvriend, ook te downloaden om in een prompt te plakken.', href: '/training/oefeningen/documenten/beslisboom/', linkLabel: 'Open de beslisboom', newTab: true },
         { label: 'Beschikbaar', title: 'App Mijn Vezelvriend', text: 'De app voor klanten: inloggen met klantnummer en postcode van een nepklant en zien wat de klant ziet. Zet hem op je beginscherm voor een echt app-gevoel.', href: '/app/', linkLabel: 'Open de app' },
         { label: 'Later', title: 'Mail en documenten, servicedesk, backlog', text: 'Deze systemen komen in een volgende versie. Tot die tijd staan losse documenten en mails in de map data/ van de repository.', href: 'https://github.com/methodicaai/vezelvriend/tree/main/data', linkLabel: 'Bekijk de map data' },
       ]} />
-    </div>
-  </section>
-
-  <section class="sectie">
-    <div class="wrap smal">
-      <article class="markdown"><DecisionTree /></article>
     </div>
   </section>
 
@@ -35,8 +28,8 @@ import { Content as DecisionTree } from '../../../../docs/decision-tree.md';
     <div class="wrap smal prose">
       <h2>Kan de AI in deze systemen kijken?</h2>
       <p>Meestal niet. De knop "Modem controleren" toont de modemgegevens alleen aan jou, en je eigen AI-assistent kan ze niet zelf ophalen. Dat is bewust: jij kiest welke gegevens je overneemt in je prompt, en jij ziet of een meting oud is en of er een storing in de straat is. Wie dat vergeet, krijgt een antwoord dat goed klinkt maar nergens op gebaseerd is.</p>
-      <p>Er is één uitzondering: de chat met Claude <strong>met koppeling</strong>, in <a href="/training/oefeningen/06-claude-zoekt-zelf/">stap 6</a>. Daar zoekt Claude zelf in het Klantbeeld, de documenten en de database, met volledige toegang. Zo zie je het verschil tussen zelf context kiezen en de AI laten zoeken.</p>
-      <p>De beslisboom hierboven kun je ook <a href="/training/oefeningen/beslisboom.txt">downloaden als tekst</a>, om in een prompt te plakken.</p>
+      <p>Er is één uitzondering: de chat met Claude <strong>met koppeling</strong>, in <a href="/training/oefeningen/07-claude-zoekt-zelf/">stap 7</a>. Daar zoekt Claude zelf in het Klantbeeld, de documenten en de database, met volledige toegang. Zo zie je het verschil tussen zelf context kiezen en de AI laten zoeken.</p>
+      <p>In de training maak je kennis met de systemen in <a href="/training/oefeningen/systemen/">stap 3</a>, met een klant die voor jou is gekozen.</p>
     </div>
   </section>
 </Base>

@@ -1,0 +1,10 @@
+---
+// The decision tree of the customer service as a company document, with a
+// download as plain text. Same file as docs/decision-tree.md, so the site, the
+// systems and the repo never disagree.
+import DocumentLayout from '../../../../layouts/DocumentLayout.astro';
+import { Content as DecisionTree } from '../../../../../../docs/decision-tree.md';
+---
+<DocumentLayout title="Beslisboom: mijn internet doet het niet" kind="Klantenservice · werkwijze" download="/training/oefeningen/beslisboom.txt">
+  <DecisionTree />
+</DocumentLayout>

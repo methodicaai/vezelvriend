@@ -3,7 +3,7 @@
 //   types or pastes (step 0-1 of the context ladder). No system prompt:
 //   participants see the effect of exactly their own words.
 // - "koppeling": Claude with the AI connection (systems/koppeling), full
-//   access. It looks things up itself (step 3-4 of the context ladder).
+//   access. It looks things up itself (steps 4 and 5 of the context ladder).
 //
 // One turn = one question of the participant. Claude may call tools several
 // times before it answers; we stop after MAX_STEPS to keep cost and time in

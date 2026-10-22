@@ -1,0 +1,89 @@
+---
+// Step 9: deepen in your own field. One page with four choices: analyst, tester,
+// SQL and code. The participant chooses first; then only that part shows, with
+// the choices on top to switch at any time (/assets/keuze.js). Without
+// JavaScript all four parts show one below the other.
+// The analyst, tester and SQL parts are the exercise files 09a to 09c
+// (frontmatter "onderdeel: verdiepen"); the code part is written here.
+import Base from '../../../layouts/TrainingLayout.astro';
+import Volgende from '../../../components/Volgende.astro';
+import Vlak from '../../../components/Vlak.astro';
+import { getExercises } from '../../../exercises';
+import { headLine } from '../../../route';
+
+const parts = getExercises().filter((ex) => ex.part === 'verdiepen');
+const byChoice = (c: string) => parts.find((p) => p.choice === c)!;
+const choices = [
+  { key: 'analist', name: 'Analist', text: 'Van klantverhaal naar user story' },
+  { key: 'tester', name: 'Tester', text: 'Testcases uit de beslisboom' },
+  { key: 'sql', name: 'SQL', text: 'Vragen aan de database' },
+  { key: 'code', name: 'Code', text: 'Lees hoe het echt werkt' },
+];
+const code = (path: string) => `/training/oefeningen/code/${path}/`;
+---
+<Base title="Verdiepen in je eigen vak" description="Kies wat bij je past: een user story, testcases, SQL of de code.">
+  <link rel="stylesheet" href="/assets/chat.css">
+  <section class="sectie">
+    <div class="wrap oef-met-chat">
+      <div class="oef-tekst">
+        <p class="eyebrow">{headLine(9)}</p>
+        <article class="markdown">
+          <h1>Stap 9: Verdiepen in je eigen vak</h1>
+          <p>Kies wat bij jouw werk past. Je ziet dan alleen dat deel. Wil je daarna nog iets anders doen, kies dan hier opnieuw.</p>
+        </article>
+        <div class="keuze-kaarten" role="group" aria-label="Kies een onderdeel" hidden>
+          {choices.map((c) => <button type="button" class="keuze-kaart" data-keuze={c.key} aria-pressed="false"><strong>{c.name}</strong><span>{c.text}</span></button>)}
+        </div>
+        <p class="prompt-status" id="keuze-status" aria-live="polite"></p>
+
+        {choices.filter((c) => c.key !== 'code').map((c) => {
+          const { Content } = byChoice(c.key);
+          return <section class="keuze-deel" id={c.key} data-keuze={c.key}><article class="markdown"><Content /></article></section>;
+        })}
+
+        <section class="keuze-deel" id="code" data-keuze="code">
+          <article class="markdown">
+            <h1>Code: lees hoe het echt werkt</h1>
+            <h2>Doel</h2>
+            <p>Je ervaart dat code ook context is. Een AI die de code niet kent, vertelt hoe het meestal gaat. Met de code erbij kan hij zeggen hoe het hier gaat, maar ook dan kijk je zelf na.</p>
+            <h2>Opdracht</h2>
+            <ol>
+              <li>Open <a href="/pakket/" target="_blank" rel="noopener">Pakket samenstellen</a> en stel een pakket samen. Wat belooft de pagina?</li>
+              <li>Stel de vraag zonder code (prompt A) in de chat hiernaast.</li>
+              <li>Open <a href={code('systems/mijn/server.js')} target="_blank" rel="noopener">de code die een bestelling verwerkt</a>, kopieer hem (knop "Kopieer bestand") en stel de vraag opnieuw met de code erbij (prompt B).</li>
+              <li>Kijk zelf na in de code: noemt de AI controles die er niet staan? Mist hij er een?</li>
+            </ol>
+            <p>Meer code lezen? Hieronder staan drie bestanden om mee te beginnen, en in <a href="/training/oefeningen/code/" target="_blank" rel="noopener">de code van Vezelvriend</a> kun je in alles zoeken.</p>
+          </article>
+          <Vlak columns={3} items={[
+            { label: 'Bestellen', title: 'Wat er gebeurt als je bestelt', text: 'De adrescheck, de regels en de prijsberekening aan de kant van de server.', href: code('systems/mijn/server.js'), linkLabel: 'systems/mijn/server.js', newTab: true },
+            { label: 'Regels', title: 'Producten en voorwaarden', text: 'Snelheden, extra\'s, looptijden en de voorwaarden van de pakket-samensteller.', href: code('data/products.json'), linkLabel: 'data/products.json', newTab: true },
+            { label: 'Database', title: 'Het databaseschema', text: 'Alle tabellen en kolommen. Handig bij SQL.', href: code('data/schema.sql'), linkLabel: 'data/schema.sql', newTab: true },
+          ]} />
+          <article class="markdown">
+            <h2>Voorbeeldprompt zonder context (A)</h2>
+            <pre><code class="language-prompt">Welke controles doet de server van een internetaanbieder als iemand online een abonnement bestelt?</code></pre>
+            <h2>Voorbeeldprompt met context (B)</h2>
+            <pre><code class="language-prompt">{'Hieronder staat de code die een bestelling van een internetabonnement verwerkt.\n\n{{plak hier de code van systems/mijn/server.js}}\n\nNoem elke controle die deze code doet, met de naam van de functie. Noem niets wat niet in de code staat. Zeg ook wat de pagina belooft en de code niet controleert, als je dat ziet.'}</code></pre>
+            <details class="reflectie">
+              <summary>Klaar? Open de reflectievragen</summary>
+              <ul>
+                <li>Wat zei de AI zonder code? Klopte dat voor Vezelvriend?</li>
+                <li>Noemde de AI met code controles die er niet in staan? Hoe zag je dat?</li>
+                <li>Hoe lang was de code, en las de AI alles? Waar zat wat hij miste?</li>
+                <li>Mag code van je eigen werk naar een AI? Wie bepaalt dat?</li>
+              </ul>
+            </details>
+          </article>
+        </section>
+        <Volgende nr={9} />
+      </div>
+      <aside class="oef-chat" aria-label="Chat met Claude, zonder koppeling">
+        <div class="vc" data-vorm="paneel" data-context="09-verdiepen" data-assistent="zonder"></div>
+      </aside>
+      <script is:inline src="/assets/keuze.js" defer></script>
+      <script is:inline src="/assets/prompt.js" defer></script>
+      <script is:inline src="/assets/chat.js" defer></script>
+    </div>
+  </section>
+</Base>

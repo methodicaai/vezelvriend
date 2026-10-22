@@ -1,28 +1,28 @@
-// The context ladder: five ways context reaches an AI, each with a worked
-// example (a weak and a strong prompt side by side, with an example answer)
-// and the check question for that step.
+// The context ladder: five ways context reaches an AI, numbered 1 to 5, each
+// with a worked example (a weak and a strong prompt side by side, with an
+// example answer) and the check question for that step.
 //
-// Each step is explained right above the exercise that practises it (rhythm:
-// explain one step, then do it): 0 and 1 at step 3, 2 at step 5, 3 at step 6,
-// 4 at step 7. The page /training/oefeningen/contexttrap/ only gives a short
-// overview. Worked examples come before the exercise on purpose: beginners
-// learn more from studying a good and a bad example than from trying straight
-// away.
+// The whole ladder is explained in one place: step 2 of the route
+// (/training/oefeningen/contexttrap/). The exercises only carry the name of the
+// ladder step they practise, as a label (see src/route.ts), with no explanation
+// or link, so participants are never told which step "they" are on.
+// Worked examples come before the exercises on purpose: beginners learn more
+// from studying a good and a bad example than from trying straight away.
 //
 // The examples use a made-up customer (Familie Peters) on another day, so they
 // show the method without giving away a scenario of the exercises.
-// Steps 2 and 3 use a neutral project example, so no pitfall of the
+// Steps 3 and 4 use a neutral project example, so no pitfall of the
 // exercises is given away here.
 
 export interface Example { prompt: string; answer: string; note: string }
 export interface Step {
   nr: number; name: string; who: string; copilot: string; check: string; risk: string;
-  intro: string; weak: Example; strong: Example; checkHow: string[];
+  intro: string; rule?: string; weak: Example; strong: Example; checkHow: string[];
 }
 
 export const steps: Step[] = [
   {
-    nr: 0, name: 'Kale vraag', who: 'Niemand', copilot: 'Elke chat-AI',
+    nr: 1, name: 'Kale vraag', who: 'Niemand', copilot: 'Elke chat-AI',
     check: 'Klopt het feitelijk?', risk: 'Het antwoord klinkt goed, maar is algemeen.',
     intro: 'Je stelt alleen een vraag. De AI weet niets van jouw klant, jouw bedrijf of hoe laat het is. Voor algemene kennis is dat prima, voor een beslissing over één klant niet.',
     weak: {
@@ -38,9 +38,10 @@ export const steps: Step[] = [
     checkHow: ['Klopt het feitelijk, en is het niet te algemeen voor wat je ermee wilt doen?', 'Heeft de AI iets aangenomen over jouw situatie dat hij niet kan weten?'],
   },
   {
-    nr: 1, name: 'Zelf plakken', who: 'Jij kiest en plakt', copilot: 'Copilot Chat zonder werkdata',
+    nr: 2, name: 'Zelf plakken', who: 'Jij kiest elk stuk', copilot: 'Copilot Chat zonder werkdata',
     check: 'Heb ik de juiste gegevens, en niet te veel?', risk: 'Te veel, te weinig of de verkeerde gegevens.',
-    intro: 'Jij kiest wat de AI te zien krijgt en plakt het in de vraag. Je hebt alles in de hand, maar het kost werk, en kiezen is een vak.',
+    intro: 'Jij kiest elk stuk dat de AI te zien krijgt, en plakt het in je vraag. Daardoor weet je precies wat de AI heeft: niet meer en niet minder. Je hebt alles in de hand, maar het kost werk, en kiezen is een vak.',
+    rule: 'Kort en volledig? Dan plak je het zelf. Zo weet je zeker dat de AI alles ziet.',
     weak: {
       prompt: 'Hier is alles wat ik over de klant heb:\nFamilie Peters, telefoon 06-00000999, peters@example.com, klant sinds 2020.\nModem Vezelbox VB-200, serienummer VB200-099999, MAC 02:56:46:00:99:99, firmware 4.2.1.\nHistorie: 2023, klant vroeg of het modem naar de woonkamer kan.\nDe klant zegt dat internet het niet doet. Wat moet ik doen?',
       answer: 'Omdat het modem eerder is verplaatst, kan de bekabeling naar de woonkamer de oorzaak zijn. Laat de klant de kabels controleren. Helpt dat niet, herstart dan het modem op afstand en plan een monteur in.',
@@ -54,9 +55,10 @@ export const steps: Step[] = [
     checkHow: ['Staat alles erin wat de beslissing bepaalt (hier: meting, tijd, straatstatus, werkwijze)?', 'Staat er iets in dat er niet in hoort, zoals persoonsgegevens of oude historie?', 'Kloppen de gegevens die je plakte nog met het systeem?'],
   },
   {
-    nr: 2, name: 'Jij kiest de documenten', who: 'Jij, met bestanden of een vaste werkruimte', copilot: 'Bestand toevoegen, Notebooks of Pages',
+    nr: 3, name: 'Documenten meegeven', who: 'Jij kiest de bestanden, de AI kiest wat hij eruit gebruikt', copilot: 'Bestand toevoegen, Notebooks of Pages',
     check: 'Zijn mijn bronnen actueel en eenduidig?', risk: 'Oude of tegenstrijdige documenten.',
-    intro: 'Je geeft hele documenten mee, of zet ze in een vaste werkruimte. Dat scheelt plakken, maar de AI leest alles wat je meegeeft, ook wat verouderd is.',
+    intro: 'Je geeft hele documenten mee als bestand, of zet ze in een vaste werkruimte. Het verschil met plakken: nu kiest de AI zelf welke delen hij gebruikt. Bij een lang document leest hij niet altijd alles, en tabellen of scans komen soms slecht door. Handig bij lange stukken, maar controleer wat hij ermee deed. En hij gebruikt alles wat je meegeeft, ook wat verouderd is.',
+    rule: 'Lang, of vaak nodig? Geef het mee als bestand, en controleer of de AI het echt las: vraag naar een kopje of naar iets op de laatste pagina.',
     weak: {
       prompt: '(Bijlagen: "Eisen klantportaal v2", "Eisen klantportaal v3", "Verslag overleg 14 oktober")\n\nMaak een lijst van alle eisen voor het klantportaal.',
       answer: '- De klant kan facturen downloaden als pdf en Excel.\n- De klant kan zijn adres zelf wijzigen.\n- Inloggen gaat met tweestapsverificatie.\n- ...',
@@ -67,10 +69,10 @@ export const steps: Step[] = [
       answer: '- Facturen downloaden als pdf (v3, par. 2.1)\n- Adres zelf wijzigen (v3, par. 2.4)\n- Inloggen met tweestapsverificatie (v3, par. 3.2)\n\nAfwijking: in het overleg van 14 oktober is afgesproken dat de download als Excel vervalt. Versie 3 noemt die nog (par. 2.1).',
       note: 'Jij bepaalt welke bronnen meetellen en welke leidend is. De AI noemt de bron per eis, en meldt tegenstrijdigheden in plaats van ze stilletjes op te lossen.',
     },
-    checkHow: ['Zijn dit de nieuwste versies, en weet de AI welke leidend is?', 'Open twee of drie bronverwijzingen: staat het er echt?', 'Spreken de documenten elkaar tegen? Wie beslist dan?'],
+    checkHow: ['Zijn dit de nieuwste versies, en weet de AI welke leidend is?', 'Open twee of drie bronverwijzingen: staat het er echt?', 'Heeft de AI alles gelezen? Vraag naar iets van de laatste pagina of uit een tabel.', 'Spreken de documenten elkaar tegen? Wie beslist dan?'],
   },
   {
-    nr: 3, name: 'De AI zoekt zelf', who: 'De AI, in alles waar jij bij kunt', copilot: 'Microsoft 365 Copilot met werkdata',
+    nr: 4, name: 'De AI zoekt zelf', who: 'De AI, in alles waar jij bij kunt', copilot: 'Microsoft 365 Copilot met werkdata',
     check: 'Waar komt dit vandaan, en mocht de AI dat zien?', risk: 'De AI vindt dingen die je niet zocht, die verouderd zijn, of die niet voor dit doel bedoeld zijn.',
     intro: 'De AI doorzoekt zelf je mail, documenten, chats en vergaderingen. Jij kiest niet meer wat erin gaat. Dat is snel, maar je ziet niet wat hij las en wat hij miste.',
     weak: {
@@ -86,7 +88,7 @@ export const steps: Step[] = [
     checkHow: ['Open de genoemde bronnen: staat het er echt, en is dit de laatste stand?', '"Niet gevonden" is niet "bestaat niet". Wat kan de AI gemist hebben?', 'Kwam er iets mee dat niet voor dit doel bedoeld is? Dan hoort het ook niet in je antwoord.'],
   },
   {
-    nr: 4, name: 'Koppelingen en agents', who: 'Een systeem haalt op, of voert zelf iets uit', copilot: 'Connectoren, agents, Copilot Studio',
+    nr: 5, name: 'Koppelingen en agents', who: 'Een systeem haalt op, of voert zelf iets uit', copilot: 'Connectoren, agents, Copilot Studio',
     check: 'Wat gaat de koppeling doen, en wie keurt het goed?', risk: 'Te veel gegevens, en acties zonder dat iemand meekijkt.',
     intro: 'Een koppeling haalt automatisch gegevens uit andere systemen, of een agent voert zelf een taak uit. Wat er wordt opgehaald en gedaan, is vooraf ingesteld. Dat moet je dus vooraf goed afspreken.',
     weak: {
@@ -102,12 +104,3 @@ export const steps: Step[] = [
     checkHow: ['Welke gegevens haalt de koppeling op, en zijn die allemaal nodig?', 'Welke acties mag de agent zelf doen, en welke pas na goedkeuring?', 'Wie heeft dit afgesproken, en waar staat dat?'],
   },
 ];
-
-// Where each step is explained and practised (the step on the route).
-export const explainedAt: Record<number, { href: string; label: string }> = {
-  0: { href: '/training/oefeningen/03-context/#trede-0', label: 'Stap 3' },
-  1: { href: '/training/oefeningen/03-context/#trede-1', label: 'Stap 3' },
-  2: { href: '/training/oefeningen/documenten/#trede-2', label: 'Stap 5' },
-  3: { href: '/training/oefeningen/06-claude-zoekt-zelf/#trede-3', label: 'Stap 6' },
-  4: { href: '/training/oefeningen/07-guardrails/#trede-4', label: 'Stap 7' },
-};

@@ -1,0 +1,14 @@
+---
+// A note field: the participant writes or pastes something, it is saved on the
+// server under their code, and the trainer can read it in /trainer/ (until the
+// trainer deletes it). /assets/aantekening.js loads and saves it.
+// page + field identify the text; keep them stable, the trainer screen uses them.
+interface Props { page: string; field: string; label: string; rows?: number; placeholder?: string }
+const { page, field, label, rows = 5, placeholder } = Astro.props;
+const id = `aant-${field}`;
+---
+<div class="aant" data-pagina={page} data-veld={field}>
+  <label class="aant-label" for={id}>{label}</label>
+  <textarea id={id} rows={rows} placeholder={placeholder}></textarea>
+  <p class="aant-status" aria-live="polite"></p>
+</div>

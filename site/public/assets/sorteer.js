@@ -1,4 +1,4 @@
-// "Groen, oranje of rood" (wat-mag-hier.astro): the participant chooses for all
+// "Groen, oranje of rood" (components/GroenOranjeRood.astro, step 5): the participant chooses for all
 // twelve situations, locks the choices, and only then sees what the AI policy of
 // Vezelvriend says. Choices stay in this browser only (localStorage).
 (() => {
@@ -25,6 +25,11 @@
         input.disabled = state.vast;
       });
       item.querySelector('.vf-antwoord').hidden = !state.vast;
+      // After locking: green when the choice matches the policy, red when it does not.
+      const right = matches(state.keuze[nr], item.dataset.antwoord);
+      item.classList.toggle('vf-item--goed', state.vast && right);
+      item.classList.toggle('vf-item--fout', state.vast && !right);
+      item.querySelector('.vf-uitslag').textContent = state.vast ? (right ? 'Goed' : 'Anders dan het beleid') : '';
     }
     lockButton.hidden = state.vast;
     lockButton.disabled = chosen < items.length;
@@ -32,6 +37,9 @@
     result.hidden = !state.vast;
     if (state.vast) resultText.textContent = summary();
   }
+
+  // "Weet ik niet" is the right answer where the policy says nothing.
+  const matches = (mine, policy) => (policy === 'open' ? mine === 'weet ik niet' : mine === policy);
 
   function summary() {
     let same = 0, stricter = 0, looser = 0, unsure = 0, gapsSeen = 0;

@@ -1,0 +1,20 @@
+---
+// Each company document as a page in the Vezelvriend house style, with a
+// download as plain text for the participant's own AI ([slug].txt.ts).
+import DocumentLayout from '../../../../layouts/DocumentLayout.astro';
+import { getDocuments, guide } from '../../../../documents';
+
+export function getStaticPaths() {
+  return getDocuments().map((d) => ({ params: { slug: d.slug }, props: { doc: d } }));
+}
+const { doc } = Astro.props;
+const { Content } = doc;
+---
+<DocumentLayout title={doc.title} kind={doc.kind} download={`/training/oefeningen/documenten/${doc.slug}.txt`}>
+  {Content ? <Content /> : (
+    <>
+      <p class="doc-meta">Versie: {guide.version}</p>
+      <ol class="doc-stappen">{guide.steps.map((s) => <li><strong>{s.title}.</strong> {s.text}</li>)}</ol>
+    </>
+  )}
+</DocumentLayout>

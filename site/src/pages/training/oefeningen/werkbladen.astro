@@ -4,6 +4,9 @@
 // Both are meant for the participant's own AI and own notes, so the prompt is
 // copy-only and the card is kept in this browser only.
 import Base from '../../../layouts/TrainingLayout.astro';
+import Volgende from '../../../components/Volgende.astro';
+import { headLine } from '../../../route';
+import { steps } from '../../../contexttrap';
 
 // The fill-in prompt: {{...}} are the fields that prompt.js turns into boxes.
 const FRAME = "Rol: {{wie ben jij, en voor wie is het antwoord bedoeld?}}\n\nSituatie: {{wat speelt er? Noem ook de datum als die ertoe doet}}\n\nContext: {{alleen de gegevens die de uitkomst bepalen; geen namen of persoonsgegevens als dat niet nodig is}}\n\nWerkwijze en bronnen: {{welke regels of documenten gelden, en welke is leidend?}}\n\nVraag: {{wat wil je precies weten of laten maken?}}\n\nVorm: {{bijvoorbeeld: maximaal 10 regels, als lijst, in gewone taal}}\n\nNoem bij elk punt waar je het op baseert. Zeg wat je niet zeker weet of niet kon vinden. Verzin niets.";
@@ -11,7 +14,7 @@ const FRAME = "Rol: {{wie ben jij, en voor wie is het antwoord bedoeld?}}\n\nSit
 <Base title="Werkbladen" description="Het promptkader en de als-dan-kaart, voor je eigen taak in je eigen AI.">
   <section class="hero">
     <div class="hero-inner">
-      <p class="eyebrow">Stap 10 · op je eigen trede · ± 35 minuten</p>
+      <p class="eyebrow">{headLine(10)}</p>
       <h1>Werkbladen</h1>
       <p class="lead">Nu doe je het op je eigen werk: de taak die je bij <a href="/training/oefeningen/wat-kan-ai/">Wat kan AI voor jou?</a> koos, in de AI die je mag gebruiken. Nog geen taak? Kies er daar een. Gebruik het promptkader om je vraag op te bouwen, en sluit af met je als-dan-kaart.</p>
     </div>
@@ -47,7 +50,7 @@ Vorm: maximaal 10 regels, eerst de besluiten, dan de actiepunten.
 Noem bij elk punt waar je het op baseert. Zeg wat je niet zeker weet of niet kon vinden. Verzin niets.
 
 (aantekeningen)</pre>
-      <p class="prose">Controle daarna (trede 1): staat elk actiepunt echt in mijn aantekeningen, en heeft de AI geen eigenaar of datum verzonnen?</p>
+      <p class="prose">Controle daarna: staat elk actiepunt echt in mijn aantekeningen, en heeft de AI geen eigenaar of datum verzonnen?</p>
 
       <h3>Vergelijk met je eerste poging</h3>
       <p class="prose">Bij <a href="/training/oefeningen/wat-kan-ai/">Wat kan AI voor jou?</a> probeerde je je taak één keer kaal. Leg dat antwoord naast het nieuwe. Wat is er beter, en waardoor: door welke context, regel of controle? Geef het nieuwe antwoord ook een cijfer van 1 tot 10.</p>
@@ -60,11 +63,7 @@ Noem bij elk punt waar je het op baseert. Zeg wat je niet zeker weet of niet kon
         <table class="tabel">
           <thead><tr><th>Trede</th><th>Controlevraag</th></tr></thead>
           <tbody>
-            <tr><td>0 Kale vraag</td><td>Klopt het feitelijk?</td></tr>
-            <tr><td>1 Zelf plakken</td><td>Heb ik de juiste gegevens, en niet te veel?</td></tr>
-            <tr><td>2 Jij kiest de documenten</td><td>Zijn mijn bronnen actueel en eenduidig?</td></tr>
-            <tr><td>3 De AI zoekt zelf</td><td>Waar komt dit vandaan, en mocht de AI dat zien?</td></tr>
-            <tr><td>4 Koppelingen en agents</td><td>Wat gaat de koppeling doen, en wie keurt het goed?</td></tr>
+            {steps.map((st) => <tr><td>{st.nr} {st.name}</td><td>{st.check}</td></tr>)}
           </tbody>
         </table>
       </div>
@@ -82,8 +81,7 @@ Noem bij elk punt waar je het op baseert. Zeg wat je niet zeker weet of niet kon
           <label>Mijn AI op het werk<input name="tool" maxlength="80" placeholder="Bijvoorbeeld: Microsoft 365 Copilot"></label>
           <label>Mijn trede<select name="trede">
             <option value="">Kies</option>
-            <option>0 Kale vraag</option><option>1 Zelf plakken</option><option>2 Jij kiest de documenten</option>
-            <option>3 De AI zoekt zelf</option><option>4 Koppelingen en agents</option>
+            {steps.map((st) => <option>{st.nr} {st.name}</option>)}
           </select></label>
         </div>
         {[1, 2, 3].map((n) => (
@@ -100,6 +98,7 @@ Noem bij elk punt waar je het op baseert. Zeg wat je niet zeker weet of niet kon
         <button type="button" class="prompt-knop prompt-knop--rand" id="ad-kopieer">Kopieer mijn kaart</button>
         <p class="prompt-status" id="ad-status" aria-live="polite"></p>
       </div>
+      <Volgende nr={10} />
     </div>
   </section>
   <script is:inline src="/assets/prompt.js" defer></script>

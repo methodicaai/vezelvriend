@@ -1,58 +1,81 @@
 ---
-// Documents page: step 2 of the context ladder ("you choose the documents").
-// Participants put these documents in their own AI and ask questions about
-// them. Because the documents are made up, this is safe to do in the AI they
-// use at work, if their employer allows it.
+// Step 6: the company documents of Vezelvriend. First the questions, the
+// documents at the bottom. Participants pick documents one by one and give
+// them to the chat next to the exercise (/assets/documenten.js puts their text
+// in the chat), or open them as a page (new tab) and download them for their
+// own AI. The chat warns in red when a document holds information that should
+// not go to an AI.
 import Base from '../../../../layouts/TrainingLayout.astro';
-import Vlak from '../../../../components/Vlak.astro';
-import Trede from '../../../../components/Trede.astro';
+import Volgende from '../../../../components/Volgende.astro';
 import { getDocuments } from '../../../../documents';
+import { headLine } from '../../../../route';
 
 const docs = getDocuments();
-const href = (slug: string) => `/training/oefeningen/documenten/${slug}.txt`;
+const view = (slug: string) => `/training/oefeningen/documenten/${slug}/`;
 ---
-<Base title="Documenten van Vezelvriend" description="Bedrijfsdocumenten van het oefenbedrijf, om in je eigen AI te zetten (trede 2 van de contexttrap).">
-  <section class="hero">
-    <div class="hero-inner">
-      <p class="eyebrow">Stap 5 · trede 2: jij kiest de documenten · ± 25 minuten</p>
-      <h1>Documenten van Vezelvriend</h1>
-      <p class="lead">Dit zijn de documenten van het oefenbedrijf: van de klantenservice, verkoop, het productteam en de directie. Zet ze in je AI en stel er vragen over. Zo oefen je trede 2 in de AI die je zelf gebruikt, zonder echte werkgegevens. Eerst de uitleg van <a href="#trede-2">trede 2</a>, daarna <a href="#zelf-doen">doe je het zelf</a>.</p>
-    </div>
-  </section>
+<Base title="Documenten van Vezelvriend" description="Geef de AI documenten van het oefenbedrijf en vraag ernaar. Kloppen je bronnen?">
+  <link rel="stylesheet" href="/assets/chat.css">
+  <section class="sectie">
+    <div class="wrap oef-met-chat">
+      <div class="oef-tekst">
+        <p class="eyebrow">{headLine(6)}</p>
+        <article class="markdown">
+          <h1>Stap 6: Documenten van Vezelvriend</h1>
+          <p>Onderaan deze pagina staan documenten van het oefenbedrijf: van de klantenservice, verkoop, het productteam en de directie. Je geeft ze aan de AI en stelt er vragen over.</p>
 
-  <Trede nr={2} tinted />
-
-  <section class="sectie" id="zelf-doen">
-    <div class="wrap">
-      <h2>Nu zelf doen: de documenten</h2>
-      <Vlak columns={3} items={docs.map((d) => ({ label: d.kind, title: d.title, text: d.about, href: href(d.slug), linkLabel: 'Bekijk of download' }))} />
-    </div>
-  </section>
-
-  <section class="sectie sectie--vlak">
-    <div class="wrap prose">
-      <h2>Opdracht</h2>
-      <ol>
-        <li><strong>Mag het?</strong> Ga na of je deze verzonnen documenten in de AI van je werk mag zetten. Twijfel je, gebruik dan de chat met Claude naast de oefeningen of <a href="/training/oefeningen/claude/">in een eigen tabblad</a>. Daar kun je geen bestanden toevoegen: open het document, kopieer de tekst en plak die in de chat.</li>
-        <li><strong>Kies je bronnen.</strong> Download de documenten die je nodig denkt te hebben (rechtsklik op de link en kies "Opslaan"), of <a href="/training/oefeningen/documenten/alle-documenten.txt">alle documenten in één bestand</a>. Voeg ze toe aan een nieuw gesprek, of zet ze in een vaste werkruimte zoals een notebook. Let op: wie alles meegeeft, kiest niet. Dat is precies wat je hier bespreekt.</li>
-        <li><strong>Stel deze vragen,</strong> één voor één:
-          <ul>
+          <h2>Stel deze vragen</h2>
+          <ol>
             <li>Een klant met een storing in de straat vraagt hoe snel het is opgelost. Wat zeg ik?</li>
             <li>Wat kost Vezel 500 per maand?</li>
             <li>Wat moet er volgens US-014 gebouwd worden?</li>
             <li>Mag ik het telefoonnummer van een klant in de AI zetten als dat handig is?</li>
+          </ol>
+
+          <h2>Zo doe je het</h2>
+          <ol>
+            <li><strong>Kies je bronnen.</strong> Vink onderaan de documenten aan die je nodig denkt te hebben, en klik op "Zet in de chat". Ze komen in het invoervak van de chat; typ je vraag eronder en verstuur. Wie alles meegeeft, kiest niet. Dat is precies wat je straks bespreekt.</li>
+            <li><strong>Lees zelf mee.</strong> Klik op een document om het te openen in een nieuw tabblad.</li>
+            <li><strong>Vraag bij elk antwoord de bron:</strong> welk document, welk stuk, en van wanneer?</li>
+            <li><strong>Controleer:</strong> zijn je bronnen actueel en eenduidig? Vergelijk de antwoorden met de <a href="/" target="_blank" rel="noopener">website</a>, <a href="/pakket/" target="_blank" rel="noopener">Pakket samenstellen</a> en het <a href="/klantbeeld/" target="_blank" rel="noopener">Klantbeeld</a>.</li>
+            <li><strong>Kleurt de chat rood?</strong> Dan zat er in wat je meegaf iets dat niet naar een AI mag. Kijk wat de chat vond.</li>
+          </ol>
+          <p>Werk je liever in de AI van je werk? Open een document en download het (knop onder het document), en voeg het toe aan je gesprek. Ga eerst na of je deze verzonnen documenten daar mag gebruiken.</p>
+
+          <details class="reflectie">
+            <summary>Klaar? Open de vragen om na te bespreken</summary>
+            <ul>
+              <li>Welke documenten koos je, en waarom? Welke liet je weg?</li>
+              <li>Spraken de documenten elkaar tegen? Merkte de AI dat op, of koos hij stilletjes één antwoord?</li>
+              <li>Was elk document nog actueel? Hoe kon je dat zien?</li>
+              <li>Heeft de AI alles gelezen wat je meegaf? Hoe weet je dat?</li>
+              <li>Wat betekent dit voor de documenten die jij op je werk aan een AI geeft?</li>
+            </ul>
+          </details>
+
+          <h2 id="documenten">De documenten</h2>
+        </article>
+        <form id="docs" class="doc-form">
+          <ul class="doc-lijst">
+            {docs.map((d) => (
+              <li>
+                <input type="checkbox" id={`doc-${d.slug}`} name="doc" value={d.slug} data-titel={d.title}>
+                <label for={`doc-${d.slug}`}><span class="doc-soort">{d.kind}</span><span class="doc-titel">{d.title}</span><span class="doc-over">{d.about}</span></label>
+                <a class="doc-open" href={view(d.slug)} target="_blank" rel="noopener">Open ↗</a>
+              </li>
+            ))}
           </ul>
-        </li>
-        <li><strong>Vraag bij elk antwoord de bron:</strong> welk document, welk stuk, en van wanneer?</li>
-        <li><strong>Controleer:</strong> zijn je bronnen actueel en eenduidig? Vergelijk de antwoorden met de <a href="/">website</a>, <a href="/pakket/">Pakket samenstellen</a> en het <a href="/klantbeeld/">Klantbeeld</a>.</li>
-      </ol>
-      <h2>Nabespreken</h2>
-      <ul>
-        <li>Welke documenten koos je, en waarom? Welke liet je weg?</li>
-        <li>Spraken de documenten elkaar tegen? Merkte de AI dat op, of koos hij stilletjes één antwoord?</li>
-        <li>Was elk document nog actueel? Hoe kon je dat zien?</li>
-        <li>Wat betekent dit voor de documenten die jij op je werk aan een AI geeft?</li>
-      </ul>
+          <div class="doc-acties">
+            <button type="submit" class="prompt-knop">Zet in de chat</button>
+            <p class="prompt-status" id="docs-status" aria-live="polite">Nog geen document gekozen.</p>
+          </div>
+        </form>
+        <Volgende nr={6} />
+      </div>
+      <aside class="oef-chat" aria-label="Chat met Claude, zonder koppeling">
+        <div class="vc" data-vorm="paneel" data-context="06-documenten" data-assistent="zonder"></div>
+      </aside>
+      <script is:inline src="/assets/documenten.js" defer></script>
+      <script is:inline src="/assets/chat.js" defer></script>
     </div>
   </section>
 </Base>

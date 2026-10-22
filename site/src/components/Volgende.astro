@@ -1,0 +1,15 @@
+---
+// The button to the next step, at the bottom of every step of the route.
+// Its text is the number and title of the next step, as on the route page.
+import { route } from '../route';
+
+interface Props { nr: number }
+const { nr } = Astro.props;
+const next = route.find((s) => s.nr === nr + 1);
+---
+<nav class="volgende" aria-label="Verder op de route">
+  {next
+    ? <a class="knop knop--vol" href={next.href}>Stap {next.nr}: {next.title}<span aria-hidden="true"> →</span></a>
+    : <a class="knop knop--vol" href="/training/oefeningen/">Terug naar de route</a>}
+  {next && <a class="volgende-route" href="/training/oefeningen/">Terug naar de route</a>}
+</nav>

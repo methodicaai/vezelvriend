@@ -38,7 +38,7 @@ De container `ai` beheert de deelnemerscodes, draait de chat met Claude naast de
 
 **Privacy.** De database bevat namen van deelnemers en alles wat ze verstuurd hebben. Vertel deelnemers dat vooraf (de site meldt het bij het inloggen), zet codes uit na de training, en verwijder trainingen als je ze niet meer nodig hebt (knop onderaan de trainingspagina).
 
-**Antwoorden van vind de fout.** Die staan niet in deze openbare repo. Op de server staan ze in `/root/apps/vezelvriend/private/vind-de-fout.json` (een kopie van `trainer-private/antwoorden/vind-de-fout.json`); de map wordt alleen-lezen in de container `ai` gezet. De trainer geeft ze per training vrij in `/trainer/`.
+**Klant per deelnemer, aantekeningen en waarschuwingen.** De container `ai` haalt de lijst met oefenklanten op bij het Klantbeeld (`KLANTBEELD_INTERNAL_URL`) en geeft elke deelnemer er willekeurig een (stap 3 en 4). Wat deelnemers in stap 1 opschrijven en plakken, en de waarschuwingen van de chat (IBAN, e-mail, klantnummer en dergelijke), staan in dezelfde database en zijn te zien en te wissen in `/trainer/`.
 
 **Kosten.** Maximaal `AI_MAX_PER_DAY` vragen per deelnemer per dag (standaard 40) en een bestedingslimiet in de Anthropic Console. Het model staat in `AI_CHAT_MODEL` (standaard claude-sonnet-5-5).
 

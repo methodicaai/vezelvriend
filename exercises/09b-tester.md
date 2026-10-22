@@ -1,28 +1,30 @@
 ---
-stap: "9b"
+stap: "9"
+onderdeel: verdiepen
+keuze: tester
 title: Testcases uit de beslisboom
 role: Tester
 summary: Leid met AI testcases af uit de beslisboom, inclusief randgevallen, en toets ze aan het Klantsysteem en het Klantbeeld.
 ---
 
-# Stap 9b: Testcases uit de beslisboom
+# Tester: testcases uit de beslisboom
 
 ## Doel
 
 Je gebruikt AI om testcases te bedenken en leert dat de AI vooral de voor de hand liggende gevallen vindt. De randgevallen moet je zelf bewaken.
 
-**Tijd:** ± 45 minuten.
+
 
 ## Opdracht
 
-1. Lees de beslisboom bij [De systemen](/training/systemen/), of [download hem als tekst](/training/oefeningen/beslisboom.txt).
+1. Lees [de beslisboom](/training/oefeningen/documenten/beslisboom/).
 2. Laat de AI testcases maken, eerst kaal (prompt A). Schrijf daarna **zelf** een prompt met de beslisboom erbij, met het [promptkader](/training/oefeningen/werkbladen/). Vergelijk je prompt met prompt B hieronder, en gebruik de beste.
 3. Vul de lijst zelf aan met randgevallen. Denk in elk geval aan:
    - een meting die **precies 15 minuten** oud is;
    - een snelheid die precies op de grens van "normaal" ligt;
    - een klant die **dubbel** in de zoekresultaten van het Klantsysteem staat;
    - een herstart op afstand die vóór of ná de laatste meting gebeurde.
-4. Zoek in het Klantsysteem en het Klantbeeld naar een echte klant voor zoveel mogelijk testcases. Waar vind je er geen?
+4. Zoek in het [Klantsysteem](/klantsysteem/) en het [Klantbeeld](/klantbeeld/) naar een echte klant voor zoveel mogelijk testcases. Waar vind je er geen?
 5. Schrijf per testcase: beginsituatie, stappen, verwachte uitkomst en waar die verwachting op gebaseerd is.
 
 ## Voorbeeldprompt zonder context (A)

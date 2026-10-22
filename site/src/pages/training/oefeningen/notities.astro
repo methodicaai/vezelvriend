@@ -1,0 +1,21 @@
+---
+// The 50 servicedesk notes of step 5 as an export in the Vezelvriend house
+// style, with a download as plain text (servicedesk-notities.txt.ts). Built
+// from the same seed as the Klantsysteem (the generated world when it exists).
+import DocumentLayout from '../../../layouts/DocumentLayout.astro';
+import notes from '../../../../../data/seed/support_log.json';
+
+interface Note { log_id: string; logged_at: string; agent: string; customer_id: string | null; category: string; free_text: string }
+const time = (iso: string) => iso.replace('T', ' ').slice(0, 16);
+---
+<DocumentLayout title="Servicedesk: notities van vrijdag 16-10-2026" kind="Export uit het servicedesksysteem" download="/training/oefeningen/servicedesk-notities.txt" wide>
+  <p class="doc-meta">{(notes as Note[]).length} notities, op volgorde van tijd.</p>
+  <div class="doc-scroll"><table class="doc-tabel">
+    <thead><tr><th>Nummer</th><th>Tijd</th><th>Medewerker</th><th>Klant</th><th>Categorie</th><th>Notitie</th></tr></thead>
+    <tbody>
+      {(notes as Note[]).map((n) => (
+        <tr><td>{n.log_id}</td><td>{time(n.logged_at)}</td><td>{n.agent}</td><td>{n.customer_id ?? '-'}</td><td>{n.category}</td><td>{n.free_text}</td></tr>
+      ))}
+    </tbody>
+  </table></div>
+</DocumentLayout>

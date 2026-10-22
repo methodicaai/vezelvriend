@@ -1,29 +1,18 @@
 ---
 import Base from '../../../layouts/TrainingLayout.astro';
 import Pad from '../../../components/Pad.astro';
-import { getExercises } from '../../../exercises';
-const exercises = getExercises();
-const byStep = (nr: string) => exercises.find((ex) => ex.step === nr);
-const exHref = (nr: string) => `/training/oefeningen/${byStep(nr)?.slug}/`;
-const link = (nr: string, label: string) => ({ href: exHref(nr), label });
+import { route } from '../../../route';
 
-// The route: ten steps. Every page on it is called "Stap N" with the same number
-// as its stone, so participants never translate between two numberings.
-// First what AI can do for you, then the context ladder from step 0 to 4, the
-// test, depth per role (9a to 9c), and the participant's own work last.
-// Times are rough, for planning and self-study. core = the one-hour route.
-const route = [
-  { nr: '1', label: 'Begin hier · 20 min', title: 'Wat kan AI voor jou?', text: 'Kies een taak uit je eigen werk en zoek uit welke AI je hebt.', href: '/training/oefeningen/wat-kan-ai/', linkLabel: 'Naar stap 1', core: true },
-  { nr: '2', label: 'Uitleg · 5 min', title: 'De contexttrap', text: 'Kort overzicht: vijf manieren waarop context bij een AI komt. Elke trede leer je kennen vlak voor de oefening.', href: '/training/oefeningen/contexttrap/', linkLabel: 'Naar stap 2' },
-  { nr: '3', label: 'Trede 0 en 1 · 30 min', title: byStep('3')?.title ?? 'Context maakt het verschil', text: 'Dezelfde klantvraag, eerst kaal en daarna met gegevens die je zelf kiest.', href: exHref('3'), linkLabel: 'Naar stap 3', core: true },
-  { nr: '4', label: 'Trede 1 · 50 min', title: 'Wat mag er naar de AI?', text: 'Eerst vijftig notities van de servicedesk: wat geef je aan de AI, en wat niet? Daarna twaalf situaties: groen, oranje of rood?', links: [link('4a', '4a: de notities'), { href: '/training/oefeningen/wat-mag-hier/', label: '4b: groen, oranje of rood' }] },
-  { nr: '5', label: 'Trede 2 · 25 min', title: 'Jij kiest de documenten', text: 'Zet de documenten van Vezelvriend in je AI en vraag ernaar. Kloppen je bronnen?', href: '/training/oefeningen/documenten/', linkLabel: 'Naar stap 5' },
-  { nr: '6', label: 'Trede 3 · 25 min', title: byStep('6')?.title ?? 'Claude zoekt zelf', text: 'Claude haalt alles zelf op en wil een monteur aanvragen. Wat komt er ongevraagd mee?', href: exHref('6'), linkLabel: 'Naar stap 6' },
-  { nr: '7', label: 'Trede 4 · 30 min', title: byStep('7')?.title ?? 'Guardrails schrijven', text: 'Schrijf regels voor wat de AI wel en niet mag, en probeer ze te breken.', href: exHref('7'), linkLabel: 'Naar stap 7' },
-  { nr: '8', label: 'Proef · 20 min', title: 'Vind de fout', text: 'Acht AI-antwoorden. Eerst schatten hoe zeker je bent, dan controleren in de bron.', href: '/training/oefeningen/vind-de-fout/', linkLabel: 'Naar stap 8' },
-  { nr: '9', label: 'Naar je rol · 45 min per keuze', title: 'Verdiepen in je eigen vak', text: 'Kies wat bij je past: een user story (analist), testcases (tester) of SQL. De code is voor allebei.', links: [link('9a', '9a: analist'), link('9b', '9b: tester'), link('9c', '9c: SQL'), { href: '/training/oefeningen/code/', label: 'De code' }] },
-  { nr: '10', label: 'Eigen werk · 35 min', title: 'Werkbladen', text: 'Je eigen taak uit stap 1 in je eigen AI, en je als-dan-kaart om mee af te sluiten.', href: '/training/oefeningen/werkbladen/', linkLabel: 'Naar stap 10', core: true },
-];
+// The route: ten steps (src/route.ts). Every page on it is called "Stap N" with
+// the same number as its stone, so participants never translate between two
+// numberings. Times are rough, for planning and self-study. core = the short route.
+const short = (time: string) => time.replace('minuten', 'min');
+const pad = route.map((s) => ({
+  nr: String(s.nr),
+  label: `${s.trede ? `Trede ${s.trede.join(' en ')}` : s.kind} · ${short(s.time)}`,
+  title: s.title, text: s.text, href: s.href, linkLabel: `Naar stap ${s.nr}`, links: s.links, core: s.core,
+}));
+const coreSteps = route.filter((s) => s.core).map((s) => s.nr);
 ---
 <Base title="Oefeningen">
   <section class="hero">
@@ -38,13 +27,13 @@ const route = [
       <div class="route-kop">
         <h2>De route</h2>
         <div class="route-lengte" role="group" aria-label="Lengte van de route" hidden>
-          <button type="button" data-lengte="kort" aria-pressed="false">Kort <span>± 1 uur</span></button>
+          <button type="button" data-lengte="kort" aria-pressed="false">Kort <span>± 2 uur</span></button>
           <button type="button" data-lengte="alles" aria-pressed="true">Alles <span>± 5 uur</span></button>
         </div>
       </div>
       <p class="route-uitleg" data-voor="alles">Alle tien stappen. Heb je weinig tijd? Kies <strong>Kort</strong>: dan zie je alleen de stappen met <span class="pad-kern">kern</span>.</p>
-      <p class="route-uitleg" data-voor="kort" hidden>De korte route: stap 1, stap 3 (bij Mevrouw Jansen) en stap 10 met je eigen taak. De andere stappen kun je later doen.</p>
-      <Pad steps={route} />
+      <p class="route-uitleg" data-voor="kort" hidden>De korte route: stap {coreSteps.slice(0, -1).join(', ')} en {coreSteps.at(-1)}. Eerst wat AI voor jou kan en de contexttrap, dan de oefening met je eigen klant, en tot slot je eigen taak. De andere stappen kun je later doen.</p>
+      <Pad steps={pad} />
     </div>
   </section>
   <script is:inline src="/assets/pad.js" defer></script>

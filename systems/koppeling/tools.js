@@ -1,5 +1,5 @@
 // The tools an AI may use to look things up in the Vezelvriend systems
-// (step 3 and 4 of the context ladder: the AI fetches context itself).
+// (steps 4 and 5 of the context ladder: the AI fetches context itself).
 //
 // Full access on purpose: the tools return everything the systems hold
 // (names, phone, e-mail, bank details, earlier residents, the whole

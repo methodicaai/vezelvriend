@@ -7,22 +7,39 @@
 // pages look the same. Styling: .vlak in public/assets/site.css (training)
 // and public/vv/vezelvriend.css (company website).
 // tone: a traffic-light colour for the whole surface (training only), e.g. for
-// "green: AI does this well", "orange: watch out", "red: do not".
-interface Item { label?: string; title: string; text?: string; href?: string; linkLabel?: string; }
-interface Props { items: Item[]; columns?: 2 | 3; tone?: 'groen' | 'oranje' | 'rood'; }
-const { items, columns = 2, tone } = Astro.props;
-const external = (href: string) => href.startsWith('http');
+// "green: AI does this well", "orange: watch out", "red: do not". A toned
+// surface has one tint for all cells (no darker first cell).
+// Per cell: tone colours one cell (e.g. a weak example red next to a strong one
+// in green), number puts a large number in front of the title (numbered lists),
+// blocks add a prompt (pre), an example answer (quote) or extra text.
+interface Block { label?: string; pre?: string; quote?: string; text?: string }
+interface Item {
+  label?: string; title?: string; text?: string; href?: string; linkLabel?: string;
+  tone?: 'groen' | 'oranje' | 'rood'; number?: number; blocks?: Block[]; newTab?: boolean;
+}
+interface Props { items: Item[]; columns?: 1 | 2 | 3 | 4; tone?: 'groen' | 'oranje' | 'rood'; class?: string }
+const { items, columns = 2, tone, class: extra } = Astro.props;
+const external = (item: Item) => item.newTab || item.href!.startsWith('http');
 ---
-<div class={`vlak vlak--${columns}${tone ? ` vlak--${tone}` : ''}`}>
+<div class={`vlak vlak--${columns}${tone ? ` vlak--${tone}` : ''}${extra ? ` ${extra}` : ''}`}>
   {items.map((item, i) => (
-    <div class={`vlak-vak${i === 0 ? ' vlak-vak--accent' : ''}`}>
+    <div class={`vlak-vak${i === 0 && !tone && !item.tone && !item.number ? ' vlak-vak--accent' : ''}${item.tone ? ` vlak-vak--${item.tone}` : ''}${item.number ? ' vlak-vak--nummer' : ''}`}>
+      {item.number && <p class="vlak-nummer" aria-hidden="true">{item.number}</p>}
       {item.label && <p class="vlak-label">{item.label}</p>}
-      <h3>{item.title}</h3>
+      {item.title && <h3>{item.title}</h3>}
       {item.text && <p>{item.text}</p>}
+      {item.blocks?.map((b) => (
+        <>
+          {b.label && <p class="vlak-sub">{b.label}</p>}
+          {b.pre && <pre class="vlak-pre">{b.pre}</pre>}
+          {b.quote && <p class="vlak-quote">{b.quote}</p>}
+          {b.text && <p>{b.text}</p>}
+        </>
+      ))}
       {item.href && (
         <p class="vlak-link">
-          <a href={item.href} target={external(item.href) ? '_blank' : undefined} rel={external(item.href) ? 'noopener' : undefined}>
-            {item.linkLabel ?? 'Lees verder'}<span aria-hidden="true"> →</span>
+          <a href={item.href} target={external(item) ? '_blank' : undefined} rel={external(item) ? 'noopener' : undefined}>
+            {item.linkLabel ?? 'Lees verder'}<span aria-hidden="true"> {external(item) ? '↗' : '→'}</span>
           </a>
         </p>
       )}

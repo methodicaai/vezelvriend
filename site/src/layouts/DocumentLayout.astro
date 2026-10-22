@@ -1,0 +1,48 @@
+---
+// A company document of Vezelvriend (policy, mail, user story, decision tree,
+// servicedesk notes) as a page in the Vezelvriend house style, so it looks like
+// a real document of the company instead of a bare text file. Opens in its own
+// tab from the exercises. Styling: /vv/vezelvriend.css + /vv/document.css.
+// The fictional-company notice and noindex, as on every page.
+import { world } from '../world';
+
+interface Props { title: string; kind: string; download?: string; wide?: boolean }
+const { title, kind, download, wide = false } = Astro.props;
+---
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{title} | {world.company} (fictief)</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/vv/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/vv/vezelvriend.css">
+  <link rel="stylesheet" href="/vv/document.css">
+</head>
+<body class="doc-body">
+  <div class="fictief" role="note">
+    <p><strong>Let op: {world.company} is een fictief bedrijf</strong>, bedacht voor de AI-training van Methodica. Dit document is verzonnen.</p>
+  </div>
+  <header class="doc-kop">
+    <div class={`doc-wrap${wide ? ' doc-wrap--breed' : ''}`}>
+      <span class="vv-logo doc-logo"><img src="/vv/logo.svg" alt="" width="32" height="32"><span>vezel<span>vriend</span></span></span>
+      <span class="doc-intern">Intern document</span>
+    </div>
+  </header>
+  <main class={`doc-wrap${wide ? ' doc-wrap--breed' : ''}`}>
+    <article class="doc-papier">
+      <p class="doc-soort">{kind}</p>
+      <h1>{title}</h1>
+      <div class="doc-inhoud"><slot /></div>
+      <p class="doc-voet">Fictief document van {world.company}, bedacht voor de AI-training van Methodica.</p>
+    </article>
+    {download && (
+      <p class="doc-acties">
+        <a class="doc-knop" href={download} download>Download als tekstbestand</a>
+        <span>Om in je eigen AI te zetten (bestand toevoegen). Sluit dit tabblad om terug te gaan naar de oefening.</span>
+      </p>
+    )}
+  </main>
+</body>
+</html>

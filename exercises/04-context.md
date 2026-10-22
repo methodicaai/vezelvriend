@@ -1,31 +1,31 @@
 ---
-stap: "3"
+stap: "4"
 title: Context maakt het verschil
 role: Iedereen
-trede: [0, 1]
-summary: Dezelfde klantvraag, eerst kaal en daarna met de gegevens uit het Klantbeeld. Wat verandert er aan het antwoord van de AI?
+summary: Dezelfde klantvraag, eerst kaal en daarna met de gegevens uit de systemen. Wat verandert er aan het antwoord van de AI?
 ---
 
-# Stap 3: Context maakt het verschil
+# Stap 4: Context maakt het verschil
+
+<div class="mijn-klant"></div>
 
 ## Doel
 
 Je ervaart dat een AI-antwoord zo goed is als de context die je meegeeft. Je leert welke gegevens het verschil maken.
 
-**Tijd:** ± 30 minuten. Hierboven staat de uitleg van [trede 0 en 1 van de contexttrap](#trede-0), met een zwak en een sterk voorbeeld.
-
 ## Opdracht
 
-Een klant belt: **"Mijn modem doet het niet."**
+Een klant belt: **"Mijn modem doet het niet."** Die klant is jouw klant: hij staat hierboven. Je collega's hebben meestal een andere klant, dus vergelijk straks niet alleen de antwoorden, maar ook wat jullie meegaven.
 
-1. Kies een klant uit de lijst hieronder, of krijg er een van de trainer. Weet je het niet? Begin met **Mevrouw Jansen**, en doe daarna **Familie Bakker** als je tijd over hebt.
-2. Stel de vraag zonder context (prompt A): in de chat met Claude naast deze oefening (knop "Zet in de chat"), of in je eigen AI. Bewaar het antwoord.
-3. Open de klant in het **Klantbeeld**. Kijk op het tabblad **Techniek** en klik op **Modem controleren**. Kijk ook naar **Klanthistorie op adres**.
-4. Stel de vraag opnieuw, nu met context (prompt B). Neem alleen over wat je nodig vindt. De werkwijze van Vezelvriend is de beslisboom: [download hem als tekst](/training/oefeningen/beslisboom.txt) en plak hem bij "Onze werkwijze".
-5. Probeer daarna prompt C. Daar kies je alleen de klant: alle context wordt automatisch uit het Klantbeeld opgehaald en ingevuld. Dat is al een stap hoger op de trap: een systeem kiest de context voor je. Lees wat er is ingevuld voordat je het verstuurt.
-6. Leg de antwoorden van A, B en C naast elkaar.
-
-Klanten om mee te oefenen: Mevrouw Jansen, Familie Bakker, De heer El Amrani, Bloemenhuis Lente, Familie De Wit.
+1. Stel de vraag zonder context (prompt A): in de chat met Claude naast deze oefening (knop "Zet in de chat"), of in je eigen AI. Bewaar het antwoord.
+2. Zoek je klant op in de systemen. Elke link opent in een nieuw tabblad:
+   - [de klantgegevens](/klantbeeld/?systeem=klantbeeld) in het Klantbeeld;
+   - [Modem controleren](/klantbeeld/?systeem=modem): de meting, de straatstatus en de laatste herstart;
+   - [de klanthistorie op het adres](/klantbeeld/?systeem=historie);
+   - [de beslisboom](/training/oefeningen/documenten/beslisboom/): zo werkt de klantenservice van Vezelvriend.
+3. Stel de vraag opnieuw, nu met context (prompt B). Bij elk vak staat een link naar het systeem waar je het vindt. Neem alleen over wat je nodig vindt.
+4. Probeer daarna prompt C. Die heeft dezelfde vakken als B, maar nu vult het systeem ze automatisch met alles wat het Klantbeeld over jouw klant weet. Lees wat er is ingevuld voordat je het verstuurt.
+5. Leg de antwoorden van A, B en C naast elkaar.
 
 ## Voorbeeldprompt zonder context (A)
 
@@ -35,26 +35,32 @@ Een klant belt en zegt: "Mijn modem doet het niet." Wat moet ik doen?
 
 ## Voorbeeldprompt met context (B)
 
+Jij kiest wat erin gaat. Haal het uit de systemen met de links bij elk vak.
+
 ```prompt
 Je helpt een medewerker van de klantenservice van een glasvezelbedrijf.
 Het is nu zaterdag 17-10-2026 10:15.
 
 De klant zegt: "Mijn modem doet het niet."
 
+Klantgegevens:
+{{bron:klantbeeld|plak hier alleen de klantgegevens die je nodig vindt}}
+
 Modemgegevens uit ons systeem:
-{{plak hier de gegevens van "Modem controleren": status, sessie, snelheid, meettijd, straatstatus, laatste herstart}}
+{{bron:modem|plak hier de gegevens van "Modem controleren": status, sessie, snelheid, meettijd, straatstatus, laatste herstart}}
 
-Relevante klanthistorie op dit adres:
-{{plak hier alleen wat over deze klant en dit probleem gaat}}
+Klanthistorie op dit adres:
+{{bron:historie|plak hier alleen wat over deze klant en dit probleem gaat}}
 
-Onze werkwijze: {{plak hier de beslisboom (download hem via de link in stap 4)}}
+Onze werkwijze:
+{{bron:beslisboom|plak hier de beslisboom}}
 
 Wat is de volgende stap, en wat zeg ik tegen de klant? Leg kort uit waarom.
 ```
 
 ## Voorbeeldprompt met automatisch opgehaalde context (C)
 
-Kies de klant; de vakken worden automatisch gevuld met wat het Klantbeeld over deze klant weet.
+Dezelfde vakken als B, maar nu kiest het systeem: alles wat het Klantbeeld over jouw klant weet, wordt automatisch ingevuld.
 
 ```prompt
 Je helpt een medewerker van de klantenservice van een glasvezelbedrijf.
@@ -90,6 +96,7 @@ Kies een vraag die je op je werk vaak krijgt. Welke drie gegevens bepalen het an
 - Zou je het antwoord zonder controle aan de klant doorgeven?
 - Wat kwam er bij prompt C automatisch mee dat je bij prompt B bewust had weggelaten? Hoort dat in een prompt?
 - Was het antwoord van C beter dan dat van B? Is automatisch alle context meegeven altijd beter?
+- Kreeg je collega met een andere klant een heel ander antwoord? Waardoor kwam dat?
 - Ging alles goed? Hoe weet je dat het de volgende keer ook goed gaat, met andere gegevens of een andere AI?
 
 </details>

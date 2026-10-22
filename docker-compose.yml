@@ -103,12 +103,10 @@ services:
     environment:
       ORDERS_FILE: /orders/orders.json
       KOPPELING_URL: http://koppeling:3000
+      KLANTBEELD_INTERNAL_URL: http://klantbeeld:3000/klantbeeld   # the customers participants get (step 3 and 4)
     volumes:
       - ai-data:/data      # the conversations database survives restarts and updates
       - orders:/orders     # the trainer wipes the website orders from the trainer screen
-      # Trainer-only files that never go in this public repo (the answers of
-      # "vind de fout"). The folder exists only on the server; see docs/server.md.
-      - ./private:/private:ro
 
 volumes:
   ai-data:

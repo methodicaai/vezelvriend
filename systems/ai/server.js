@@ -10,10 +10,10 @@
 // The AI never reads the fake systems: the participant still decides what
 // context goes into the prompt. That stays the core of the training.
 import crypto from 'node:crypto';
-import fs from 'node:fs';
 import { aiEnabled } from './claude.js';
 import { ASSISTANTS, chatModel, decideRequest, runTurn } from './agent.js';
-import { openStore } from './store.js';
+import { FIXED_TRAINING, openStore } from './store.js';
+import { findSensitive } from './sensitive.js';
 import { KEEP_DAYS, readOrders, writeOrders } from '../shared/orders.js';
 import { cookie, registerFailure, sign, tooManyFailures, unsign } from '../shared/session.js';
 import { cookies, html, readForm, readJson, routesOf, serve } from '../shared/web.js';
@@ -91,6 +91,79 @@ function logout() {
   return json(200, { ok: true }, { 'Set-Cookie': cookie(PARTICIPANT_COOKIE, '', 0) });
 }
 
+// ---------------------------------------------------------------- own customer (step 3 and 4)
+//
+// Every participant works with a customer of their own: chosen at random from
+// the scenario customers when the code is made (or on first use), so two
+// participants of one group rarely share one, and fixed afterwards. The pool
+// comes from the Klantbeeld (the same list as the customer picker of prompt C).
+// The trainer (fixed code or trainer login) may pick any customer.
+
+const KLANTBEELD_INTERNAL_URL = process.env.KLANTBEELD_INTERNAL_URL ?? 'http://localhost:3002/klantbeeld';
+let pool = { at: 0, customers: [] };
+async function customerPool() {
+  if (pool.customers.length && Date.now() - pool.at < 10 * 60 * 1000) return pool.customers;
+  try {
+    const res = await fetch(`${KLANTBEELD_INTERNAL_URL}/api/klanten`, { signal: AbortSignal.timeout(3000) });
+    if (res.ok) pool = { at: Date.now(), customers: await res.json() };
+  } catch { /* Klantbeeld not reachable: keep the old list (or none) */ }
+  return pool.customers;
+}
+
+const mayChoose = (p) => !p || p.training_name === FIXED_TRAINING;
+
+async function myCustomer({ req }) {
+  const p = participantFrom(req);
+  if (!p && !isTrainer(req)) return json(401, { error: 'Log eerst in met je deelnemerscode.' });
+  const customers = await customerPool();
+  if (mayChoose(p)) {
+    // The trainer picks; the choice of the fixed code is kept, a trainer login keeps it in the browser.
+    const chosen = customers.find((c) => c.customer_id === p?.customer_id) ?? null;
+    return json(200, { vrij: true, opgeslagen: Boolean(p), klant: chosen, klanten: customers });
+  }
+  const id = p.customer_id ?? store.assignCustomer(p.participant_id, customers.map((c) => c.customer_id));
+  const klant = customers.find((c) => c.customer_id === id) ?? (id ? { customer_id: id, name: id, address: '' } : null);
+  return json(200, { vrij: false, klant });
+}
+
+async function chooseCustomer({ req }) {
+  const p = participantFrom(req);
+  if (!p || !mayChoose(p)) return json(403, { error: 'Je klant ligt vast. Vraag de trainer als je een andere wilt.' });
+  const { klant } = await readJson(req, 1_000);
+  const customers = await customerPool();
+  if (!customers.some((c) => c.customer_id === klant)) return json(400, { error: 'Onbekende klant.' });
+  store.setCustomer(p.participant_id, klant);
+  return json(200, { ok: true });
+}
+
+// ---------------------------------------------------------------- notes on a page (step 1)
+//
+// What a participant writes or pastes in a note field (components/Aantekening.astro).
+// Saved per participant, so the trainer can read it; kept until the trainer deletes it.
+
+const PAGE = /^[a-z0-9-]{1,40}$/;
+const MAX_NOTE_CHARS = 20_000;
+
+function getNotes({ req, url }) {
+  const p = participantFrom(req);
+  if (!p) return json(401, { error: 'Log in met je deelnemerscode om dit te bewaren.' });
+  const page = url.searchParams.get('pagina') ?? '';
+  if (!PAGE.test(page)) return json(400, { error: 'Onbekende pagina.' });
+  return json(200, Object.fromEntries(store.notesOf(p.participant_id, page).map((n) => [n.field, n.text])));
+}
+
+async function saveNote({ req }) {
+  const p = participantFrom(req);
+  if (!p) return json(401, { error: 'Log in met je deelnemerscode om dit te bewaren.' });
+  const body = await readJson(req, MAX_NOTE_CHARS * 2);
+  if (!PAGE.test(body.pagina ?? '') || !PAGE.test(body.veld ?? '')) return json(400, { error: 'Onbekend veld.' });
+  const text = typeof body.tekst === 'string' ? body.tekst : '';
+  if (text.length > MAX_NOTE_CHARS) return json(400, { error: `Dit is te lang (meer dan ${MAX_NOTE_CHARS} tekens).` });
+  if (store.notesOf(p.participant_id, body.pagina).length >= 30) return json(429, { error: 'Te veel velden op deze pagina.' });
+  store.saveNote(p.participant_id, body.pagina, body.veld, text);
+  return json(200, { ok: true });
+}
+
 // ---------------------------------------------------------------- the Vezelvriend chat (Claude with the AI connection)
 
 const CONTEXT = /^[a-z0-9-]{1,40}$/;
@@ -140,13 +213,15 @@ async function chatMessage({ req, params }) {
   const forClaude = c.note ? `[Melding van het systeem: ${c.note}]
 
 ${question}` : question;
+  // The chat warns (never blocks) when something goes in that should not go to an AI.
+  const warnings = findSensitive(question);
   const source = { kind: 'chat', training: trainingIdOf(p.participant_id), participant: p.participant_id, label: p.label, chat: c.chat_id };
   const result = await runTurn({ apiMessages: c.api_messages, question: forClaude, assistant: c.assistant, source });
   store.saveMessage({ participantId: p.participant_id, exercise: c.context, promptBlock: c.assistant === 'koppeling' ? 'Chat met koppeling' : 'Chat zonder koppeling', prompt: question,
-    answer: result.answer, status: result.status, error: result.error, model: result.model, inputTokens: result.inputTokens, outputTokens: result.outputTokens, durationMs: result.durationMs });
+    answer: result.answer, status: result.status, error: result.error, model: result.model, inputTokens: result.inputTokens, outputTokens: result.outputTokens, durationMs: result.durationMs, warnings });
   if (result.status === 'error') return json(502, { error: result.participantMessage });
 
-  const newItems = [{ type: 'vraag', text: question }, ...result.newItems];
+  const newItems = [{ type: 'vraag', text: question, ...(warnings.length ? { waarschuwingen: warnings } : {}) }, ...result.newItems];
   const title = c.items.length === 0 ? titleOf(question) : c.title;
   store.saveChat(c.chat_id, { title, apiMessages: result.apiMessages, items: [...c.items, ...newItems], note: null });
   return json(200, { title, items: newItems });
@@ -312,14 +387,14 @@ function ordersPanel() {
     </form>`}`;
 }
 
-// Technician requests that Claude made through the connection (step 6). All
+// Technician requests that Claude made through the connection (step 7). All
 // participants share one world, so the trainer clears them between two groups.
 async function requestsPanel() {
   const list = await fetch(`${KOPPELING_URL}/internal/verzoeken`, { signal: AbortSignal.timeout(3000) }).then((r) => r.json()).catch(() => null);
   if (!Array.isArray(list)) return html`<h2>Monteursverzoeken van de AI</h2><p class="uitleg">De koppeling is niet bereikbaar.</p>`;
   const open = list.filter((r) => r.status === 'wacht op goedkeuring').length;
   return html`<h2>Monteursverzoeken van de AI</h2>
-    <p class="uitleg">${list.length === 0 ? 'Er zijn geen monteursverzoeken.' : `${list.length} verzoek${list.length === 1 ? '' : 'en'}, waarvan ${open} nog wacht${open === 1 ? '' : 'en'} op goedkeuring.`} Alle deelnemers zien dezelfde verzoeken in het Klantbeeld. Wis ze vóór een nieuwe groep, zodat stap 6 schoon begint.</p>
+    <p class="uitleg">${list.length === 0 ? 'Er zijn geen monteursverzoeken.' : `${list.length} verzoek${list.length === 1 ? '' : 'en'}, waarvan ${open} nog wacht${open === 1 ? '' : 'en'} op goedkeuring.`} Alle deelnemers zien dezelfde verzoeken in het Klantbeeld. Wis ze vóór een nieuwe groep, zodat stap 7 schoon begint.</p>
     ${list.length === 0 ? '' : html`<form method="post" action="/trainer/verzoeken/wissen" class="paneel">
       <p><label><input type="checkbox" name="zeker" value="ja" required> Ja, wis alle ${list.length} monteursverzoeken</label></p>
       <p><button type="submit">Monteursverzoeken wissen</button></p>
@@ -332,29 +407,6 @@ async function wipeTechnicianRequests({ req }) {
     await fetch(`${KOPPELING_URL}/internal/wissen`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ alleen: 'verzoeken' }), signal: AbortSignal.timeout(3000) }).catch(() => {});
   }
   return redirect('/trainer/');
-}
-
-// The answers of "vind de fout" are trainer material: they are not in the public
-// repo or the site. On the server they sit in a private file (ANSWERS_FILE, mounted
-// read-only) and reach participants only after the trainer releases them.
-const ANSWERS_FILE = process.env.ANSWERS_FILE ?? '/private/vind-de-fout.json';
-function readAnswers() {
-  try { const list = JSON.parse(fs.readFileSync(ANSWERS_FILE, 'utf8')); return Array.isArray(list) ? list : null; } catch { return null; }
-}
-
-function findTheErrorAnswers({ req }) {
-  const p = participantFrom(req);
-  if (!p && !isTrainer(req)) return json(401, { error: 'Log eerst in met je deelnemerscode.' });
-  if (p && !p.answers_released) return json(200, { released: false });
-  const answers = readAnswers();
-  if (!answers) return json(200, { released: false });
-  return json(200, { released: true, answers });
-}
-
-async function setAnswersReleased({ req, params }) {
-  const form = await readForm(req);
-  store.setAnswersReleased(Number(params.id), form.get('vrijgeven') === '1');
-  return redirect(`/trainer/training/${Number(params.id)}`);
 }
 
 async function wipeOrders({ req }) {
@@ -373,6 +425,9 @@ async function createTraining({ req }) {
   }
   if (!name || labels.length === 0 || labels.length > 60) return { status: 400, body: trainerPage('Fout', html`<h1>Vul een naam en 1 tot 60 deelnemers in.</h1><p><a href="/trainer/">Terug</a></p>`) };
   const { trainingId, participants } = store.createTraining(name, labels);
+  // Give everyone a customer of their own right away (if the Klantbeeld is reachable; otherwise on first use).
+  const ids = (await customerPool()).map((c) => c.customer_id);
+  for (const p of store.participants(trainingId)) store.assignCustomer(p.participant_id, ids);
   return { body: codesPage(trainingId, name, participants) };
 }
 
@@ -405,23 +460,23 @@ async function trainingDetail({ params, url }) {
       <button type="submit" class="knop--licht">${t.active ? 'Codes uitzetten (training afgelopen)' : 'Codes weer aanzetten'}</button>
       <a class="knop knop--licht" href="/trainer/training/${t.training_id}/export.csv">Download als CSV</a>
     </form>
-    <form method="post" action="/trainer/training/${t.training_id}/antwoorden" class="zoek">
-      <input type="hidden" name="vrijgeven" value="${t.answers_released ? '0' : '1'}">
-      <span>Antwoorden van vind de fout: ${t.answers_released ? html`<span class="status status--ok">vrijgegeven</span>` : html`<span class="status status--uit">verborgen</span>`}${readAnswers() ? '' : ' (het antwoordbestand staat niet op deze server)'}</span>
-      <button type="submit" class="knop--licht">${t.answers_released ? 'Antwoorden weer verbergen' : 'Antwoorden vrijgeven'}</button>
-    </form>
-    <p class="uitleg">Vrijgegeven: deelnemers van deze training zien bij vind de fout de uitleg, nadat ze zelf hebben gekozen. Handig voor wie de proef alleen doet.</p>
 
     <h2>Deelnemers</h2>
     <div class="tabel-vak"><table>
-      <thead><tr><th>Deelnemer</th><th>Laatst ingelogd</th><th>AI-vragen</th><th>Ingeleverd</th><th></th></tr></thead>
+      <thead><tr><th>Deelnemer</th><th>Klant</th><th>Laatst ingelogd</th><th>AI-vragen</th><th>Waarschuwingen</th><th>Aantekeningen</th><th>Ingeleverd</th><th></th></tr></thead>
       <tbody>${participants.map((p) => html`<tr>
         <td><a href="/trainer/training/${t.training_id}?deelnemer=${p.participant_id}">${p.label}</a></td>
-        <td>${time(p.last_login_at)}</td><td>${p.messages}</td><td>${p.submissions}</td>
+        <td class="mono">${p.customer_id ?? (t.name === FIXED_TRAINING ? 'kiest zelf' : '-')}</td>
+        <td>${time(p.last_login_at)}</td><td>${p.messages}</td>
+        <td>${p.warnings ? html`<span class="status status--bad">${p.warnings}</span>` : '0'}</td><td>${p.notes}</td><td>${p.submissions}</td>
         <td><form method="post" action="/trainer/deelnemer/${p.participant_id}/nieuwe-code"><input type="hidden" name="training" value="${t.training_id}"><button class="knop--licht">Nieuwe code</button></form></td></tr>`)}</tbody>
     </table></div>
 
+    <p class="uitleg">Klant: de eigen klant van de deelnemer in stap 3 en 4, willekeurig gekozen. Waarschuwingen: berichten in de chat waarin iets stond dat niet naar een AI mag (zoals een IBAN, e-mailadres of klantnummer).</p>
+
     ${connectionPanel(t)}
+
+    ${notesPanel(t, filter, who, allLink)}
 
     <h2>Ingeleverd${filter ? html` door ${who} · ${allLink}` : ''}</h2>
     <p class="uitleg">Wat deelnemers zelf hebben ingeleverd uit hun eigen AI (bijvoorbeeld Copilot op het werk).</p>
@@ -440,6 +495,7 @@ async function trainingDetail({ params, url }) {
       <section class="paneel">
         <p class="uitleg"><strong>${m.label}</strong> · ${time(m.sent_at)} · ${m.exercise || '-'}${m.prompt_block ? ` · ${m.prompt_block}` : ''}
           · ${m.status === 'ok' ? 'beantwoord' : m.status === 'refusal' ? 'geweigerd' : 'fout'}${m.input_tokens !== null ? ` · ${m.input_tokens} + ${m.output_tokens} tokens` : ''}</p>
+        ${warningLine(m.warnings)}
         <div class="kolommen">
           <div><h3>Prompt</h3><pre class="schema">${m.prompt}</pre></div>
           <div><h3>Antwoord</h3><pre class="schema">${m.answer ?? m.error ?? ''}</pre></div>
@@ -478,6 +534,46 @@ const TOOL_LABELS = { zoek_klanten: 'klanten gezocht', klantbeeld: 'klantbeeld',
   storingen: 'storingen', beslisboom: 'beslisboom', documenten: 'lijst met documenten', document_lezen: 'document gelezen', sql: 'SQL-vraag', monteur_inplannen: 'monteur aangevraagd' };
 const lookup = (tool, args) => `${TOOL_LABELS[tool] ?? tool}${Object.values(args ?? {}).filter((v) => typeof v === 'string').length ? ` (${Object.values(args).filter((v) => typeof v === 'string').join(', ').slice(0, 160)})` : ''}`;
 
+/** Red line under a message: what the chat recognised as information that should not go to an AI. */
+const warningLine = (list) => (list?.length
+  ? html`<p class="melding fout"><strong>Waarschuwing:</strong> ${list.map((w) => `${w.soort} (${w.gevonden})`).join('; ')}</p>` : '');
+
+const NOTE_LABELS = {
+  'wat-kan-ai': 'Stap 1',
+  'poging-prompt': 'Probeer het meteen: de prompt', 'poging-antwoord': 'Probeer het meteen: het antwoord', 'poging-cijfer': 'Probeer het meteen: cijfer',
+  'ai-kort': 'Welke AI heb jij: antwoord op de korte vragen', 'ai-lang': 'Welke AI heb jij: antwoord op de lange vragen',
+};
+
+/** What participants wrote or pasted on the pages (step 1), with delete buttons. */
+function notesPanel(t, filter, who, allLink) {
+  const notes = store.notesOfTraining(t.training_id, filter);
+  const byParticipant = Map.groupBy(notes, (n) => n.participant_id);
+  return html`<h2>Aantekeningen${filter ? html` van ${who} · ${allLink}` : ''}</h2>
+    <p class="uitleg">Wat deelnemers in stap 1 hebben opgeschreven en geplakt: hun eerste poging en wat hun eigen AI kan. Het blijft bewaard tot je het hier wist.</p>
+    ${notes.length === 0 ? html`<p class="leeg">Nog geen aantekeningen.</p>` : [...byParticipant.values()].map((list) => html`
+      <details class="paneel">
+        <summary><strong>${list[0].label}</strong> · ${list.length} veld${list.length === 1 ? '' : 'en'} · laatst bijgewerkt ${time(list.map((n) => n.updated_at).sort().at(-1))}</summary>
+        ${list.map((n) => html`<h3>${NOTE_LABELS[n.page] ?? n.page} · ${NOTE_LABELS[n.field] ?? n.field}</h3><pre class="schema">${n.text}</pre>`)}
+        <form method="post" action="/trainer/training/${t.training_id}/aantekeningen/wissen">
+          <input type="hidden" name="deelnemer" value="${list[0].participant_id}">
+          <button type="submit" class="knop--licht">Aantekeningen van ${list[0].label} wissen</button>
+        </form>
+      </details>`)}
+    ${notes.length === 0 || filter ? '' : html`<form method="post" action="/trainer/training/${t.training_id}/aantekeningen/wissen" class="paneel">
+      <p><label><input type="checkbox" name="zeker" value="ja" required> Ja, wis alle aantekeningen van deze training</label></p>
+      <p><button type="submit">Alle aantekeningen wissen</button></p>
+    </form>`}`;
+}
+
+async function wipeNotes({ req, params }) {
+  const form = await readForm(req);
+  const trainingId = Number(params.id);
+  const one = Number(form.get('deelnemer') || 0);
+  if (one) store.deleteNotes(trainingId, one);
+  else if (form.get('zeker') === 'ja') store.deleteNotes(trainingId);
+  return redirect(`/trainer/training/${trainingId}`);
+}
+
 /** The chat conversations of a training, with what Claude looked up and what was decided. */
 function chatsPanel(t, filter, who, allLink) {
   const chats = store.chatsOfTraining(t.training_id, filter);
@@ -486,7 +582,7 @@ function chatsPanel(t, filter, who, allLink) {
     ${chats.length === 0 ? html`<p class="leeg">Nog geen chatgesprekken.</p>` : chats.map((c) => html`
       <details class="paneel">
         <summary><strong>${c.label}</strong> · ${c.assistant === 'koppeling' ? 'met koppeling' : 'zonder koppeling'} · ${c.context} · ${time(c.updated_at)} · ${c.title}</summary>
-        ${c.items.map((i) => i.type === 'vraag' ? html`<p><strong>Deelnemer:</strong> ${i.text}</p>`
+        ${c.items.map((i) => i.type === 'vraag' ? html`<p><strong>Deelnemer:</strong> ${i.text}</p>${warningLine(i.waarschuwingen)}`
           : i.type === 'tekst' ? html`<pre class="schema">${i.text}</pre>`
           : i.type === 'opvraging' ? html`<p class="uitleg">Claude vroeg op: ${lookup(i.tool, i.args)}${i.ok ? '' : ' (mislukt)'}</p>`
           : i.type === 'goedkeuring' ? html`<p><strong>Monteursverzoek ${i.verzoek}</strong> (${i.klantnummer}): ${i.status}</p>`
@@ -565,9 +661,11 @@ function exportCsv({ params }) {
   if (!t) return { status: 404, body: 'Niet gevonden' };
   const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   // One sheet for both; 'soort' tells a hand-in (own AI) from a Vezelvriend-AI conversation.
-  const rows = [['soort', 'deelnemer', 'tijdstip', 'oefening', 'prompt_blok', 'ai', 'status', 'prompt', 'antwoord', 'toelichting', 'tokens_in', 'tokens_uit']]
-    .concat(store.submissions(t.training_id).map((m) => ['ingeleverd', m.label, time(m.submitted_at), m.exercise, m.prompt_block, m.tool, '', m.prompt, m.answer, m.note, '', '']))
-    .concat(store.messages(t.training_id).map((m) => ['vezelvriend-ai', m.label, time(m.sent_at), m.exercise, m.prompt_block, m.model, m.status, m.prompt, m.answer ?? m.error, '', m.input_tokens, m.output_tokens]));
+  const rows = [['soort', 'deelnemer', 'tijdstip', 'oefening', 'prompt_blok', 'ai', 'status', 'prompt', 'antwoord', 'toelichting', 'tokens_in', 'tokens_uit', 'waarschuwingen']]
+    .concat(store.submissions(t.training_id).map((m) => ['ingeleverd', m.label, time(m.submitted_at), m.exercise, m.prompt_block, m.tool, '', m.prompt, m.answer, m.note, '', '', '']))
+    .concat(store.messages(t.training_id).map((m) => ['vezelvriend-ai', m.label, time(m.sent_at), m.exercise, m.prompt_block, m.model, m.status, m.prompt, m.answer ?? m.error, '', m.input_tokens, m.output_tokens,
+      m.warnings.map((w) => `${w.soort}: ${w.gevonden}`).join('; ')]))
+    .concat(store.notesOfTraining(t.training_id).map((n) => ['aantekening', n.label, time(n.updated_at), n.page, n.field, '', '', '', n.text, '', '', '', '']));
   const safeName = t.name.replace(/[^\w-]+/g, '_').slice(0, 50);
   return {
     type: 'text/csv; charset=utf-8',
@@ -585,6 +683,10 @@ serve({
     'POST /api/ai/logout': logout,
     'GET /api/ai/check': check,
     'POST /api/ai/inleveren': handIn,
+    'GET /api/ai/mijn-klant': myCustomer,
+    'POST /api/ai/mijn-klant': chooseCustomer,
+    'GET /api/ai/aantekeningen': getNotes,
+    'POST /api/ai/aantekeningen': saveNote,
     'GET /api/ai/chat': chatInfo,
     'GET /api/ai/chats': listChats,
     'POST /api/ai/chats': newChat,
@@ -598,8 +700,7 @@ serve({
     'POST /trainer/training': trainerOnly(createTraining),
     'POST /trainer/bestellingen/wissen': trainerOnly(wipeOrders),
     'POST /trainer/verzoeken/wissen': trainerOnly(wipeTechnicianRequests),
-    'POST /trainer/training/:id/antwoorden': trainerOnly(setAnswersReleased),
-    'GET /api/ai/vindfout': findTheErrorAnswers,
+    'POST /trainer/training/:id/aantekeningen/wissen': trainerOnly(wipeNotes),
     'GET /trainer/training/:id': trainerOnly(trainingDetail),
     'POST /trainer/training/:id/actief': trainerOnly(setActive),
     'POST /trainer/training/:id/verwijderen': trainerOnly(deleteTraining),

@@ -1,38 +1,71 @@
 ---
-// Step 2: a short overview of the context ladder, as an introduction. Each step
-// of the ladder is explained right above the exercise that practises it
-// (data and component: src/contexttrap.ts, components/Trede.astro).
+// Step 2: the context ladder. The only place where the ladder is shown and
+// explained: first the five steps as a staircase, then per step what it is, a
+// weak and a strong example (red and green) and the check question. The
+// exercises only carry the name of the step they practise (src/route.ts).
+// Data: src/contexttrap.ts.
 import Base from '../../../layouts/TrainingLayout.astro';
-import { steps, explainedAt } from '../../../contexttrap';
+import Vlak from '../../../components/Vlak.astro';
+import Volgende from '../../../components/Volgende.astro';
+import { steps } from '../../../contexttrap';
+import { headLine, route } from '../../../route';
+
+const practisedIn = (nr: number) => route.filter((s) => s.trede?.includes(nr));
+const example = (e: { prompt: string; answer: string; note: string }, label: string, tone: 'rood' | 'groen') => ({
+  label, tone,
+  blocks: [{ label: 'Prompt', pre: e.prompt }, { label: 'Antwoord van de AI (voorbeeld)', quote: e.answer }, { text: e.note }],
+});
 ---
-<Base title="De contexttrap" description="Kort overzicht: vijf manieren waarop context bij een AI komt.">
+<Base title="De contexttrap" description="Vijf manieren waarop context bij een AI komt, met voorbeelden en controlevragen.">
   <section class="hero">
     <div class="hero-inner">
-      <p class="eyebrow">Stap 2 · kort overzicht · ± 5 minuten</p>
+      <p class="eyebrow">{headLine(2)}</p>
       <h1>De contexttrap</h1>
-      <p class="lead">Goede context erin, kritisch nakijken eruit. Er zijn vijf manieren waarop context bij een AI komt: de vijf treden van de contexttrap. Hieronder zie je ze in één oogopslag. Elke trede leer je later kennen, vlak voor de oefening waarin je hem zelf doet.</p>
+      <p class="lead">Goede context erin, kritisch nakijken eruit. Er zijn vijf manieren waarop context bij een AI komt: de vijf treden van de contexttrap. Hieronder zie je ze eerst in één oogopslag, en daarna per trede een zwak en een sterk voorbeeld. In de oefeningen kom je ze weer tegen.</p>
     </div>
   </section>
 
   <section class="sectie">
     <div class="wrap">
-      <div class="tabel-vak">
-        <table class="tabel">
-          <thead><tr><th>Trede</th><th>Wie kiest de context?</th><th>Controlevraag</th><th>Uitleg en oefening</th></tr></thead>
-          <tbody>
-            {steps.map((s) => (
-              <tr><td><strong>{s.nr} {s.name}</strong></td><td>{s.who}</td><td>{s.check}</td><td><a href={explainedAt[s.nr].href}>{explainedAt[s.nr].label}</a></td></tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <h2>De vijf treden</h2>
+      <ol class="trap-trap">
+        {steps.map((s) => (
+          <li><a class={`trap-trede trap-h${s.nr}`} href={`#trede-${s.nr}`}>
+            <span class="trap-nr">{s.nr}</span>
+            <span class="trap-naam">{s.name}</span>
+            <span class="trap-wie">Wie kiest de context? {s.who}.</span>
+          </a></li>
+        ))}
+      </ol>
+      <p class="trap-pijl"><span>Jij ziet precies wat erin gaat, maar het kost je meer werk</span><span>Minder werk, maar je ziet minder wat erin gaat</span></p>
 
       <div class="trap-let-op">
         <p><strong>Hoger is niet beter.</strong> De treden zijn afwegingen, geen niveaus. Hoe hoger, hoe minder werk voor jou, maar hoe minder je zelf ziet wat er in de AI gaat. Een organisatie kan bewust op een lage trede blijven staan.</p>
         <p><strong>In de oefeningen zitten bewust fouten.</strong> Fouten maken is de bedoeling: daar leer je het meest van. Na elke oefening bespreek je met de trainer wat je zag, waarom het gebeurde, en wat het betekent voor jouw werk.</p>
       </div>
-
-      <p><a class="knop knop--vol" href="/training/oefeningen/03-context/">Naar stap 3: trede 0 en 1</a></p>
     </div>
   </section>
+
+  {steps.map((s, i) => (
+    <section class={`sectie trap-sectie${i % 2 === 0 ? ' sectie--vlak' : ''}`} id={`trede-${s.nr}`}>
+      <div class="wrap">
+        <p class="label">Trede {s.nr} · {s.who}</p>
+        <h2>{s.name}</h2>
+        <p class="prose">{s.intro} <em>Bijvoorbeeld: {s.copilot}.</em></p>
+        {s.rule && <p class="trap-regel prose"><strong>Vuistregel:</strong> {s.rule}</p>}
+
+        <Vlak columns={2} items={[example(s.weak, 'Zwak', 'rood'), example(s.strong, 'Sterk', 'groen')]} />
+
+        <div class="trap-controle">
+          <p class="trap-kop">Controlevraag: {s.check}</p>
+          <ul>{s.checkHow.map((c) => <li>{c}</li>)}</ul>
+          <p class="trap-risico"><strong>Nieuw risico op deze trede:</strong> {s.risk}</p>
+        </div>
+        {practisedIn(s.nr).length > 0 && (
+          <p class="trap-oefen">Je oefent dit in {practisedIn(s.nr).map((p, j) => <>{j > 0 && ' en '}<a href={p.href}>stap {p.nr}: {p.title}</a></>)}.</p>
+        )}
+        {i === steps.length - 1 && <Volgende nr={2} />}
+      </div>
+    </section>
+  ))}
 </Base>

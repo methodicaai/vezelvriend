@@ -4,8 +4,21 @@
 // people who want to do something with AI at work but do not know where to
 // start. We do not tell participants which step of the context ladder they are
 // on: the site cannot know that. Nothing here uses Vezelvriend data.
+// What participants write and paste here is saved under their code, so the
+// trainer can read it (components/Aantekening.astro).
 import Base from '../../../layouts/TrainingLayout.astro';
 import Vlak from '../../../components/Vlak.astro';
+import Aantekening from '../../../components/Aantekening.astro';
+import Volgende from '../../../components/Volgende.astro';
+import { headLine } from '../../../route';
+import { LONG, SHORT } from '../../../intake';
+
+const firstTask = [
+  { number: 1, title: 'Je doet hem vaak', text: 'Minstens elke week. Dan levert het iets op, en oefen je vanzelf.' },
+  { number: 2, title: 'Het is werk met tekst', text: 'Geen beslissing. De AI maakt een eerste versie, jij beslist.' },
+  { number: 3, title: 'Je kunt het nakijken', text: 'Je weet genoeg van het onderwerp om een fout te zien.' },
+  { number: 4, title: 'Er zit niets in dat niet mag', text: 'Geen persoonsgegevens of vertrouwelijke stukken, tenzij je werkgever dat uitdrukkelijk toestaat.' },
+];
 
 const tasks = [
   { label: 'Mail en berichten', title: 'Lezen en schrijven', text: 'Een lange mailwisseling samenvatten tot de afspraken. Een lastige mail herschrijven: korter, vriendelijker of duidelijker. Een eerste versie van een antwoord maken.' },
@@ -44,7 +57,7 @@ const red = [
 <Base title="Wat kan AI voor jou?" description="Ontdek welke taken in je werk geschikt zijn voor AI, en welke AI jij mag gebruiken.">
   <section class="hero">
     <div class="hero-inner">
-      <p class="eyebrow">Stap 1 · ± 20 minuten</p>
+      <p class="eyebrow">{headLine(1)}</p>
       <h1>Wat kan AI voor jou?</h1>
       <p class="lead">Voordat je leert hoe je AI goed gebruikt, kijk je eerst waarvoor. Welke taken in jouw werk lenen zich ervoor, en welke AI mag jij gebruiken? Met die twee antwoorden maak je de rest van de oefeningen, en aan het eind doe je een echte taak van jezelf.</p>
     </div>
@@ -75,40 +88,52 @@ const red = [
   </section>
 
   <section class="sectie sectie--vlak">
-    <div class="wrap prose">
+    <div class="wrap">
       <h2>Zo kies je je eerste taak</h2>
-      <p>Een goede eerste taak voldoet aan vier dingen:</p>
-      <ol>
-        <li><strong>Je doet hem vaak,</strong> minstens elke week. Dan levert het iets op, en oefen je vanzelf.</li>
-        <li><strong>Het is werk met tekst,</strong> geen beslissing. De AI maakt een eerste versie, jij beslist.</li>
-        <li><strong>Je kunt de uitkomst zelf controleren.</strong> Je weet genoeg van het onderwerp om een fout te zien.</li>
-        <li><strong>Er zit niets in dat niet naar de AI mag,</strong> zoals persoonsgegevens of vertrouwelijke stukken, tenzij je werkgever dat uitdrukkelijk toestaat.</li>
-      </ol>
-      <p><strong>Liever niet voor een eerste taak:</strong> beslissingen over mensen, feiten die je niet kunt nakijken, rekenwerk waar geld van afhangt, en alles waarvan je niet weet of het naar de AI mag.</p>
-      <h3>Probeer het meteen, één keer kaal</h3>
-      <p>Stel je AI de vraag voor je taak zoals je hem nu zou stellen, zonder voorbereiding. Kopieer het antwoord naar een document en bewaar het. Schat ook: hoe bruikbaar is dit, van 1 tot 10?</p>
-      <p>Aan het eind, bij de <a href="/training/oefeningen/werkbladen/">werkbladen</a>, doe je dezelfde taak opnieuw met alles wat je geleerd hebt. Dan zie je zelf wat het verschil is.</p>
+      <p class="prose">Een goede eerste taak voldoet aan vier dingen:</p>
+      <Vlak columns={4} items={firstTask} />
+
+      <h3 class="tussenkop">Probeer het meteen, één keer kaal</h3>
+      <div class="prose">
+        <p>Stel je AI de vraag voor je taak zoals je hem nu zou stellen, zonder voorbereiding. Schrijf hieronder op welke prompt je gebruikte, en plak het antwoord van je AI eronder.</p>
+        <p class="let-op"><strong>Let op:</strong> zet hier geen bedrijfsgevoelige gegevens in, zoals namen van klanten of collega's, cijfers of vertrouwelijke stukken. Haal ze eerst weg of vervang ze. Wat je hier invult, wordt bewaard en de trainer kan het lezen.</p>
+        <Aantekening page="wat-kan-ai" field="poging-prompt" label="1. Je prompt: wat vroeg je aan de AI?" rows={4} placeholder="Typ of plak hier je prompt" />
+        <Aantekening page="wat-kan-ai" field="poging-antwoord" label="2. Het antwoord van de AI" rows={8} placeholder="Plak hier het antwoord" />
+        <Aantekening page="wat-kan-ai" field="poging-cijfer" label="3. Hoe bruikbaar is dit, van 1 tot 10? En waarom?" rows={2} />
+      </div>
     </div>
   </section>
 
   <section class="sectie">
     <div class="wrap">
       <h2>Welke AI heb jij, en wat kan die?</h2>
-      <p class="prose">Plak deze vragen in de AI die je op je werk gebruikt. Ze testen niets en zoeken niets op: de AI vertelt alleen wat hij kan. Twijfel je of je dit mag vragen? Kijk dan in het menu van je AI, of vraag het je IT-afdeling.</p>
-      <pre class="prompt-alleen-kopieren"><code class="language-prompt">Ik ga binnenkort een training volgen over het gebruik van AI. Ik wil weten wat ik met jou kan doen. Beantwoord de vragen hieronder over je eigen mogelijkheden. Zoek daarvoor niets op en laat niets zien uit mijn mail, documenten of andere bestanden: vertel alleen wat je kunt. Weet je iets niet zeker, zeg dat dan.
-
-1. Kun je op internet zoeken?
-2. Kan ik een bestand toevoegen aan dit gesprek?
-3. Kan ik documenten en instructies bewaren op een vaste plek, zodat ik ze later weer kan gebruiken (bijvoorbeeld een project of notebook)?
-4. Kun je zelf in mijn documenten of mail zoeken, of moet ik je de informatie zelf geven?
-5. Onthoud je iets van mij tussen gesprekken?
-
-Antwoord per vraag met ja, nee of weet ik niet, en één zin uitleg.</code></pre>
-      <p class="prose">Schrijf de antwoorden op. Ze vertellen je welke manieren om context te geven jouw AI kent. Wat dat betekent, zie je in de volgende stappen. Koppelingen met andere systemen en agents stellen beheerders in; of die er zijn, weet je IT-afdeling het best.</p>
-      <p class="prose">Zei je AI ja op vraag 5? Dan gaat wat hij over jou onthoudt ongezien mee in elk gesprek. Dat is ook context. Kijk in de instellingen wat hij onthoudt, en haal weg wat er niet hoort.</p>
-      <p class="prose">Mag je de AI van je werk niet gebruiken voor deze training? Gebruik dan de chat met Claude die naast elke oefening staat. Daar gaat alleen verzonnen data in.</p>
-      <p><a class="knop knop--vol" href="/training/oefeningen/contexttrap/">Naar de contexttrap</a></p>
+      <div class="prose">
+        <p>Plak deze vragen in de AI die je op je werk gebruikt. Er zijn twee versies. <strong>Kort:</strong> vijf vragen, de AI vertelt wat hij kan. <strong>Lang:</strong> de AI test het echt, punt voor punt, en zet de uitkomst in een tabel. Dat duurt langer, maar dan weet je het zekerder.</p>
+      </div>
+      <div class="wissel" role="group" aria-label="Kies de korte of de lange versie" hidden>
+        <button type="button" data-deel="kort" aria-pressed="true">Kort</button>
+        <button type="button" data-deel="lang" aria-pressed="false">Lang</button>
+      </div>
+      <div class="wissel-deel prose" data-deel="kort">
+        <h3>Kort: vijf vragen</h3>
+        <pre class="prompt-alleen-kopieren"><code class="language-prompt">{SHORT}</code></pre>
+        <Aantekening page="wat-kan-ai" field="ai-kort" label="Plak hier het antwoord van je AI op de korte vragen" rows={8} />
+      </div>
+      <div class="wissel-deel prose" data-deel="lang">
+        <h3>Lang: laat de AI het testen</h3>
+        <pre class="prompt-alleen-kopieren"><code class="language-prompt">{LONG}</code></pre>
+        <Aantekening page="wat-kan-ai" field="ai-lang" label="Plak hier de tabel die je AI maakte" rows={10} />
+      </div>
+      <div class="prose">
+        <p class="let-op"><strong>Let op:</strong> plak alleen wat de trainer mag zien. Staan er namen van mappen, systemen of collega's in het antwoord, haal die dan eerst weg.</p>
+        <p>De antwoorden vertellen je welke manieren om context te geven jouw AI kent. Wat dat betekent, zie je in de volgende stappen. Koppelingen met andere systemen en agents stellen beheerders in; of die er zijn, weet je IT-afdeling het best.</p>
+        <p>Zegt je AI dat hij dingen over jou onthoudt (geheugen)? Dan gaat wat hij onthoudt ongezien mee in elk gesprek. Dat is ook context. Kijk in de instellingen wat hij onthoudt, en haal weg wat er niet hoort.</p>
+        <p>Mag je de AI van je werk niet gebruiken voor deze training? Gebruik dan de chat met Claude die naast de oefeningen staat. Daar gaat alleen verzonnen data in.</p>
+      </div>
+      <Volgende nr={1} />
     </div>
   </section>
   <script is:inline src="/assets/prompt.js" defer></script>
+  <script is:inline src="/assets/wissel.js" defer></script>
+  <script is:inline src="/assets/aantekening.js" defer></script>
 </Base>
