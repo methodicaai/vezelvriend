@@ -23,6 +23,11 @@ const store = openStore(process.env.AI_DB_FILE ?? '/data/ai.db');
 const MAX_PER_DAY = Number(process.env.AI_MAX_PER_DAY || 40);
 const MAX_PROMPT_CHARS = Number(process.env.AI_MAX_PROMPT_CHARS || 30_000);
 const TRAINER_PASSWORD = process.env.TRAINER_PASSWORD || '';
+// The trainer's own code that always works. Never in this public repo: only in
+// .env on the server. Too short a code is ignored, because anyone could guess it.
+const TRAINER_CODE = (process.env.TRAINER_CODE || '').trim();
+if (TRAINER_CODE.length >= 10) store.ensureFixedCode(TRAINER_CODE);
+else if (TRAINER_CODE) console.warn('TRAINER_CODE is shorter than 10 characters and is ignored.');
 
 const PARTICIPANT_COOKIE = 'vv_ai';
 const TRAINER_COOKIE = 'vv_trainer';

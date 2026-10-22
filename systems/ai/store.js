@@ -159,6 +159,21 @@ export function openStore(file) {
       }
     },
 
+    /**
+     * The trainer's fixed code (TRAINER_CODE in .env): a participant in its own
+     * training that is switched on again at every start, so the code always
+     * works. Only its hash is stored, like every other code.
+     */
+    ensureFixedCode(code) {
+      const name = 'Vaste code van de trainer';
+      let t = db.prepare('SELECT training_id FROM trainings WHERE name = ?').get(name);
+      if (!t) t = { training_id: Number(db.prepare('INSERT INTO trainings (name, created_at) VALUES (?, ?)').run(name, nowIso()).lastInsertRowid) };
+      db.prepare('UPDATE trainings SET active = 1 WHERE training_id = ?').run(t.training_id);
+      const p = db.prepare('SELECT participant_id FROM participants WHERE training_id = ?').get(t.training_id);
+      if (p) db.prepare('UPDATE participants SET code_hash = ? WHERE participant_id = ?').run(hashCode(code), p.participant_id);
+      else db.prepare('INSERT INTO participants (training_id, label, code_hash, created_at) VALUES (?, ?, ?, ?)').run(t.training_id, 'Trainer (vaste code)', hashCode(code), nowIso());
+    },
+
     /** Finds the participant for a code, only while the training is active. */
     login(code) {
       const p = db.prepare(`
