@@ -1,4 +1,4 @@
-// Your own customer (step 3 and 4). Every participant gets a customer of their
+// Your own customer (step 3 and 6). Every participant gets a customer of their
 // own (chosen at random by the server, then fixed); the trainer may pick any.
 //
 // - Fills every <div class="mijn-klant"> with who your customer is (or, for the

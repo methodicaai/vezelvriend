@@ -3,7 +3,7 @@
 // SQL and code. The participant chooses first; then only that part shows, with
 // the choices on top to switch at any time (/assets/keuze.js). Without
 // JavaScript all four parts show one below the other.
-// The analyst, tester and SQL parts are the exercise files 09a to 09c
+// The analyst, tester and SQL parts are the exercise files 11a to 11c
 // (frontmatter "onderdeel: verdiepen"); the code part is written here.
 import Base from '../../../layouts/TrainingLayout.astro';
 import Volgende from '../../../components/Volgende.astro';
@@ -26,9 +26,9 @@ const code = (path: string) => `/training/oefeningen/code/${path}/`;
   <section class="sectie">
     <div class="wrap oef-met-chat">
       <div class="oef-tekst">
-        <p class="eyebrow">{headLine(9)}</p>
+        <p class="eyebrow">{headLine(11)}</p>
         <article class="markdown">
-          <h1>Stap 9: Verdiepen in je eigen vak</h1>
+          <h1>Stap 11: Verdiepen in je eigen vak</h1>
           <p>Kies wat bij jouw werk past. Je ziet dan alleen dat deel. Wil je daarna nog iets anders doen, kies dan hier opnieuw.</p>
         </article>
         <div class="keuze-kaarten" role="group" aria-label="Kies een onderdeel" hidden>
@@ -76,10 +76,10 @@ const code = (path: string) => `/training/oefeningen/code/${path}/`;
             </details>
           </article>
         </section>
-        <Volgende nr={9} />
+        <Volgende nr={11} />
       </div>
       <aside class="oef-chat" aria-label="Chat met Claude, zonder koppeling">
-        <div class="vc" data-vorm="paneel" data-context="09-verdiepen" data-assistent="zonder"></div>
+        <div class="vc" data-vorm="paneel" data-context="11-verdiepen" data-assistent="zonder"></div>
       </aside>
       <script is:inline src="/assets/keuze.js" defer></script>
       <script is:inline src="/assets/prompt.js" defer></script>

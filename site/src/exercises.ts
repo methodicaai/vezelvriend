@@ -14,7 +14,7 @@ export function getExercises() {
       summary: mod.frontmatter.summary,
       // 'aan': the chat next to the exercise has the AI connection (Claude looks things up itself).
       connection: mod.frontmatter.koppeling === 'aan',
-      // Part of a page with several choices (step 9: "verdiepen"); such files get no page of their own.
+      // Part of a page with several choices (step 11: "verdiepen"); such files get no page of their own.
       part: (mod.frontmatter.onderdeel ?? null) as string | null,
       choice: (mod.frontmatter.keuze ?? null) as string | null,
       Content: mod.Content,

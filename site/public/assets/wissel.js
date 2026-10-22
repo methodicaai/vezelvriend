@@ -1,4 +1,4 @@
-// Switch between two versions on a page (step 1: the short and the long
+// Switch between two versions on a page (step 4: the short and the long
 // prompt). Buttons in .wissel with data-deel, parts in .wissel-deel with the
 // same data-deel. Without JavaScript both parts stay visible.
 (() => {

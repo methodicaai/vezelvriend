@@ -5,7 +5,7 @@
 // "koppeling: aan", where Claude looks things up itself).
 // At the top: step, the name of the ladder step it practises, and the time
 // (src/route.ts). At the bottom: the button to the next step.
-// Exercise files that are part of a page with choices (step 9) get no page here.
+// Exercise files that are part of a page with choices (step 11) get no page here.
 import Base from '../../../layouts/TrainingLayout.astro';
 import Volgende from '../../../components/Volgende.astro';
 import GroenOranjeRood from '../../../components/GroenOranjeRood.astro';
@@ -25,7 +25,7 @@ const { Content } = ex;
       <div class="oef-tekst">
         <p class="eyebrow">{headLine(ex.step)}</p>
         <article class="markdown"><Content /></article>
-        {ex.step === 5 && <GroenOranjeRood />}
+        {ex.step === 7 && <GroenOranjeRood />}
         <Volgende nr={ex.step} />
       </div>
       <aside class="oef-chat" aria-label={ex.connection ? 'Chat met Claude, met koppeling' : 'Chat met Claude, zonder koppeling'}>
@@ -35,7 +35,7 @@ const { Content } = ex;
       <script is:inline src="/assets/mijnklant.js" defer></script>
       <script is:inline src="/assets/prompt.js" defer></script>
       <script is:inline src="/assets/chat.js" defer></script>
-      {ex.step === 5 && <script is:inline src="/assets/sorteer.js" defer></script>}
+      {ex.step === 7 && <script is:inline src="/assets/sorteer.js" defer></script>}
     </div>
   </section>
 </Base>

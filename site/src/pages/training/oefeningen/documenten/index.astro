@@ -18,9 +18,9 @@ const view = (slug: string) => `/training/oefeningen/documenten/${slug}/`;
   <section class="sectie">
     <div class="wrap oef-met-chat">
       <div class="oef-tekst">
-        <p class="eyebrow">{headLine(6)}</p>
+        <p class="eyebrow">{headLine(8)}</p>
         <article class="markdown">
-          <h1>Stap 6: Documenten van Vezelvriend</h1>
+          <h1>Stap 8: Documenten van Vezelvriend</h1>
           <p>Onderaan deze pagina staan documenten van het oefenbedrijf: van de klantenservice, verkoop, het productteam en de directie. Je geeft ze aan de AI en stelt er vragen over.</p>
 
           <h2>Stel deze vragen</h2>
@@ -69,10 +69,10 @@ const view = (slug: string) => `/training/oefeningen/documenten/${slug}/`;
             <p class="prompt-status" id="docs-status" aria-live="polite">Nog geen document gekozen.</p>
           </div>
         </form>
-        <Volgende nr={6} />
+        <Volgende nr={8} />
       </div>
       <aside class="oef-chat" aria-label="Chat met Claude, zonder koppeling">
-        <div class="vc" data-vorm="paneel" data-context="06-documenten" data-assistent="zonder"></div>
+        <div class="vc" data-vorm="paneel" data-context="08-documenten" data-assistent="zonder"></div>
       </aside>
       <script is:inline src="/assets/documenten.js" defer></script>
       <script is:inline src="/assets/chat.js" defer></script>

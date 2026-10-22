@@ -1,4 +1,4 @@
-// The company documents of Vezelvriend, for step 6 ("Documenten van
+// The company documents of Vezelvriend, for step 8 ("Documenten van
 // Vezelvriend"). Participants open them as a page in the Vezelvriend house
 // style (components/DocumentLayout.astro), give them to the chat next to the
 // exercise, or download them as plain text for their own AI.

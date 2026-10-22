@@ -2,7 +2,7 @@
 // with a worked example (a weak and a strong prompt side by side, with an
 // example answer) and the check question for that step.
 //
-// The whole ladder is explained in one place: step 2 of the route
+// The whole ladder is explained in one place: step 5 of the route
 // (/training/oefeningen/contexttrap/). The exercises only carry the name of the
 // ladder step they practise, as a label (see src/route.ts), with no explanation
 // or link, so participants are never told which step "they" are on.

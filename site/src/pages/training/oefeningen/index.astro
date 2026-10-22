@@ -31,7 +31,7 @@ const coreSteps = route.filter((s) => s.core).map((s) => s.nr);
           <button type="button" data-lengte="alles" aria-pressed="true">Alles <span>± 5 uur</span></button>
         </div>
       </div>
-      <p class="route-uitleg" data-voor="alles">Alle tien stappen. Heb je weinig tijd? Kies <strong>Kort</strong>: dan zie je alleen de stappen met <span class="pad-kern">kern</span>.</p>
+      <p class="route-uitleg" data-voor="alles">Alle twaalf stappen. Heb je weinig tijd? Kies <strong>Kort</strong>: dan zie je alleen de stappen met <span class="pad-kern">kern</span>.</p>
       <p class="route-uitleg" data-voor="kort" hidden>De korte route: stap {coreSteps.slice(0, -1).join(', ')} en {coreSteps.at(-1)}. Eerst wat AI voor jou kan en de contexttrap, dan de oefening met je eigen klant, en tot slot je eigen taak. De andere stappen kun je later doen.</p>
       <Pad steps={pad} />
     </div>

@@ -1,15 +1,15 @@
 ---
-stap: "8"
+stap: "10"
 title: Guardrails schrijven
 role: Iedereen
 summary: Schrijf regels voor wat de AI wel en niet mag adviseren, en test ze op vier lastige situaties. Houdt de AI zich eraan, en is dat dan ook goed?
 ---
 
-# Stap 8: Guardrails schrijven
+# Stap 10: Guardrails schrijven
 
 ## Doel
 
-Je leert grenzen stellen aan een AI-assistent, zodat een goed klinkend antwoord geen verkeerde beslissing wordt. In stap 7 zag je een AI die zelf een monteur wilde aanvragen; hier bepaal jij de regels.
+Je leert grenzen stellen aan een AI-assistent, zodat een goed klinkend antwoord geen verkeerde beslissing wordt. In stap 9 zag je een AI die zelf een monteur wilde aanvragen; hier bepaal jij de regels.
 
 Je ontdekt twee dingen: een AI die zich aan je regels houdt, is nog geen goede AI. En dat het deze keer goed ging, zegt weinig over de volgende keer.
 

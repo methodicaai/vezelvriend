@@ -1,5 +1,5 @@
 ---
-// Step 2: the context ladder. The only place where the ladder is shown and
+// Step 5: the context ladder. The only place where the ladder is shown and
 // explained: first the five steps as a staircase, then per step what it is, a
 // weak and a strong example (red and green) and the check question. The
 // exercises only carry the name of the step they practise (src/route.ts).
@@ -19,7 +19,7 @@ const example = (e: { prompt: string; answer: string; note: string }, label: str
 <Base title="De contexttrap" description="Vijf manieren waarop context bij een AI komt, met voorbeelden en controlevragen.">
   <section class="hero">
     <div class="hero-inner">
-      <p class="eyebrow">{headLine(2)}</p>
+      <p class="eyebrow">{headLine(5)}</p>
       <h1>De contexttrap</h1>
       <p class="lead">Goede context erin, kritisch nakijken eruit. Er zijn vijf manieren waarop context bij een AI komt: de vijf treden van de contexttrap. Hieronder zie je ze eerst in één oogopslag, en daarna per trede een zwak en een sterk voorbeeld. In de oefeningen kom je ze weer tegen.</p>
     </div>
@@ -64,7 +64,7 @@ const example = (e: { prompt: string; answer: string; note: string }, label: str
         {practisedIn(s.nr).length > 0 && (
           <p class="trap-oefen">Je oefent dit in {practisedIn(s.nr).map((p, j) => <>{j > 0 && ' en '}<a href={p.href}>stap {p.nr}: {p.title}</a></>)}.</p>
         )}
-        {i === steps.length - 1 && <Volgende nr={2} />}
+        {i === steps.length - 1 && <Volgende nr={5} />}
       </div>
     </section>
   ))}

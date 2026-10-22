@@ -172,7 +172,7 @@
     box.append(ul);
     const tip = el('p', '', 'Dit is nu naar de AI gegaan. Haal het de volgende keer eerst weg of vervang het door een label, zoals [IBAN]. ');
     const how = el('a', '', 'Zo maak je gegevens veilig');
-    how.href = '/training/oefeningen/05-wat-mag-erin/#zo-maak-je-gegevens-veilig';
+    how.href = '/training/oefeningen/07-wat-mag-erin/#zo-maak-je-gegevens-veilig';
     how.target = '_blank'; how.rel = 'noopener';
     tip.append(how, '. De chat herkent niet alles: kijk ook zelf.');
     box.append(tip);

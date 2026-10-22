@@ -1,11 +1,15 @@
 ---
-import Base from '../../layouts/TrainingLayout.astro';
-import world from '../../../../config/world.json';
+// Step 1: the company Vezelvriend. Who it is, who works there, the fixed clock
+// of the practice world and the participant's role.
+import Base from '../../../layouts/TrainingLayout.astro';
+import Volgende from '../../../components/Volgende.astro';
+import { headLine } from '../../../route';
+import world from '../../../../../config/world.json';
 ---
 <Base title="Het bedrijf Vezelvriend">
   <section class="hero">
     <div class="hero-inner">
-      <p class="eyebrow">Het bedrijf</p>
+      <p class="eyebrow">{headLine(1)}</p>
       <h1>{world.company}</h1>
       <p class="lead">Een regionaal glasvezelbedrijf in {world.city} {world.district}, met ongeveer 25 medewerkers. Klein genoeg om iedereen te kennen, groot genoeg om rommelige systemen te hebben.</p>
     </div>
@@ -40,7 +44,8 @@ import world from '../../../../config/world.json';
       </div>
 
       <h2>De werkregel</h2>
-      <p>Er gaat pas een monteur als het modem <strong>aantoonbaar</strong> niet goed werkt. Een monteur kost geld en een dagdeel van de klant. Daarom werkt de klantenservice met een beslisboom, die je bij <a href="/training/systemen/">De systemen</a> vindt.</p>
+      <p>Er gaat pas een monteur als het modem <strong>aantoonbaar</strong> niet goed werkt. Een monteur kost geld en een dagdeel van de klant. Daarom werkt de klantenservice met <a href="/training/oefeningen/documenten/beslisboom/">een beslisboom</a>. In stap 3 maak je er kennis mee, samen met de andere systemen.</p>
+      <Volgende nr={1} />
     </div>
   </section>
 </Base>

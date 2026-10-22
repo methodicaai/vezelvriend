@@ -1,5 +1,5 @@
 ---
-stap: "9"
+stap: "11"
 onderdeel: verdiepen
 keuze: tester
 title: Testcases uit de beslisboom

@@ -1,4 +1,4 @@
-// "Groen, oranje of rood" (components/GroenOranjeRood.astro, step 5): the participant chooses for all
+// "Groen, oranje of rood" (components/GroenOranjeRood.astro, step 7): the participant chooses for all
 // twelve situations, locks the choices, and only then sees what the AI policy of
 // Vezelvriend says. Choices stay in this browser only (localStorage).
 (() => {

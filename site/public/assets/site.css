@@ -465,3 +465,7 @@ details.reflectie[open] summary{margin-bottom:.5rem}
 .tussenkop{margin:2.5rem 0 .75rem;font-family:var(--font-kop);font-weight:400;font-size:clamp(1.5rem,3vw,2rem)}
 a.prompt-knop{display:inline-block;text-decoration:none}
 .oef-tekst .keuze-kaarten{grid-template-columns:repeat(2,minmax(0,1fr))}
+.voet-links{display:flex;flex-wrap:wrap;gap:.4rem 1.5rem;padding-bottom:1.25rem;margin-bottom:1.25rem;border-bottom:1px solid rgba(255,255,255,.15)}
+.voet-links a{font-weight:700;text-decoration:none;color:var(--kleur-op-donker)}
+.voet-links a:hover{color:var(--kleur-accent)}
+.voet-links a[aria-current="page"]{color:var(--kleur-accent)}

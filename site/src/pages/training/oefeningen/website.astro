@@ -1,0 +1,51 @@
+---
+// Step 2: the website of Vezelvriend, as customers see it. A short tour with
+// the same set-up as the systems (components/Rondleiding.astro). The website is
+// also a source: what it says does not always match what is said inside the
+// company. Tasks are neutral on purpose: they never hint at what is wrong.
+import Base from '../../../layouts/TrainingLayout.astro';
+import Volgende from '../../../components/Volgende.astro';
+import Rondleiding from '../../../components/Rondleiding.astro';
+import { headLine } from '../../../route';
+
+const parts = [
+  { key: 'home', name: 'De voorpagina', href: '/', open: 'Open de website',
+    what: 'Wat Vezelvriend is en belooft, met de weg naar alle andere onderdelen.',
+    where: 'vezelvriend.nl', task: 'Wat belooft Vezelvriend zijn klanten?' },
+  { key: 'internet', name: 'Abonnementen', href: '/internet/', open: 'Open de abonnementen',
+    what: 'De abonnementen voor thuis en voor bedrijven, met snelheden en extra\'s.',
+    where: 'vezelvriend.nl › Internet', task: 'Welke snelheden zijn er voor thuis?' },
+  { key: 'storingen', name: 'Storingen', href: '/storingen/', open: 'Open de storingen',
+    what: 'De storingen van dit moment, op een kaart van het gebied.',
+    where: 'vezelvriend.nl › Storingen', task: 'Is er nu een storing? Waar?' },
+  { key: 'service', name: 'Service en voorwaarden', href: '/service/', open: 'Open Service',
+    what: 'Veelgestelde vragen over storingen, wifi en je abonnement, en de servicevoorwaarden.',
+    where: 'vezelvriend.nl › Service', task: 'Over welke onderwerpen staan er vragen?' },
+  { key: 'pakket', name: 'Pakket samenstellen', href: '/pakket/', open: 'Open Pakket samenstellen',
+    what: 'Klanten kiezen een snelheid en extra\'s, controleren hun adres en bestellen. Alle gegevens zijn verzonnen; je hoeft niet te bestellen.',
+    where: 'vezelvriend.nl › Pakket samenstellen', task: 'Stel een pakket samen. Wat kost het per maand?' },
+  { key: 'app', name: 'De app Mijn Vezelvriend', href: '/app/', open: 'Open de app',
+    what: 'De app waarin klanten hun eigen aansluiting zien. Je logt in met het klantnummer en de postcode van een voorbeeldklant; die staan op het inlogscherm.',
+    where: 'vezelvriend.nl › Mijn Vezelvriend', task: 'Log in als voorbeeldklant. Wat ziet een klant van zijn eigen aansluiting?' },
+];
+---
+<Base title="De website van Vezelvriend" description="Kennismaken met de website van het oefenbedrijf, zoals klanten hem zien.">
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">{headLine(2)}</p>
+      <h1>De website van Vezelvriend</h1>
+      <p class="lead">Dit zien klanten van Vezelvriend. Open elk onderdeel, zoek één ding op, en vink het af. De website is ook een bron: wat daar staat, zegt een klant soms aan de telefoon terug.</p>
+    </div>
+  </section>
+
+  <section class="sectie">
+    <div class="wrap smal">
+      <Rondleiding items={parts} store="website" noun="onderdelen" />
+      <div class="trap-let-op prose">
+        <p><strong>Let op:</strong> de website is van een verzonnen bedrijf. De adressen zijn echt, maar de klanten, prijzen en storingen zijn verzonnen.</p>
+      </div>
+      <Volgende nr={2} />
+    </div>
+  </section>
+  <script is:inline src="/assets/tour.js" defer></script>
+</Base>

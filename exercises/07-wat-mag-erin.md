@@ -1,11 +1,11 @@
 ---
-stap: "5"
+stap: "7"
 title: Wat mag er naar de AI?
 role: Iedereen
 summary: "Vijftig notities van de servicedesk. Wat geef je aan de AI, wat vervang je, en wat meld je aan het bronteam? Daarna twaalf situaties: groen, oranje of rood?"
 ---
 
-# Stap 5: Wat mag er naar de AI?
+# Stap 7: Wat mag er naar de AI?
 
 ## Doel
 
@@ -41,7 +41,7 @@ Zo maak je gegevens veilig voordat je ze in een AI zet, ook op je werk in Copilo
 
 1. **Vervang het zelf.** Maak van namen "Klant A", "Klant B", van rekeningnummers `[IBAN]` en van e-mailadressen `[e-mail]`. Dat kan altijd, met zoeken en vervangen in een teksteditor, en je hebt niets extra's nodig. Kijk daarna alles nog één keer na: een zoekopdracht mist vaak een schrijfwijze (met spaties, kleine letters).
 2. **Een hulpmiddel kan helpen.** Er zijn browserextensies die tekst maskeren voordat je hem plakt, en de echte gegevens in het antwoord weer terugzetten. Een voorbeeld is [Privatiser](https://addons.mozilla.org/firefox/addon/privatiser/) voor Firefox (werkt in ChatGPT, Claude, Gemini en Copilot). Een overzicht van gratis hulpmiddelen staat op [deze pagina](https://pasqualepillitteri.it/nl/news/19981/klantgegevens-anonimiseren-ai-avg). Microsoft heeft [Presidio](https://microsoft.github.io/presidio/), maar dat is gereedschap voor ontwikkelaars: alleen zinvol als IT het voor iedereen inricht. Zet nooit zelf iets op je werklaptop zonder toestemming van IT, en controleer het resultaat altijd: geen hulpmiddel vindt alles, en ze zijn niet getest op Nederlandse gegevens zoals een BSN.
-3. **Vraag je IT-afdeling welke route jullie hebben.** Misschien is er al een afspraak of een hulpmiddel. De lange prompt van stap 1 vroeg je AI hier ook naar (vraag 21).
+3. **Vraag je IT-afdeling welke route jullie hebben.** Misschien is er al een afspraak of een hulpmiddel. De lange prompt van stap 4 vroeg je AI hier ook naar (vraag 21).
 
 Kleurt de chat rood, doe dan dit en stuur het opnieuw.
 

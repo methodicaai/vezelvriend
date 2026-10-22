@@ -1,0 +1,25 @@
+---
+// A guided tour (steps 2 and 3): per part what it is, where it is, one thing to
+// look up, a button that opens it in a new tab and a "Gevonden" tick with a
+// counter (/assets/tour.js, remembered in this browser under `store`).
+// href with "?systeem=key" becomes a link for the participant's own customer
+// (/assets/mijnklant.js), when that script is on the page.
+export interface TourItem { key: string; name: string; what: string; where: string; task: string; usedIn?: string; href: string; open: string }
+interface Props { items: TourItem[]; store: string; noun: string }
+const { items, store, noun } = Astro.props;
+---
+<p class="tour-teller" id="tour-teller" aria-live="polite" data-woord={noun}></p>
+<ol class="tour" id="tour" data-opslag={store}>
+  {items.map((s) => (
+    <li class="tour-stap" data-systeem={s.key}>
+      <h3>{s.name}</h3>
+      <p>{s.what}</p>
+      <p class="tour-waar">Waar: {s.where}{s.usedIn && ` · Nodig in ${s.usedIn}`}</p>
+      <p class="tour-opdracht"><strong>Zoek op:</strong> {s.task}</p>
+      <p class="tour-acties">
+        <a class="prompt-knop" href={s.href} target="_blank" rel="noopener">{s.open} ↗</a>
+        <label><input type="checkbox" name="gevonden" value={s.key}> Gevonden</label>
+      </p>
+    </li>
+  ))}
+</ol>

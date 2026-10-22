@@ -1,5 +1,5 @@
 ---
-// First step of the route: before learning HOW to use AI well, participants
+// Step 4 of the route (the first about the participant's own work): before learning HOW to use AI well, participants
 // find out WHAT they could use it for, and what their AI can do. Written for
 // people who want to do something with AI at work but do not know where to
 // start. We do not tell participants which step of the context ladder they are
@@ -32,7 +32,7 @@ const tasks = [
   { label: 'Leren', title: 'Jezelf iets eigen maken', text: 'Een nieuw begrip of vakgebied laten uitleggen, met voorbeelden. Jezelf laten overhoren. Een Excel-formule stap voor stap laten uitleggen.' },
 ];
 
-// Traffic light, as in step 4b. Orange: where AI is weak depends on what it
+// Traffic light, as in step 7. Orange: where AI is weak depends on what it
 // has to work with; the same task can go well with the right context or tool,
 // and wrong without. Sources (22-10-2026): BCG/Harvard "jagged frontier" field
 // experiment, Autoriteit Persoonsgegevens on data leaks via AI chatbots, EU AI
@@ -57,7 +57,7 @@ const red = [
 <Base title="Wat kan AI voor jou?" description="Ontdek welke taken in je werk geschikt zijn voor AI, en welke AI jij mag gebruiken.">
   <section class="hero">
     <div class="hero-inner">
-      <p class="eyebrow">{headLine(1)}</p>
+      <p class="eyebrow">{headLine(4)}</p>
       <h1>Wat kan AI voor jou?</h1>
       <p class="lead">Voordat je leert hoe je AI goed gebruikt, kijk je eerst waarvoor. Welke taken in jouw werk lenen zich ervoor, en welke AI mag jij gebruiken? Met die twee antwoorden maak je de rest van de oefeningen, en aan het eind doe je een echte taak van jezelf.</p>
     </div>
@@ -130,7 +130,7 @@ const red = [
         <p>Zegt je AI dat hij dingen over jou onthoudt (geheugen)? Dan gaat wat hij onthoudt ongezien mee in elk gesprek. Dat is ook context. Kijk in de instellingen wat hij onthoudt, en haal weg wat er niet hoort.</p>
         <p>Mag je de AI van je werk niet gebruiken voor deze training? Gebruik dan de chat met Claude die naast de oefeningen staat. Daar gaat alleen verzonnen data in.</p>
       </div>
-      <Volgende nr={1} />
+      <Volgende nr={4} />
     </div>
   </section>
   <script is:inline src="/assets/prompt.js" defer></script>

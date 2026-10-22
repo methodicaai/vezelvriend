@@ -1,11 +1,11 @@
 ---
-stap: "4"
+stap: "6"
 title: Context maakt het verschil
 role: Iedereen
 summary: Dezelfde klantvraag, eerst kaal en daarna met de gegevens uit de systemen. Wat verandert er aan het antwoord van de AI?
 ---
 
-# Stap 4: Context maakt het verschil
+# Stap 6: Context maakt het verschil
 
 <div class="mijn-klant"></div>
 

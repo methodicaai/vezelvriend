@@ -9,19 +9,15 @@ import world from '../../../config/world.json';
 interface Props { title: string; description?: string; }
 const { title, description = 'Oefenomgeving van Methodica: leer AI goed inzetten met context, guardrails en oog voor valkuilen in data.' } = Astro.props;
 
-const nav = [
+// No menu at the top: everything starts at Start and follows the route. The
+// other pages are linked in the footer of every page.
+const footerLinks = [
   { href: '/training/', label: 'Start' },
-  { href: '/training/bedrijf/', label: 'Het bedrijf Vezelvriend' },
-  { href: '/training/systemen/', label: 'De systemen' },
-  { href: '/training/oefeningen/', label: 'Oefeningen' },
+  { href: '/training/oefeningen/', label: 'De route' },
   { href: '/training/oefeningen/code/', label: 'Code' },
   { href: '/training/over-methodica/', label: 'Over Methodica' },
   { href: '/', label: 'Naar vezelvriend.nl' },
 ];
-const path = Astro.url.pathname;
-const CODE = '/training/oefeningen/code/';
-const isCurrent = (href: string) => href === '/' ? false : href === '/training/' ? path === '/training/'
-  : href === '/training/oefeningen/' ? path.startsWith(href) && !path.startsWith(CODE) : path.startsWith(href);
 ---
 <!doctype html>
 <html lang="nl">
@@ -49,13 +45,6 @@ const isCurrent = (href: string) => href === '/' ? false : href === '/training/'
         <img src="/favicon.svg" alt="" width="28" height="28">
         <span><span class="brand-name">Vezelvriend</span><br><span class="brand-sub">oefenomgeving van Methodica</span></span>
       </a>
-      <nav aria-label="Hoofdmenu">
-        <ul class="nav-list">
-          {nav.map((item) => (
-            <li><a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a></li>
-          ))}
-        </ul>
-      </nav>
     </div>
   </header>
   <main id="inhoud">
@@ -63,6 +52,9 @@ const isCurrent = (href: string) => href === '/' ? false : href === '/training/'
   </main>
   <footer class="site-footer">
     <div class="wrap">
+      <nav class="voet-links" aria-label="Meer">
+        {footerLinks.map((l) => <a href={l.href} aria-current={Astro.url.pathname === l.href ? 'page' : undefined}>{l.label}</a>)}
+      </nav>
       <p class="voet-naam">Methodica</p>
       <p>AI is zo goed als de context die je meegeeft.</p>
       <p>{world.company} ({world.city} {world.district}) is fictief. Code: MIT-licentie. Oefeningen en teksten: CC BY-NC 4.0. <a href="https://github.com/methodicaai/vezelvriend">Bekijk de broncode</a>.</p>

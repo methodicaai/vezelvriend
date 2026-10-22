@@ -1,43 +1,36 @@
 ---
-// Step 3: getting to know the systems, right before the first exercise. Every
+// Step 3: getting to know the systems, right before the exercises. Every
 // participant has a customer of their own (/assets/mijnklant.js) and looks it
 // up in each system: open it in a new tab, find one thing, tick it off. After
 // this the exercises link straight to the systems. The list: src/systems.ts.
 import Base from '../../../layouts/TrainingLayout.astro';
 import Volgende from '../../../components/Volgende.astro';
+import Rondleiding from '../../../components/Rondleiding.astro';
 import { tour } from '../../../systems';
 import { headLine } from '../../../route';
+
+const items = tour.map((s) => ({
+  ...s,
+  href: s.key === 'beslisboom' ? '/training/oefeningen/documenten/beslisboom/' : `/${s.key === 'klantsysteem' ? 'klantsysteem' : 'klantbeeld'}/?systeem=${s.key}`,
+  open: `Open ${s.name.split(':')[0]}`,
+}));
 ---
 <Base title="De systemen van Vezelvriend" description="Kennismaken met de systemen van het oefenbedrijf, met je eigen klant.">
   <section class="hero">
     <div class="hero-inner">
       <p class="eyebrow">{headLine(3)}</p>
       <h1>De systemen van Vezelvriend</h1>
-      <p class="lead">In de oefeningen haal je gegevens uit de systemen van Vezelvriend. Hier maak je er eerst kennis mee, met een klant die voor jou is gekozen. Open elk systeem, zoek één ding op, en vink het af. Daarna weet je waar je wat vindt.</p>
+      <p class="lead">In de oefeningen haal je gegevens uit de systemen van Vezelvriend. Ze zijn nagebouwd voor de training: eenvoudig, maar met de rommel van echte bedrijfssoftware. Je maakt er kennis mee met een klant die voor jou is gekozen. Open elk systeem, zoek één ding op, en vink het af.</p>
     </div>
   </section>
 
   <section class="sectie">
     <div class="wrap smal">
       <div class="mijn-klant"></div>
-      <p class="tour-teller" id="tour-teller" aria-live="polite"></p>
-      <ol class="tour" id="tour">
-        {tour.map((s) => (
-          <li class="tour-stap" data-systeem={s.key}>
-            <h3>{s.name}</h3>
-            <p>{s.what}</p>
-            <p class="tour-waar">Waar: {s.where} · Nodig in {s.usedIn}</p>
-            <p class="tour-opdracht"><strong>Zoek op:</strong> {s.task}</p>
-            <p class="tour-acties">
-              <a class="prompt-knop" href={s.key === 'beslisboom' ? '/training/oefeningen/documenten/beslisboom/' : `/${s.key === 'klantsysteem' ? 'klantsysteem' : 'klantbeeld'}/?systeem=${s.key}`} target="_blank" rel="noopener">Open {s.name.split(':')[0]} ↗</a>
-              <label><input type="checkbox" name="gevonden" value={s.key}> Gevonden</label>
-            </p>
-          </li>
-        ))}
-      </ol>
+      <Rondleiding items={items} store="systemen" noun="systemen" />
 
       <div class="trap-let-op prose">
-        <p><strong>Kan de AI in deze systemen kijken?</strong> Meestal niet. Je eigen AI kan de gegevens niet zelf ophalen: jij kiest wat je overneemt in je prompt, en jij ziet of een meting oud is of dat er een storing in de straat is. Er is één uitzondering: de chat met Claude <strong>met koppeling</strong> in stap 7. Daar zoekt Claude zelf, met volledige toegang.</p>
+        <p><strong>Kan de AI in deze systemen kijken?</strong> Meestal niet. Je eigen AI kan de gegevens niet zelf ophalen: jij kiest wat je overneemt in je prompt, en jij ziet of een meting oud is of dat er een storing in de straat is. Er is één uitzondering: de chat met Claude <strong>met koppeling</strong> in stap 9. Daar zoekt Claude zelf, met volledige toegang.</p>
         <p>Klantgegevens, metingen, historie: alles wat je hier ziet is ook context. Denk bij elk systeem al na: wat hiervan zou jij aan een AI geven, en wat niet?</p>
       </div>
       <Volgende nr={3} />

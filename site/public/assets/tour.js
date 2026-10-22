@@ -1,10 +1,11 @@
-// Step 3: ticks off the systems the participant has looked at, with a counter.
-// Remembered in this browser only.
+// Guided tours (components/Rondleiding.astro, steps 2 and 3): ticks off what the
+// participant has looked at, with a counter. Remembered in this browser only.
 (() => {
   const list = document.getElementById('tour');
   if (!list) return;
-  const KEY = 'vv-systemen-gevonden';
+  const KEY = `vv-rondleiding-${list.dataset.opslag}`;
   const counter = document.getElementById('tour-teller');
+  const noun = counter.dataset.woord;
   const steps = [...list.querySelectorAll('.tour-stap')];
   let done = [];
   try { done = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { /* fresh start */ }
@@ -16,7 +17,7 @@
       s.querySelector('input').checked = on;
     });
     const n = steps.filter((s) => done.includes(s.dataset.systeem)).length;
-    counter.textContent = n === steps.length ? `Alle ${n} systemen gevonden. Je bent klaar voor stap 4.` : `${n} van ${steps.length} systemen gevonden.`;
+    counter.textContent = n === steps.length ? `Alle ${n} ${noun} gevonden. Je bent klaar voor de volgende stap.` : `${n} van ${steps.length} ${noun} gevonden.`;
   };
   list.addEventListener('change', (e) => {
     if (e.target.name !== 'gevonden') return;

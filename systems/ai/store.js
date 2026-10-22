@@ -86,7 +86,7 @@ CREATE INDEX IF NOT EXISTS chats_by_participant ON chats(participant_id, updated
 -- One key per training for the AI connection (systems/koppeling): participants
 -- add https://<site>/mcp/<key> to an AI app of their own. Stored as a hash,
 -- shown once; it works only while the training is active.
--- What participants write or paste on a page (step 1: their first attempt and
+-- What participants write or paste on a page (step 4: their first attempt and
 -- what their own AI can do), so the trainer can read it. One text per field;
 -- kept until the trainer deletes it.
 CREATE TABLE IF NOT EXISTS notes (
@@ -131,7 +131,7 @@ export function openStore(file) {
   if (!db.prepare('PRAGMA table_info(chats)').all().some((c) => c.name === 'assistant')) {
     db.exec("ALTER TABLE chats ADD COLUMN assistant TEXT NOT NULL DEFAULT 'zonder'");
   }
-  // Each participant gets a customer of their own for the exercises (step 3 and 4).
+  // Each participant gets a customer of their own for the exercises (step 3 and 6).
   if (!db.prepare('PRAGMA table_info(participants)').all().some((c) => c.name === 'customer_id')) {
     db.exec('ALTER TABLE participants ADD COLUMN customer_id TEXT');
   }

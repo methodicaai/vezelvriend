@@ -1,4 +1,4 @@
-// The two intake prompts of step 1 ("Welke AI heb jij, en wat kan die?"),
+// The two intake prompts of step 4 ("Welke AI heb jij, en wat kan die?"),
 // for the participant's own AI at work. Short: the AI tells what it can.
 // Long (text by David, 22-10-2026): the AI really tests every point and puts
 // the outcome in a table. Copy-only: they are not meant for the chat here.

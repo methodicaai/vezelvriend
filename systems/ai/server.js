@@ -91,7 +91,7 @@ function logout() {
   return json(200, { ok: true }, { 'Set-Cookie': cookie(PARTICIPANT_COOKIE, '', 0) });
 }
 
-// ---------------------------------------------------------------- own customer (step 3 and 4)
+// ---------------------------------------------------------------- own customer (step 3 and 6)
 //
 // Every participant works with a customer of their own: chosen at random from
 // the scenario customers when the code is made (or on first use), so two
@@ -136,7 +136,7 @@ async function chooseCustomer({ req }) {
   return json(200, { ok: true });
 }
 
-// ---------------------------------------------------------------- notes on a page (step 1)
+// ---------------------------------------------------------------- notes on a page (step 4)
 //
 // What a participant writes or pastes in a note field (components/Aantekening.astro).
 // Saved per participant, so the trainer can read it; kept until the trainer deletes it.
@@ -387,14 +387,14 @@ function ordersPanel() {
     </form>`}`;
 }
 
-// Technician requests that Claude made through the connection (step 7). All
+// Technician requests that Claude made through the connection (step 9). All
 // participants share one world, so the trainer clears them between two groups.
 async function requestsPanel() {
   const list = await fetch(`${KOPPELING_URL}/internal/verzoeken`, { signal: AbortSignal.timeout(3000) }).then((r) => r.json()).catch(() => null);
   if (!Array.isArray(list)) return html`<h2>Monteursverzoeken van de AI</h2><p class="uitleg">De koppeling is niet bereikbaar.</p>`;
   const open = list.filter((r) => r.status === 'wacht op goedkeuring').length;
   return html`<h2>Monteursverzoeken van de AI</h2>
-    <p class="uitleg">${list.length === 0 ? 'Er zijn geen monteursverzoeken.' : `${list.length} verzoek${list.length === 1 ? '' : 'en'}, waarvan ${open} nog wacht${open === 1 ? '' : 'en'} op goedkeuring.`} Alle deelnemers zien dezelfde verzoeken in het Klantbeeld. Wis ze vóór een nieuwe groep, zodat stap 7 schoon begint.</p>
+    <p class="uitleg">${list.length === 0 ? 'Er zijn geen monteursverzoeken.' : `${list.length} verzoek${list.length === 1 ? '' : 'en'}, waarvan ${open} nog wacht${open === 1 ? '' : 'en'} op goedkeuring.`} Alle deelnemers zien dezelfde verzoeken in het Klantbeeld. Wis ze vóór een nieuwe groep, zodat stap 9 schoon begint.</p>
     ${list.length === 0 ? '' : html`<form method="post" action="/trainer/verzoeken/wissen" class="paneel">
       <p><label><input type="checkbox" name="zeker" value="ja" required> Ja, wis alle ${list.length} monteursverzoeken</label></p>
       <p><button type="submit">Monteursverzoeken wissen</button></p>
@@ -472,7 +472,7 @@ async function trainingDetail({ params, url }) {
         <td><form method="post" action="/trainer/deelnemer/${p.participant_id}/nieuwe-code"><input type="hidden" name="training" value="${t.training_id}"><button class="knop--licht">Nieuwe code</button></form></td></tr>`)}</tbody>
     </table></div>
 
-    <p class="uitleg">Klant: de eigen klant van de deelnemer in stap 3 en 4, willekeurig gekozen. Waarschuwingen: berichten in de chat waarin iets stond dat niet naar een AI mag (zoals een IBAN, e-mailadres of klantnummer).</p>
+    <p class="uitleg">Klant: de eigen klant van de deelnemer in stap 3 en 6, willekeurig gekozen. Waarschuwingen: berichten in de chat waarin iets stond dat niet naar een AI mag (zoals een IBAN, e-mailadres of klantnummer).</p>
 
     ${connectionPanel(t)}
 
@@ -539,17 +539,17 @@ const warningLine = (list) => (list?.length
   ? html`<p class="melding fout"><strong>Waarschuwing:</strong> ${list.map((w) => `${w.soort} (${w.gevonden})`).join('; ')}</p>` : '');
 
 const NOTE_LABELS = {
-  'wat-kan-ai': 'Stap 1',
+  'wat-kan-ai': 'Stap 4 (Wat kan AI voor jou?)',
   'poging-prompt': 'Probeer het meteen: de prompt', 'poging-antwoord': 'Probeer het meteen: het antwoord', 'poging-cijfer': 'Probeer het meteen: cijfer',
   'ai-kort': 'Welke AI heb jij: antwoord op de korte vragen', 'ai-lang': 'Welke AI heb jij: antwoord op de lange vragen',
 };
 
-/** What participants wrote or pasted on the pages (step 1), with delete buttons. */
+/** What participants wrote or pasted on the pages (step 4), with delete buttons. */
 function notesPanel(t, filter, who, allLink) {
   const notes = store.notesOfTraining(t.training_id, filter);
   const byParticipant = Map.groupBy(notes, (n) => n.participant_id);
   return html`<h2>Aantekeningen${filter ? html` van ${who} · ${allLink}` : ''}</h2>
-    <p class="uitleg">Wat deelnemers in stap 1 hebben opgeschreven en geplakt: hun eerste poging en wat hun eigen AI kan. Het blijft bewaard tot je het hier wist.</p>
+    <p class="uitleg">Wat deelnemers in stap 4 hebben opgeschreven en geplakt: hun eerste poging en wat hun eigen AI kan. Het blijft bewaard tot je het hier wist.</p>
     ${notes.length === 0 ? html`<p class="leeg">Nog geen aantekeningen.</p>` : [...byParticipant.values()].map((list) => html`
       <details class="paneel">
         <summary><strong>${list[0].label}</strong> · ${list.length} veld${list.length === 1 ? '' : 'en'} · laatst bijgewerkt ${time(list.map((n) => n.updated_at).sort().at(-1))}</summary>
