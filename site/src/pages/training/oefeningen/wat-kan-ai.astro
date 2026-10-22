@@ -14,6 +14,21 @@ const tasks = [
   { label: 'Analisten', title: 'Eisen en user stories', text: 'Eisen uit mails en verslagen halen. Een user story met acceptatiecriteria opzetten. Gaten en tegenstrijdigheden zoeken in wat er al ligt.' },
   { label: 'Testers', title: 'Testgevallen en randgevallen', text: 'Testgevallen afleiden uit een beschrijving of regel. Randgevallen bedenken. Een bevinding helder opschrijven: verwacht, werkelijk, stappen.' },
   { label: 'Uitleggen', title: 'Begrijpelijk maken', text: 'Een technisch stuk uitleggen in gewone taal. Een tekst schrijven voor een andere doelgroep. Een SQL-vraag of foutmelding laten uitleggen.' },
+  { label: 'Meedenken', title: 'Advocaat van de duivel', text: 'Je plan of ontwerp laten bekritiseren: wat zie ik over het hoofd? Welke vragen gaat de stuurgroep stellen? Wat zijn de zwakke plekken?' },
+  { label: 'Ordenen', title: 'Structuur aanbrengen', text: "Honderden klantreacties in thema's verdelen. Rommelige aantekeningen omzetten in een tabel. Een lange lijst groeperen en ontdubbelen." },
+  { label: 'Leren', title: 'Jezelf iets eigen maken', text: 'Een nieuw begrip of vakgebied laten uitleggen, met voorbeelden. Jezelf laten overhoren. Een Excel-formule stap voor stap laten uitleggen.' },
+];
+
+// Where AI is weak depends on what it has to work with: the same task can be
+// fine with the right context or tool, and risky without. Sources (22-10-2026):
+// BCG/Harvard "jagged frontier" field experiment, Autoriteit Persoonsgegevens
+// on data leaks via AI chatbots, EU AI Act (employment decisions are high-risk).
+const goodOrRisky = [
+  { topic: 'Feiten en bronnen', good: 'je de documenten meegeeft, of hij zelf zoekt, en hij bij elk antwoord de bron noemt.', risky: 'hij het uit zijn geheugen haalt. Dan verzint hij soms een wetsartikel, citaat of link die niet bestaat, en dat klinkt overtuigend.' },
+  { topic: 'Rekenen en tellen', good: 'hij met een rekenhulpmiddel werkt, zoals code of Excel, en je kunt zien hoe hij rekent.', risky: 'hij uit het hoofd rekent of telt in een lang antwoord: rijen tellen, totalen van veel getallen, percentages halverwege een tekst.' },
+  { topic: 'Wat bij jullie geldt', good: 'je de regels, de werkwijze en de laatste stand meegeeft.', risky: 'hij moet raden hoe jullie werken, of wat de laatste stand is.' },
+  { topic: 'Lange stukken', good: 'je vraagt naar een bepaald onderdeel, met de vindplaats erbij.', risky: 'hij alles in één keer moet samenvatten. Dan mist hij dingen, vaak in het midden.' },
+  { topic: 'Controleren', good: 'jij het nakijkt in de bron.', risky: 'je hem vraagt "weet je het zeker?". Dan krijg je vaak alleen een andere toon, geen controle.' },
 ];
 ---
 <Base title="Wat kan AI voor jou?" description="Ontdek welke taken in je werk geschikt zijn voor AI, en welke AI jij mag gebruiken.">
@@ -34,6 +49,33 @@ const tasks = [
   </section>
 
   <section class="sectie sectie--vlak">
+    <div class="wrap">
+      <h2>Waar AI juist niet goed in is</h2>
+      <p class="prose">Of AI ergens goed in is, hangt vaak af van wat je meegeeft. Dezelfde taak kan goed gaan of mis, afhankelijk van de context en de hulpmiddelen die de AI heeft.</p>
+      <div class="tabel-vak">
+        <table class="tabel">
+          <thead><tr><th>Onderwerp</th><th>Goed, als…</th><th>Riskant, als…</th></tr></thead>
+          <tbody>
+            {goodOrRisky.map((r) => <tr><td><strong>{r.topic}</strong></td><td>{r.good}</td><td>{r.risky}</td></tr>)}
+          </tbody>
+        </table>
+      </div>
+      <div class="prose">
+        <h3>Laat AI dit niet doen</h3>
+        <ul>
+          <li><strong>Beslissen over mensen,</strong> zoals selectie, beoordeling of ontslag. De Europese AI-wet noemt dat hoog risico.</li>
+          <li><strong>Persoonsgegevens of vertrouwelijke stukken verwerken</strong> zonder dat je werkgever dat heeft afgesproken. De Autoriteit Persoonsgegevens krijgt steeds meer meldingen van datalekken op deze manier.</li>
+          <li><strong>Zelf iets versturen of uitvoeren</strong> zonder dat iemand meekijkt, zoals een mail aan een klant of een betaling.</li>
+          <li><strong>Het laatste woord hebben</strong> bij juridisch, medisch of financieel advies.</li>
+          <li><strong>Gesprekken voeren die een mens vragen,</strong> zoals slecht nieuws of een conflict. Helpen voorbereiden mag wel.</li>
+          <li><strong>Werk doen waarvan jij de uitkomst niet kunt controleren.</strong></li>
+        </ul>
+        <p><strong>Het lastige:</strong> je ziet het verschil niet altijd. Een fout antwoord klinkt net zo zeker als een goed antwoord.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sectie">
     <div class="wrap prose">
       <h2>Zo kies je je eerste taak</h2>
       <p>Een goede eerste taak voldoet aan vier dingen:</p>
@@ -50,7 +92,7 @@ const tasks = [
     </div>
   </section>
 
-  <section class="sectie">
+  <section class="sectie sectie--vlak">
     <div class="wrap">
       <h2>Welke AI heb jij, en wat kan die?</h2>
       <p class="prose">Plak deze vragen in de AI die je op je werk gebruikt. Ze testen niets en zoeken niets op: de AI vertelt alleen wat hij kan. Twijfel je of je dit mag vragen? Kijk dan in het menu van je AI, of vraag het je IT-afdeling.</p>
