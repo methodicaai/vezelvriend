@@ -6,7 +6,8 @@
 //
 // How it works:
 // - The small hand-made world in data/seed/ is the TEMPLATE. Its scenario
-//   customers (K-0871, K-1001 ... K-1012), their addresses (A-2001 ... A-2011),
+//   customers (K-0871, K-1001 ... K-1012, plus four more customers per
+//   situation made by scenario-variants.mjs), their addresses (A-2001 ...),
 //   tickets, contacts and measurements keep their IDs and stories, so the
 //   exercises, the trainer material and the decision-tree test stay valid.
 //   They are only moved to real streets.
@@ -72,17 +73,26 @@ for (const street of [...byStreet.keys()].sort()) {
 
 // ------------------------------------------------------------ scenario streets
 
-// Five streets with enough addresses for a believable neighbourhood, in a
-// stable "random" order. Street 3 needs an address with a house letter
-// (scenario 3 lives at one).
-const candidates = shuffle([...byStreet.entries()].filter(([, list]) => list.length >= 25).map(([s]) => s).sort());
-if (candidates.length < 5) throw new Error('Te weinig straten met minstens 25 adressen in deze wijk.');
-const withLetter = candidates.filter((s) => byStreet.get(s).some((a) => a.house_letter && !a.house_suffix));
-const street3 = withLetter[0] ?? candidates[0];
-const others = candidates.filter((s) => s !== street3);
-const scenarioStreet = { Kabelkade: others[0], Glasvezelstraat: others[1], Lichtsnelheidlaan: street3, Routerpad: others[2], Modemhof: others[3] };
-const segmentRename = Object.fromEntries(Object.entries({ 'S-KABEL': 'Kabelkade', 'S-GLAS': 'Glasvezelstraat', 'S-LICHT': 'Lichtsnelheidlaan', 'S-ROUTER': 'Routerpad', 'S-MODEM': 'Modemhof' })
-  .map(([old, tmplStreet]) => [old, segmentOf.get(scenarioStreet[tmplStreet])]));
+// Every street of the template gets a real street of its own with enough
+// addresses for a believable neighbourhood, in a stable "random" order. Streets
+// where a template address has a house letter get a street that has one.
+const templateStreets = [...new Set(T.addresses.map((a) => a.street))];
+const needsLetter = new Set(T.addresses.filter((a) => a.house_number_suffix).map((a) => a.street));
+let candidates = [];
+for (let minSize = 25; minSize >= 5; minSize -= 5) {
+  candidates = shuffle([...byStreet.entries()].filter(([, list]) => list.length >= minSize).map(([st]) => st).sort());
+  if (candidates.length >= templateStreets.length) break;
+}
+if (candidates.length < templateStreets.length) throw new Error(`Te weinig straten in deze wijk: ${templateStreets.length} nodig.`);
+const hasLetter = (st) => byStreet.get(st).some((a) => a.house_letter && !a.house_suffix);
+const scenarioStreet = {};
+const takenStreets = new Set();
+for (const t of [...templateStreets.filter((st) => needsLetter.has(st)), ...templateStreets.filter((st) => !needsLetter.has(st))]) {
+  const real = (needsLetter.has(t) && candidates.find((c) => !takenStreets.has(c) && hasLetter(c))) || candidates.find((c) => !takenStreets.has(c));
+  scenarioStreet[t] = real;
+  takenStreets.add(real);
+}
+const segmentRename = Object.fromEntries(T.addresses.map((t) => [t.network_segment, segmentOf.get(scenarioStreet[t.street])]));
 
 const usedAddress = new Set();
 function takeAddress(street, predicate = () => true) {
@@ -97,7 +107,7 @@ const addressRows = [];
 const scenarioAddress = {};
 for (const t of T.addresses) {
   const street = scenarioStreet[t.street];
-  const a = t.address_id === 'A-2006'
+  const a = t.house_number_suffix
     ? takeAddress(street, (x) => x.house_letter && !x.house_suffix)
     : takeAddress(street);
   scenarioAddress[t.address_id] = a;
@@ -107,8 +117,8 @@ function toAddressRow(address_id, a) {
   return { address_id, street: a.street, house_number: a.house_number, house_number_suffix: suffixOf(a), postcode: a.postcode.replace(/^(\d{4})(\w{2})$/, '$1 $2'),
     city: a.city, network_segment: segmentOf.get(a.street), is_placeholder: 0, bag_id: a.bag_id, lat: a.lat, lon: a.lon };
 }
-const replaceStreets = (text) => text && Object.entries(scenarioStreet).reduce((t, [tmpl, real]) => t.replaceAll(tmpl, real), text)
-  .replace(/S-[A-Z]+/g, (code) => segmentRename[code] ?? code);
+const replaceStreets = (text) => text && Object.entries(scenarioStreet).sort(([a], [b]) => b.length - a.length).reduce((t, [tmpl, real]) => t.replaceAll(tmpl, real), text)
+  .replace(/S-[A-Z]+\d*/g, (code) => segmentRename[code] ?? code);
 
 // ------------------------------------------------------------ template rows, moved to the new streets
 
@@ -142,8 +152,9 @@ const pickProduct = (business) => {
 const date = (y1, y2) => `${between(y1, y2)}-${pad(between(1, 12), 2)}-${pad(between(1, 28), 2)}`;
 const slug = (s) => s.normalize('NFD').replace(/[^\w]+/g, '.').replace(/^\.|\.$/g, '').toLowerCase();
 
-const protectedStreets = new Set([scenarioStreet.Routerpad]); // Bakker: no other offline modems here (decision tree step 4)
 const outageStreet = scenarioStreet.Kabelkade;
+// No random offline modems on the other scenario streets: "only at this customer" (decision tree step 4) must stay true.
+const protectedStreets = new Set(Object.values(scenarioStreet).filter((st) => st !== outageStreet));
 const free = shuffle(bag.addresses.filter((a) => a.street && a.house_number && !usedAddress.has(a.bag_id)));
 const extra = Math.max(0, TOTAL - customers.length);
 const ACTIVE_SHARE = 0.9;
@@ -222,14 +233,17 @@ function variantSpelling(street, suffix, number) {
     ? street.replace(/(laan|straat|weg|singel|plein|kade|dijk|markt|steeg|hof)$/i, 's$1') : `${street}s`;
   return `${s} ${number}-${(suffix ?? 'a').toLowerCase()}`;
 }
+// Template addresses whose map label is spelled differently keep that difference.
+const oddSpelling = new Set(T.network_map.filter((m) => { const t = T.addresses.find((x) => x.address_id === m.address_id);
+  return t && m.map_label !== `${t.street} ${t.house_number}${t.house_number_suffix ?? ''}`; }).map((m) => m.address_id));
 const networkMap = addressRows.map((a) => ({
   address_id: a.address_id,
-  map_label: a.address_id === 'A-2006' ? variantSpelling(a.street, a.house_number_suffix, a.house_number) : `${a.street} ${a.house_number}${a.house_number_suffix ?? ''}`,
+  map_label: oddSpelling.has(a.address_id) ? variantSpelling(a.street, a.house_number_suffix, a.house_number) : `${a.street} ${a.house_number}${a.house_number_suffix ?? ''}`,
   network_segment: a.network_segment,
   splitter: `SPL-${a.network_segment.slice(2, 5)}-${pad(Math.ceil(a.house_number / 40), 2)}`,
 }));
 
-const outageTemplate = T.area_status.find((s) => s.status === 'storing');
+const outageTemplate = T.area_status.find((st) => st.status === 'storing');
 const segments = [...new Set(addressRows.map((a) => a.network_segment))].sort();
 const areaStatus = segments.map((seg) => seg === segmentRename['S-KABEL']
   ? { ...outageTemplate, network_segment: seg }
@@ -238,9 +252,12 @@ const areaStatus = segments.map((seg) => seg === segmentRename['S-KABEL']
 // Accounting export (a separate system): matches the customer system,
 // with exceptions described in the trainer material.
 const accounting = ['customer_id;customer_name;invoice_id;invoice_date;amount_eur;status'];
+// The template export has the lines of the scenario customers that differ on purpose.
+const templateAccounting = fs.readFileSync(path.join(ROOT, 'data', 'accounting', 'open-items.csv'), 'utf8').trim().split('\n').slice(1);
+const SPECIAL = /^K-1[0-4]05$/;
 for (const c of customers.filter((x) => x.open_balance_eur > 0)) {
-  if (c.customer_id === 'K-1005') {
-    accounting.push(`K-1005;${c.name};F-2026-0905;2026-09-01;85.00;open`, `K-1005;${c.name};F-2026-1005;2026-10-01;42.50;open`);
+  if (SPECIAL.test(c.customer_id)) {
+    accounting.push(...templateAccounting.filter((l) => l.startsWith(`${c.customer_id};`)));
   } else {
     accounting.push(`${c.customer_id};${c.name};F-2026-10${c.customer_id.slice(2)};2026-10-01;${c.open_balance_eur.toFixed(2)};open`);
   }
@@ -264,11 +281,15 @@ const facts = [
   `# Wereld: ${bag.meta.wijknaam} (${bag.meta.wijkcode})`, '',
   `Gegenereerd op ${new Date().toISOString().slice(0, 10)} uit ${bag.meta.count} BAG-adressen. Klanten: ${customers.length} (${customers.filter((c) => c.status === 'actief').length} actief).`, '',
   '| Scenario | Klant | Adres |', '|---|---|---|',
-  `| 1 Storing in de straat | Familie De Wit (K-1001) | ${fmt('A-2001')} (segment ${segmentRename['S-KABEL']}, storing) |`,
-  `| 2 Groen, klant zegt niks werkt | Mevrouw Jansen (K-1002), dubbel als K-1012 | ${fmt('A-2004')} |`,
-  `| 3 Verouderde meting | De heer El Amrani (K-1003) | ${fmt('A-2006')}; netwerkkaart: "${networkMap.find((m) => m.address_id === 'A-2006').map_label}" |`,
-  `| 4 Monteur | Familie Bakker (K-1004), vorige bewoner K-0871 | ${fmt('A-2008')} |`,
-  `| 5 Escaleren | Bloemenhuis Lente (K-1005) | ${fmt('A-2010')} |`, '',
+  ...['1 Storing in de straat', '2 Groen, klant zegt niks werkt', '3 Verouderde meting', '4 Monteur', '5 Escaleren'].flatMap((label, i) =>
+    [0, 1, 2, 3, 4].map((v) => {
+      const c = customers.find((x) => x.customer_id === `K-1${v}0${i + 1}`);
+      if (!c) return null;
+      const extra = i === 1 ? `, dubbel als K-1${v}12` : i === 3 ? `, vorige bewoner ${v === 0 ? 'K-0871' : `K-087${v + 1}`}` : '';
+      const map = i === 2 ? `; netwerkkaart: "${networkMap.find((m) => m.address_id === c.address_id).map_label}"` : '';
+      return `| ${label} | ${c.name} (${c.customer_id})${extra} | ${fmt(c.address_id)}${map} |`;
+    }).filter(Boolean)),
+  '', `Storing op segment ${segmentRename['S-KABEL']} (${outageStreet}).`, '',
   `Offline door de storing in ${outageStreet}: ${measurements.filter((m) => m.status === 'offline').length} modems in totaal offline.`,
   `Verouderde firmware: ${modems.filter((m) => m.firmware !== world.latestFirmware).length} modems.`,
   `Actieve klanten met een ander actief record op hetzelfde adres: zie de SQL-vraag in stap 9c.`,

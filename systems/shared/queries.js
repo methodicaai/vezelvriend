@@ -14,6 +14,14 @@ const CUSTOMER_SELECT = `
 // trainer material). Lists for exercises show only these, not the whole base.
 export const isScenarioCustomer = (customerId) => /^K-10\d\d$/.test(customerId);
 
+// Each of the five situations exists at five customers (other name, other
+// address, same situation): K-1{v}0{s}, s = situation 1..5, v = 0..4 (made by
+// tools/world/scenario-variants.mjs). Returns the situation, or null.
+export const scenarioOf = (customerId) => {
+  const m = /^K-1[0-4]0([1-5])$/.exec(customerId);
+  return m ? Number(m[1]) : null;
+};
+
 export function formatAddress(row) {
   return `${row.street} ${row.house_number}${row.house_number_suffix ?? ''}, ${row.postcode} ${row.city}`;
 }

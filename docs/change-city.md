@@ -27,7 +27,7 @@ De oefenwereld speelt in het centrum van de stad waar je de training geeft, met 
 | Waar | Wat |
 |---|---|
 | Klanten | 2000 verzonnen klanten op echte adressen in de wijk, ook oud-klanten op adressen waar nu iemand anders woont |
-| Scenario's | De vijf scenarioklanten (K-1001 t/m K-1005) en hun valkuilen schuiven mee naar echte straten. Klantnummers en verhalen blijven gelijk, dus oefeningen en trainersmateriaal kloppen |
+| Scenario's | Vijf situaties, elk bij vijf klanten (K-1{v}0{s}: K-1001 t/m K-1005 en vier varianten per situatie, gemaakt met `tools/world/scenario-variants.mjs`), schuiven met hun valkuilen mee naar echte straten. Elke variant van situatie 2 t/m 5 krijgt een eigen straat. Klantnummers en verhalen blijven gelijk, dus oefeningen en trainersmateriaal kloppen |
 | Storing | Ligt in de straat van scenario 1 (zie `world-facts.md`) |
 | Website | Storingspagina, abonnementen en stadsnaam volgen de nieuwe wereld |
 | App | De demoklanten krijgen de postcodes van hun nieuwe adres |

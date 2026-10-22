@@ -3,5 +3,21 @@
   {"network_segment":"S-GLAS","status":"normaal","since":null,"ticket_id":null,"description":null},
   {"network_segment":"S-LICHT","status":"normaal","since":null,"ticket_id":null,"description":null},
   {"network_segment":"S-ROUTER","status":"normaal","since":null,"ticket_id":null,"description":null},
-  {"network_segment":"S-MODEM","status":"normaal","since":null,"ticket_id":null,"description":null}
+  {"network_segment":"S-MODEM","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-GLAS2","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-GLAS3","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-GLAS4","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-GLAS5","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-LICHT2","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-LICHT3","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-LICHT4","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-LICHT5","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-ROUTER2","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-ROUTER3","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-ROUTER4","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-ROUTER5","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-MODEM2","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-MODEM3","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-MODEM4","status":"normaal","since":null,"ticket_id":null,"description":null},
+  {"network_segment":"S-MODEM5","status":"normaal","since":null,"ticket_id":null,"description":null}
 ]

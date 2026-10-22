@@ -2,3 +2,11 @@ customer_id;customer_name;invoice_id;invoice_date;amount_eur;status
 K-1005;Bloemenhuis Lente;F-2026-0905;2026-09-01;85.00;open
 K-1005;Bloemenhuis Lente;F-2026-1005;2026-10-01;42.50;open
 K-1010;R. Hendriks;F-2026-1010;2026-10-01;15.00;open
+K-1105;Kapsalon Knip;F-2026-09051;2026-09-01;85.00;open
+K-1105;Kapsalon Knip;F-2026-10051;2026-10-01;42.50;open
+K-1205;Lunchroom De Zon;F-2026-09052;2026-09-01;85.00;open
+K-1205;Lunchroom De Zon;F-2026-10052;2026-10-01;42.50;open
+K-1305;Fietsenmaker Vlot;F-2026-09053;2026-09-01;85.00;open
+K-1305;Fietsenmaker Vlot;F-2026-10053;2026-10-01;42.50;open
+K-1405;Brillen Scherp;F-2026-09054;2026-09-01;85.00;open
+K-1405;Brillen Scherp;F-2026-10054;2026-10-01;42.50;open

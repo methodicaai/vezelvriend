@@ -1,4 +1,12 @@
 [
   {"restart_id":"R-7001","modem_id":"M-5004","requested_at":"2026-10-17 10:05","result":"mislukt"},
-  {"restart_id":"R-6950","modem_id":"M-5005","requested_at":"2026-10-10 14:20","result":"gelukt"}
+  {"restart_id":"R-6950","modem_id":"M-5005","requested_at":"2026-10-10 14:20","result":"gelukt"},
+  {"restart_id":"R-7001-1","modem_id":"M-5104","requested_at":"2026-10-17 10:05","result":"mislukt"},
+  {"restart_id":"R-7001-2","modem_id":"M-5204","requested_at":"2026-10-17 10:05","result":"mislukt"},
+  {"restart_id":"R-7001-3","modem_id":"M-5304","requested_at":"2026-10-17 10:05","result":"mislukt"},
+  {"restart_id":"R-7001-4","modem_id":"M-5404","requested_at":"2026-10-17 10:05","result":"mislukt"},
+  {"restart_id":"R-6950-1","modem_id":"M-5105","requested_at":"2026-10-10 14:20","result":"gelukt"},
+  {"restart_id":"R-6950-2","modem_id":"M-5205","requested_at":"2026-10-10 14:20","result":"gelukt"},
+  {"restart_id":"R-6950-3","modem_id":"M-5305","requested_at":"2026-10-10 14:20","result":"gelukt"},
+  {"restart_id":"R-6950-4","modem_id":"M-5405","requested_at":"2026-10-10 14:20","result":"gelukt"}
 ]

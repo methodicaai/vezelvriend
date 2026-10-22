@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { openDatabase } from '../shared/db.js';
-import { formatAddress, getAddressHistory, getCustomer, getModemCheck, getNetworkMapEntry, isScenarioCustomer, searchCustomers } from '../shared/queries.js';
+import { formatAddress, getAddressHistory, getCustomer, getModemCheck, getNetworkMapEntry, scenarioOf, searchCustomers } from '../shared/queries.js';
 import { ROOT, formatEuro, formatStamp, world } from '../shared/world.js';
 import { html, page, paginate, readForm, routesOf, serve } from '../shared/web.js';
 
@@ -291,8 +291,8 @@ const DECISION_TREE = fs.readFileSync(path.join(ROOT, 'docs', 'decision-tree.md'
 const json = (data, status = 200) => ({ status, type: 'application/json; charset=utf-8', body: JSON.stringify(data) });
 
 function apiCustomers() {
-  // Only the scenario customers: a list of thousands is no use in an exercise.
-  const rows = searchCustomers(db, '').filter((r) => r.status === 'actief' && isScenarioCustomer(r.customer_id));
+  // Only the customers of the five situations (five each): a list of thousands is no use in an exercise.
+  const rows = searchCustomers(db, '').filter((r) => r.status === 'actief' && scenarioOf(r.customer_id));
   const withModem = new Set(db.prepare('SELECT customer_id FROM modems').all().map((r) => r.customer_id));
   return json(rows.filter((r) => withModem.has(r.customer_id))
     .map((r) => ({ customer_id: r.customer_id, name: r.name, address: formatAddress(r) })));

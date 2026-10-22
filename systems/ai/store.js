@@ -11,6 +11,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
+import { scenarioOf } from '../shared/queries.js';
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS trainings (
@@ -133,6 +134,11 @@ export function openStore(file) {
   // Each participant gets a customer of their own for the exercises (step 3 and 4).
   if (!db.prepare('PRAGMA table_info(participants)').all().some((c) => c.name === 'customer_id')) {
     db.exec('ALTER TABLE participants ADD COLUMN customer_id TEXT');
+  }
+  // Only customers of the five situations count (since 22-10-2026); anyone who got
+  // another customer earlier gets a new one on first use.
+  for (const { customer_id } of db.prepare('SELECT DISTINCT customer_id FROM participants WHERE customer_id IS NOT NULL').all()) {
+    if (!scenarioOf(customer_id)) db.prepare('UPDATE participants SET customer_id = NULL WHERE customer_id = ?').run(customer_id);
   }
   // What the chat recognised as information that should not go to an AI (JSON list).
   if (!db.prepare('PRAGMA table_info(messages)').all().some((c) => c.name === 'warnings')) {
@@ -303,19 +309,27 @@ export function openStore(file) {
     },
 
     /**
-     * Gives a participant a customer of their own: at random, preferring a
-     * customer nobody else in the training has yet. Stays fixed afterwards.
+     * Gives a participant a customer of their own, fixed afterwards. First the
+     * situation: the one fewest people in the training have yet (so a group
+     * gets all five situations before one repeats), at random among equals.
+     * Then a customer in that situation nobody in the training has yet.
      */
     assignCustomer(participantId, pool) {
       const p = db.prepare('SELECT training_id, customer_id FROM participants WHERE participant_id = ?').get(participantId);
       if (!p || p.customer_id || pool.length === 0) return p?.customer_id ?? null;
-      const used = new Map(pool.map((id) => [id, 0]));
+      const usedCustomer = new Map(pool.map((id) => [id, 0]));
+      const usedSituation = new Map();
       for (const r of db.prepare('SELECT customer_id FROM participants WHERE training_id = ? AND customer_id IS NOT NULL').all(p.training_id)) {
-        if (used.has(r.customer_id)) used.set(r.customer_id, used.get(r.customer_id) + 1);
+        if (usedCustomer.has(r.customer_id)) usedCustomer.set(r.customer_id, usedCustomer.get(r.customer_id) + 1);
+        const s = scenarioOf(r.customer_id);
+        if (s) usedSituation.set(s, (usedSituation.get(s) ?? 0) + 1);
       }
-      const least = Math.min(...used.values());
-      const candidates = pool.filter((id) => used.get(id) === least);
-      const pick = candidates[crypto.randomInt(candidates.length)];
+      const random = (list) => list[crypto.randomInt(list.length)];
+      const fewest = (list, count) => { const min = Math.min(...list.map(count)); return list.filter((x) => count(x) === min); };
+      const situations = [...new Set(pool.map(scenarioOf).filter(Boolean))];
+      const situation = situations.length ? random(fewest(situations, (s) => usedSituation.get(s) ?? 0)) : null;
+      const inSituation = situation ? pool.filter((id) => scenarioOf(id) === situation) : pool;
+      const pick = random(fewest(inSituation, (id) => usedCustomer.get(id)));
       db.prepare('UPDATE participants SET customer_id = ? WHERE participant_id = ?').run(pick, participantId);
       return pick;
     },
